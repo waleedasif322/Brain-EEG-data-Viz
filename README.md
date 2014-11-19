@@ -1,6 +1,10 @@
 Brain EEG data readme
 =====================
 
+* brainvisionio.py - replacement file for the one in the neo/io library
+* intervals.txt = file which contains the time in ms where each picture was shown
+* Untitled1.ipynb - file for use with `ipython notebook` which contains commands to load EEG data from only 64 channels/nodes, and calculate the average signal for each image for every channel/node.
+
 # Getting Started for the first time
 
 How to read data from .eeg file:
