@@ -1,0 +1,43 @@
+<!doctype html>
+<html ng-app="data-viz-proj">
+  <head>
+    <link rel="stylesheet" href="/libs/bootstrap/dist/css/bootstrap.min.css">
+
+    <script type="text/javascript" src="/libs/jquery/dist/jquery.min.js"></script>
+
+    <script src="/libs/angular/angular.min.js"></script>
+    <script src="/libs/angular-bootstrap/ui-bootstrap.min.js"></script>
+    <script src="/libs/d3/d3.v3.min.js"></script>
+
+    <script src="/picture-loader.js"></script>
+  </head>
+  <body>
+  <br>
+  <h1>Brain EEG Data Visualization Project</h1>
+<!--   <div class="row">
+    <div class="col-md-4">
+      <input class="form-control" type="text" ng-model="yourName" placeholder="Enter a name here">
+      <h1>Hello, {{ yourName }}!</h1>
+    </div>
+  </div> -->
+  <hr>
+  <div class="container">
+    <div class ="row">
+      <div ng-controller="MainCtrl" class="col-md-6">
+      <button ng-click="createImages()">Load Images</button>
+      <br>
+      <input class="form-control" type="text" ng-model="imageNumber" placeholder="Enter an image number to see path">
+      <button ng-click="showPath(imageNumber)">Show Image</button> <img ng-src="http://localhost:8000{{showPath(imageNumber)}}">
+      </div>
+    </div>
+  </div>
+  <script>
+  var dataset;
+    d3.csv("/corr_diff.csv", function (data) {
+      dataset = data;
+    })
+    d3.select("body").append("p").text("New paragraph!");
+
+  </script
+  </body>
+</html>

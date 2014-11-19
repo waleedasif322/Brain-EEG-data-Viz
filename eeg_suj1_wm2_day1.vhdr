@@ -1,0 +1,297 @@
+Brain Vision Data Exchange Header File Version 1.0
+; Data created by the actiCHamp PyCorder
+
+[Common Infos]
+Codepage=UTF-8
+DataFile=eeg_suj1_wm2_day1.eeg
+MarkerFile=eeg_suj1_wm2_day1.vmrk
+DataFormat=BINARY
+; Data orientation: MULTIPLEXED=ch1,pt1, ch2,pt1 ...
+DataOrientation=MULTIPLEXED
+NumberOfChannels=128
+; Sampling interval in microseconds
+SamplingInterval=1000
+
+[Binary Infos]
+BinaryFormat=IEEE_FLOAT_32
+
+[Channel Infos]
+; Each entry: Ch<Channel number>=<Name>,<Reference channel name>,
+; <Scaling factor in "Unit">,<Unit>, Future extensions..
+; Fields are delimited by commas, some fields might be omitted (empty).
+; Commas in channel names are coded as "\1".
+Ch1=Ch1,REF,1.0,µV
+Ch2=Ch2,REF,1.0,µV
+Ch3=Ch3,REF,1.0,µV
+Ch4=Ch4,REF,1.0,µV
+Ch5=Ch5,REF,1.0,µV
+Ch6=Ch6,REF,1.0,µV
+Ch7=Ch7,REF,1.0,µV
+Ch8=Ch8,REF,1.0,µV
+Ch9=Ch9,REF,1.0,µV
+Ch10=Ch11,REF,1.0,µV
+Ch11=Ch12,REF,1.0,µV
+Ch12=Ch13,REF,1.0,µV
+Ch13=Ch14,REF,1.0,µV
+Ch14=Ch15,REF,1.0,µV
+Ch15=Ch16,REF,1.0,µV
+Ch16=Ch17,REF,1.0,µV
+Ch17=Ch18,REF,1.0,µV
+Ch18=Ch19,REF,1.0,µV
+Ch19=Ch20,REF,1.0,µV
+Ch20=Ch21,REF,1.0,µV
+Ch21=Ch22,REF,1.0,µV
+Ch22=Ch23,REF,1.0,µV
+Ch23=Ch24,REF,1.0,µV
+Ch24=Ch25,REF,1.0,µV
+Ch25=Ch26,REF,1.0,µV
+Ch26=Ch27,REF,1.0,µV
+Ch27=Ch28,REF,1.0,µV
+Ch28=Ch29,REF,1.0,µV
+Ch29=Ch30,REF,1.0,µV
+Ch30=Ch31,REF,1.0,µV
+Ch31=Ch32,REF,1.0,µV
+Ch32=Ch33,REF,1.0,µV
+Ch33=Ch34,REF,1.0,µV
+Ch34=Ch35,REF,1.0,µV
+Ch35=Ch36,REF,1.0,µV
+Ch36=Ch37,REF,1.0,µV
+Ch37=Ch38,REF,1.0,µV
+Ch38=Ch39,REF,1.0,µV
+Ch39=Ch40,REF,1.0,µV
+Ch40=Ch41,REF,1.0,µV
+Ch41=Ch42,REF,1.0,µV
+Ch42=Ch43,REF,1.0,µV
+Ch43=Ch44,REF,1.0,µV
+Ch44=Ch45,REF,1.0,µV
+Ch45=Ch46,REF,1.0,µV
+Ch46=Ch47,REF,1.0,µV
+Ch47=Ch48,REF,1.0,µV
+Ch48=Ch49,REF,1.0,µV
+Ch49=Ch50,REF,1.0,µV
+Ch50=Ch51,REF,1.0,µV
+Ch51=Ch52,REF,1.0,µV
+Ch52=Ch53,REF,1.0,µV
+Ch53=Ch54,REF,1.0,µV
+Ch54=Ch55,REF,1.0,µV
+Ch55=Ch56,REF,1.0,µV
+Ch56=Ch57,REF,1.0,µV
+Ch57=Ch58,REF,1.0,µV
+Ch58=Ch59,REF,1.0,µV
+Ch59=Ch60,REF,1.0,µV
+Ch60=Ch61,REF,1.0,µV
+Ch61=Ch62,REF,1.0,µV
+Ch62=Ch63,REF,1.0,µV
+Ch63=Ch64,REF,1.0,µV
+Ch64=Ch65,REF,1.0,µV
+Ch65=Ch66,REF,1.0,µV
+Ch66=Ch67,REF,1.0,µV
+Ch67=Ch68,REF,1.0,µV
+Ch68=Ch69,REF,1.0,µV
+Ch69=Ch70,REF,1.0,µV
+Ch70=Ch71,REF,1.0,µV
+Ch71=Ch72,REF,1.0,µV
+Ch72=Ch73,REF,1.0,µV
+Ch73=Ch74,REF,1.0,µV
+Ch74=Ch75,REF,1.0,µV
+Ch75=Ch76,REF,1.0,µV
+Ch76=Ch77,REF,1.0,µV
+Ch77=Ch78,REF,1.0,µV
+Ch78=Ch79,REF,1.0,µV
+Ch79=Ch80,REF,1.0,µV
+Ch80=Ch81,REF,1.0,µV
+Ch81=Ch82,REF,1.0,µV
+Ch82=Ch83,REF,1.0,µV
+Ch83=Ch84,REF,1.0,µV
+Ch84=Ch85,REF,1.0,µV
+Ch85=Ch86,REF,1.0,µV
+Ch86=Ch87,REF,1.0,µV
+Ch87=Ch88,REF,1.0,µV
+Ch88=Ch89,REF,1.0,µV
+Ch89=Ch90,REF,1.0,µV
+Ch90=Ch91,REF,1.0,µV
+Ch91=Ch92,REF,1.0,µV
+Ch92=Ch93,REF,1.0,µV
+Ch93=Ch94,REF,1.0,µV
+Ch94=Ch95,REF,1.0,µV
+Ch95=Ch96,REF,1.0,µV
+Ch96=Ch97,REF,1.0,µV
+Ch97=Ch98,REF,1.0,µV
+Ch98=Ch99,REF,1.0,µV
+Ch99=Ch100,REF,1.0,µV
+Ch100=Ch101,REF,1.0,µV
+Ch101=Ch102,REF,1.0,µV
+Ch102=Ch103,REF,1.0,µV
+Ch103=Ch104,REF,1.0,µV
+Ch104=Ch105,REF,1.0,µV
+Ch105=Ch106,REF,1.0,µV
+Ch106=Ch107,REF,1.0,µV
+Ch107=Ch108,REF,1.0,µV
+Ch108=Ch109,REF,1.0,µV
+Ch109=Ch110,REF,1.0,µV
+Ch110=Ch111,REF,1.0,µV
+Ch111=Ch112,REF,1.0,µV
+Ch112=Ch113,REF,1.0,µV
+Ch113=Ch114,REF,1.0,µV
+Ch114=Ch115,REF,1.0,µV
+Ch115=Ch116,REF,1.0,µV
+Ch116=Ch117,REF,1.0,µV
+Ch117=Ch118,REF,1.0,µV
+Ch118=Ch119,REF,1.0,µV
+Ch119=Ch120,REF,1.0,µV
+Ch120=Ch121,REF,1.0,µV
+Ch121=Ch122,REF,1.0,µV
+Ch122=Ch123,REF,1.0,µV
+Ch123=Ch124,REF,1.0,µV
+Ch124=Ch125,REF,1.0,µV
+Ch125=Ch126,REF,1.0,µV
+Ch126=Ch127,REF,1.0,µV
+Ch127=Ch128,REF,1.0,µV
+Ch128=Aux1,,1.0,µV
+
+[Comment]
+PyCorder V1.0.4
+
+Amplifier
+actiCHamp (5001) SN: 13010138
+Module 1  (5010) SN: 12110238
+Module 2  (5010) SN: 12110288
+Module 3  (5010) SN: 12110298
+Module 4  (5010) SN: 12110297
+Module 5  n.a.
+Version: DLL_17.12.11.16, DRV_03.04.01.146, CTRL_04.11.04.28, FPGA_44.00.00.00, DSP_06.11.05.25
+
+
+
+Reference channel: Ch10
+
+Impedance [KOhm] at 15:11:22
+  1 Ch1: 9
+  2 Ch2: 0
+  3 Ch3: 0
+  4 Ch4: 4
+  5 Ch5: 1
+  6 Ch6: 1
+  7 Ch7: 0
+  8 Ch8: 0
+  9 Ch9: 4
+ 10 REF_Ch10: 7
+ 11 Ch11: 1
+ 12 Ch12: 9
+ 13 Ch13: 0
+ 14 Ch14: 2
+ 15 Ch15: 3
+ 16 Ch16: 3
+ 17 Ch17: 12
+ 18 Ch18: 3
+ 19 Ch19: 2
+ 20 Ch20: 3
+ 21 Ch21: 0
+ 22 Ch22: 1
+ 23 Ch23: 4
+ 24 Ch24: 1
+ 25 Ch25: 0
+ 26 Ch26: 5
+ 27 Ch27: 4
+ 28 Ch28: 4
+ 29 Ch29: 1
+ 30 Ch30: 1
+ 31 Ch31: 12
+ 32 Ch32: 1
+ 33 Ch33: 5
+ 34 Ch34: 0
+ 35 Ch35: 1
+ 36 Ch36: 1
+ 37 Ch37: 12
+ 38 Ch38: 1
+ 39 Ch39: 0
+ 40 Ch40: 2
+ 41 Ch41: 1
+ 42 Ch42: 4
+ 43 Ch43: 9
+ 44 Ch44: 0
+ 45 Ch45: 4
+ 46 Ch46: 0
+ 47 Ch47: 4
+ 48 Ch48: 7
+ 49 Ch49: 1
+ 50 Ch50: 1
+ 51 Ch51: 4
+ 52 Ch52: 0
+ 53 Ch53: 0
+ 54 Ch54: 2
+ 55 Ch55: 4
+ 56 Ch56: 0
+ 57 Ch57: 5
+ 58 Ch58: 1
+ 59 Ch59: 0
+ 60 Ch60: 7
+ 61 Ch61: 5
+ 62 Ch62: 2
+ 63 Ch63: 1
+ 64 Ch64: 3
+ 65 Ch65: Disconnected!
+ 66 Ch66: Disconnected!
+ 67 Ch67: Disconnected!
+ 68 Ch68: Disconnected!
+ 69 Ch69: Disconnected!
+ 70 Ch70: Disconnected!
+ 71 Ch71: Disconnected!
+ 72 Ch72: Disconnected!
+ 73 Ch73: Disconnected!
+ 74 Ch74: Disconnected!
+ 75 Ch75: Disconnected!
+ 76 Ch76: Disconnected!
+ 77 Ch77: Disconnected!
+ 78 Ch78: Disconnected!
+ 79 Ch79: Disconnected!
+ 80 Ch80: Disconnected!
+ 81 Ch81: Disconnected!
+ 82 Ch82: Disconnected!
+ 83 Ch83: Disconnected!
+ 84 Ch84: Disconnected!
+ 85 Ch85: Disconnected!
+ 86 Ch86: Disconnected!
+ 87 Ch87: Disconnected!
+ 88 Ch88: Disconnected!
+ 89 Ch89: Disconnected!
+ 90 Ch90: Disconnected!
+ 91 Ch91: Disconnected!
+ 92 Ch92: Disconnected!
+ 93 Ch93: Disconnected!
+ 94 Ch94: Disconnected!
+ 95 Ch95: Disconnected!
+ 96 Ch96: Disconnected!
+ 97 Ch97: Disconnected!
+ 98 Ch98: Disconnected!
+ 99 Ch99: Disconnected!
+100 Ch100: Disconnected!
+101 Ch101: Disconnected!
+102 Ch102: Disconnected!
+103 Ch103: Disconnected!
+104 Ch104: Disconnected!
+105 Ch105: Disconnected!
+106 Ch106: Disconnected!
+107 Ch107: Disconnected!
+108 Ch108: Disconnected!
+109 Ch109: Disconnected!
+110 Ch110: Disconnected!
+111 Ch111: Disconnected!
+112 Ch112: Disconnected!
+113 Ch113: Disconnected!
+114 Ch114: Disconnected!
+115 Ch115: Disconnected!
+116 Ch116: Disconnected!
+117 Ch117: Disconnected!
+118 Ch118: Disconnected!
+119 Ch119: Disconnected!
+120 Ch120: Disconnected!
+121 Ch121: Disconnected!
+122 Ch122: Disconnected!
+123 Ch123: Disconnected!
+124 Ch124: Disconnected!
+125 Ch125: Disconnected!
+126 Ch126: Disconnected!
+127 Ch127: Disconnected!
+128 Ch128: Disconnected!
+GND: 12
