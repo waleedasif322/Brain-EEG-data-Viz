@@ -1,7 +1,7 @@
 Brain EEG data readme
 =====================
 
-* brainvisionio.py - replacement file for the one in the neo library
+* brainvisionio.py - replacement file for the one in the neo library. The library has an error, and I had to manually fix them, so this file contains the corrections.
 * intervals.txt = file which contains the time in ms where each picture was shown
 * Untitled1.ipynb - file for use with `ipython notebook` which contains commands to load EEG data from only 64 channels/nodes, and calculate the average signal for each image for every channel/node.
 
