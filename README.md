@@ -33,7 +33,7 @@ Pull the latest code from GitHub. Now you need to copy the .EEG file and the .VH
 
 Once you have pulled, you need to install the dependencies.
 
-	pip install requirements.txt
+	pip install -r requirements.txt
 
 Since there is an error with the offical library that we use to read the binary data, you need to copy the file `brainvisionio.py` that you see in the folder, and replace it with the one that was installed by `pip`.
 
