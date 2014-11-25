@@ -1,7 +1,7 @@
 Brain EEG data readme
 =====================
 
-* brainvisionio.py - replacement file for the one in the neo/io library
+* brainvisionio.py - replacement file for the one in the neo library. The library has an error, and I had to manually fix them, so this file contains the corrections.
 * intervals.txt = file which contains the time in ms where each picture was shown
 * Untitled1.ipynb - file for use with `ipython notebook` which contains commands to load EEG data from only 64 channels/nodes, and calculate the average signal for each image for every channel/node.
 
@@ -33,7 +33,7 @@ Pull the latest code from GitHub. Now you need to copy the .EEG file and the .VH
 
 Once you have pulled, you need to install the dependencies.
 
-	pip install requirements.txt
+	pip install -r requirements.txt
 
 Since there is an error with the offical library that we use to read the binary data, you need to copy the file `brainvisionio.py` that you see in the folder, and replace it with the one that was installed by `pip`.
 
