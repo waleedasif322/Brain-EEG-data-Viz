@@ -1,5 +1,6 @@
 Brain EEG data readme
 =====================
+[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/waleedasif322/Brain-EEG-data-Viz?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 * brainvisionio.py - replacement file for the one in the neo library. The library has an error, and I had to manually fix them, so this file contains the corrections.
 * intervals.txt = file which contains the time in ms where each picture was shown
