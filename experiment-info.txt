@@ -1,0 +1,31 @@
+The .eeg file in this directory contains the EEG data.
+The .vhdr file is the header file which contains things like channel names and impedance measurements (not important for you). 
+
+In this experiment 64 channels of data were collected at 1 kHz. 
+Channels 63 and 64 were left and right EOG (eye muscles) and channel 10 was recording from the left mastoid (reference).
+
+Here is a link to python code to read this particular type of BrainVision EEG file format:
+
+https://gist.github.com/breuderink/6266871
+
+
+
+
+
+
+TME 11/6/14
+
+OK, the file I'm sending is about 1GB containing all the data we recorded yesterday. I put it in a subdirectory called EEG_Data of the original folder I shared with you. I gave you edit permission for that folder so that you can add people to share it with. It's going to take a while for this file to upload. Check back around 5pm. 
+
+There is a readme file in there with a link to some python code to read the EEG data, which is in the Brain Vision format. See if you can use or modify that python code to read in the EEG data. If not, I can read it into matlab and convert it for you but it would be good if you could do the file I/O in python so we don't have to rely on matlab. Each channel contains a continuous recording. There will be a large transient toward the end when we unplugged the subject but let recording continue for a few minutes. Channels 65-129 are all zeros (we only recorded channels 1-64). 
+
+Once you are able to read the matrix of channels I suggest subtracting the mean signal from each, filtering to remove noise above 30 Hz. Then you will have to correlate every channel signal with every other channel signal in order to compute the correlation coefficient between each channel and every other one. You will need to do this to create a correlation matrix similar to the one I gave you for the image correlations. You will need to do this if you want to display in the chord diagram how every signal at each channel is related to the signal at every other channel. Channel = node. So there will be 64 nodes in this chord diagram.  
+
+We are going to do another recording next Wednesday afternoon. Probably be finishing up around 4pm. You should come and give us a presentation on the big screen to update the lab on how the project is going.
+
+TME 11/13/14
+
+Day 2 EEG data collected on 11/12/14 is now in this folder. The task was old/new scene image recognition. 
+
+
+

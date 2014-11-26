@@ -17,7 +17,7 @@ def readEEGFile():
 	i=0 # will iterate 64 times for all data
 	j=0 # for each i (node), j will iterate 1.8 million times which is half an hour of data (1.8 million ms)
 
-	# While we are in the inner for loop, compute the mean signal for two nodes at a time within a timeframe an image was shown
+	# While we are in the inner while loop, compute the mean signal for two nodes at a time within a timeframe an image was shown
 	# and store in a 2D array.
 	# e.g. curr_image = numbers[i], next_image = numbers[i+1], np.average(signal_list[curr_image:next_image])
 	# store each mean signal you get in a multidimensional array that is 140 X 64. 
