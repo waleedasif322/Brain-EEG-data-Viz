@@ -1,0 +1,1 @@
+We are using custom bootstrap without carousel since there is a conflict with flexslider

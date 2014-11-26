@@ -1,0 +1,6 @@
+/images/*.jpg
+
+*.eeg
+*.vmrk
+*.vhdr
+/.ipynb_checkpoints
