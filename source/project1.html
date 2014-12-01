@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+body {
+  font: 10px sans-serif;
+}
+
+.chord path {
+  fill-opacity: .67;
+  stroke: #000;
+  stroke-width: .5px;
+}
+
+</style>
+<body>
+Images selected: <input type="text" name="fname">
+<button type="button">Generate graph</button></br>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="d3.js"></script>
+<script>
+
+//read file
+
+		
+d3.text('correlation-chord-subtracted.csv', function(error3, data3){
+			
+			var corr_diff = d3.csv.parseRows(data3);
+			
+			var arr = [];
+			
+			var nr = 20;
+			
+			
+			for(var x = 0; x < nr; x++){
+				arr[x] = [];    
+				for(var y = 0; y < nr; y++){ 
+				
+					arr[x][y] = corr_diff[x][y];  
+				}    
+			}
+			
+			var min_val1 = d3.min(corr_diff);
+			var max_val2 = d3.max(corr_diff);
+			
+			var min_val = d3.min(min_val1);
+			var max_val = d3.max(max_val2);
+			
+			//console.log(min_val);
+			//console.log(max_val);
+
+			var aa = d3.scale.linear()
+					.domain([-0.1,0.25])
+					.range([0,1]);
+
+			
+			for(var x = 0; x < nr; x++){
+				for(var y = 0; y < nr; y++){ 
+				
+					arr[x][y] = aa(arr[x][y]);  
+					
+				}    
+			}
+			
+			for(var i = 0; i<nr; i++){		
+				for(var j=0; j<=i; j++){			
+				arr[i][j] = 0;
+			
+				}
+			}
+
+			//console.log(arr);
+			
+			var t_list= [2,4,5,10,12,15,17,20];
+			
+			var t_len = t_list.length;
+			
+			console.log(t_len);
+			var new_arr = [];
+			
+			for(var i=0; i<t_len; i++){
+				
+				new_arr[i] = []
+				
+				for(var j=0; j<=i; j++){
+				
+					new_arr[i][j] = 0;
+				
+				}		
+				for(var j=i+1; j<t_len; j++){
+				
+					var val = aa(corr_diff[t_list[i]][t_list[j]]);
+					new_arr[i][j] = val;//t_list[i] + "," + t_list[j];
+				}
+				
+			}
+			
+			console.log(new_arr);
+			console.log(corr_diff[3][19]);
+			console.log(corr_diff[3][14]);
+			
+			
+			
+			var chord = d3.layout.chord()
+				.padding(.05)
+				.sortSubgroups(d3.descending)
+				.matrix(arr);
+				
+			var width = 960,
+				height = 600,
+				innerRadius = Math.min(width, height) * .41,
+				outerRadius = innerRadius * 1.1;
+
+			var fill = d3.scale.ordinal()
+				.domain(d3.range(20))
+				.range([
+				 "#9ACD32"
+				,"#377DB8"
+				,"#F5DEB3"
+				,"#EE82EE"
+				,"#40E0D0"
+				,"#FF6347"
+				,"#D8BFD8"
+				,"#D2B48C"
+				,"#4682B4"
+				,"#00FF7F"
+				,"#FFFAFA"
+				,"#708090"
+				,"#708090"
+				,"#6A5ACD"
+				,"#87CEEB"
+				,"#A0522D"
+				,"#FFF5EE"
+				,"#2E8B57"
+				,"#F4A460"
+				,"#FA8072"	
+				]);
+
+			var svg = d3.select("body").append("svg")
+				.attr("width", width)
+				.attr("height", height)
+			  .append("g")
+				.attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+			svg.append("g").selectAll("path")
+				.data(chord.groups)
+			  .enter().append("path")
+				.style("fill", function(d) { return fill(d.index); })
+				.style("stroke", function(d) { return fill(d.index); })
+				.attr("d", d3.svg.arc().innerRadius(innerRadius).outerRadius(outerRadius))
+				.on("mouseover", fade(.1))
+				.on("mouseout", fade(1));
+
+			var ticks = svg.append("g").selectAll("g")
+				.data(chord.groups)
+			  .enter().append("g").selectAll("g")
+				.data(groupTicks)
+			  .enter().append("g")
+				.attr("transform", function(d) {
+				  return "rotate(" + (d.angle * 180 / Math.PI - 90) + ")"
+					  + "translate(" + outerRadius + ",0)";
+				});
+
+			ticks.append("line")
+				.attr("x1", 1)
+				.attr("y1", 0)
+				.attr("x2", 5)
+				.attr("y2", 0)
+				.style("stroke", "#000");
+
+			ticks.append("text")
+				.attr("x", 8)
+				.attr("dy", ".35em")
+				.attr("transform", function(d) { return d.angle > Math.PI ? "rotate(180)translate(-16)" : null; })
+				.style("text-anchor", function(d) { return d.angle > Math.PI ? "end" : null; })
+				.text(function(d,i,e) { 
+				return e; });
+
+			svg.append("g")
+				.attr("class", "chord")
+			  .selectAll("path")
+				.data(chord.chords)
+			  .enter().append("path")
+				.attr("d", d3.svg.chord().radius(innerRadius))
+				.style("fill", function(d) { return fill(d.target.index); })
+				.on("mouseover", function(d,i){ return this.style("fill", function(){ return fill(d.target.index);})})
+				.style("opacity", 1);
+	
+					// Returns an array of tick angles and labels, given a group.
+			function groupTicks(d) {
+			  var k = (d.endAngle - d.startAngle) / d.value;
+			  return d3.range(0, d.value, 1000).map(function(v, i) {
+				return {
+				  angle: v * k + d.startAngle,
+				  label: i % 5 ? null : v / 1000 + "k"
+				};
+			  });
+			}
+
+			// Returns an event handler for fading a given chord group.
+			function fade(opacity) {
+			  return function(g, i) {
+				svg.selectAll(".chord path")
+					.filter(function(d) { return d.source.index != i && d.target.index != i; })
+				  .transition()
+					.style("opacity", opacity);
+			  };
+			}
+
+		});
+	 
+
+</script>
