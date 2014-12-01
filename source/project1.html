@@ -25,23 +25,23 @@ Images selected: <input type="text" name="fname">
 		
 d3.text('correlation-chord-subtracted.csv', function(error3, data3){
 			
-			var corr_diff = d3.csv.parseRows(data3);
+			var corr_C_subtracted = d3.csv.parseRows(data3);
 			
 			var arr = [];
 			
-			var nr = 20;
+			var nr = 140;
 			
 			
 			for(var x = 0; x < nr; x++){
 				arr[x] = [];    
 				for(var y = 0; y < nr; y++){ 
 				
-					arr[x][y] = corr_diff[x][y];  
+					arr[x][y] = corr_C_subtracted[x][y];  
 				}    
 			}
 			
-			var min_val1 = d3.min(corr_diff);
-			var max_val2 = d3.max(corr_diff);
+			var min_val1 = d3.min(corr_C_subtracted);
+			var max_val2 = d3.max(corr_C_subtracted);
 			
 			var min_val = d3.min(min_val1);
 			var max_val = d3.max(max_val2);
@@ -89,15 +89,15 @@ d3.text('correlation-chord-subtracted.csv', function(error3, data3){
 				}		
 				for(var j=i+1; j<t_len; j++){
 				
-					var val = aa(corr_diff[t_list[i]][t_list[j]]);
+					var val = aa(corr_C_subtracted[t_list[i]][t_list[j]]);
 					new_arr[i][j] = val;//t_list[i] + "," + t_list[j];
 				}
 				
 			}
 			
 			console.log(new_arr);
-			console.log(corr_diff[3][19]);
-			console.log(corr_diff[3][14]);
+			console.log(corr_C_subtracted[3][19]);
+			console.log(corr_C_subtracted[3][14]);
 			
 			
 			
