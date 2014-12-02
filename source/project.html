@@ -22,30 +22,30 @@ Images selected: <input type="text" name="fname">
 
 //read file
 
-		
-d3.text('corr_diff.csv', function(error3, data3){
-			
+
+d3.text('correlation-chord-subtracted.csv', function(error3, data3){
+
 			var corr_diff = d3.csv.parseRows(data3);
-			
+
 			var arr = [];
-			
-			var nr = 20;
-			
-			
+
+			var nr = 140;
+
+
 			for(var x = 0; x < nr; x++){
-				arr[x] = [];    
-				for(var y = 0; y < nr; y++){ 
-				
-					arr[x][y] = corr_diff[x][y];  
-				}    
+				arr[x] = [];
+				for(var y = 0; y < nr; y++){
+
+					arr[x][y] = corr_diff[x][y];
+				}
 			}
-			
+
 			var min_val1 = d3.min(corr_diff);
 			var max_val2 = d3.max(corr_diff);
-			
+
 			var min_val = d3.min(min_val1);
 			var max_val = d3.max(max_val2);
-			
+
 			//console.log(min_val);
 			//console.log(max_val);
 
@@ -53,59 +53,61 @@ d3.text('corr_diff.csv', function(error3, data3){
 					.domain([-0.1,0.25])
 					.range([0,1]);
 
-			
+
 			for(var x = 0; x < nr; x++){
-				for(var y = 0; y < nr; y++){ 
-				
-					arr[x][y] = aa(arr[x][y]);  
-					
-				}    
+				for(var y = 0; y < nr; y++){
+
+					arr[x][y] = aa(arr[x][y]);
+
+				}
 			}
-			
-			for(var i = 0; i<nr; i++){		
-				for(var j=0; j<=i; j++){			
+
+			for(var i = 0; i<nr; i++){
+				for(var j=0; j<=i; j++){
 				arr[i][j] = 0;
-			
+
 				}
 			}
 
 			//console.log(arr);
-			
-			var t_list= [2,4,5,10,12,15,17,20];
-			
+
+			var t_list = [136, 189, 3, 158, 87, 90, 54, 9, 10, 171, 129, 11, 103, 141, 216, 43, 156, 39, 2, 166, 58, 92, 67, 78, 26, 173, 101, 175, 32, 102, 208, 138, 48, 139, 18, 199, 167, 19, 40, 192, 120, 106, 127, 13, 165, 211, 95, 118, 57, 169, 203, 111, 112, 200, 96, 114, 35, 198, 182, 145, 152, 22, 168, 5, 178, 150, 162, 47, 122, 31, 181, 213, 204, 98, 44, 89, 135, 159, 66, 29, 8, 7, 187, 1, 121, 79, 23, 52, 212, 17, 176, 113, 20, 123, 137, 144, 151, 46, 147, 196, 28, 84, 85, 201, 172, 12, 214, 131, 94, 42, 190, 61, 206, 80, 153, 34, 69, 33, 210, 119, 185, 55, 108, 27, 4, 160, 70, 107, 76, 163, 155, 91, 142, 143, 64, 75, 125, 130, 21, 194];
+
+
 			var t_len = t_list.length;
-			
+
 			console.log(t_len);
 			var new_arr = [];
-			
+
 			for(var i=0; i<t_len; i++){
-				
+
 				new_arr[i] = []
-				
+
 				for(var j=0; j<=i; j++){
-				
+
 					new_arr[i][j] = 0;
-				
-				}		
+
+				}
+				console.log(j);
 				for(var j=i+1; j<t_len; j++){
-				
+				console.log(j);
 					var val = aa(corr_diff[t_list[i]][t_list[j]]);
 					new_arr[i][j] = val;//t_list[i] + "," + t_list[j];
 				}
-				
+
 			}
-			
+
 			console.log(new_arr);
 			console.log(corr_diff[3][19]);
 			console.log(corr_diff[3][14]);
-			
-			
-			
+
+
+
 			var chord = d3.layout.chord()
 				.padding(.05)
 				.sortSubgroups(d3.descending)
 				.matrix(arr);
-				
+
 			var width = 960,
 				height = 600,
 				innerRadius = Math.min(width, height) * .41,
@@ -133,7 +135,7 @@ d3.text('corr_diff.csv', function(error3, data3){
 				,"#FFF5EE"
 				,"#2E8B57"
 				,"#F4A460"
-				,"#FA8072"	
+				,"#FA8072"
 				]);
 
 			var svg = d3.select("body").append("svg")
@@ -173,7 +175,7 @@ d3.text('corr_diff.csv', function(error3, data3){
 				.attr("dy", ".35em")
 				.attr("transform", function(d) { return d.angle > Math.PI ? "rotate(180)translate(-16)" : null; })
 				.style("text-anchor", function(d) { return d.angle > Math.PI ? "end" : null; })
-				.text(function(d,i,e) { 
+				.text(function(d,i,e) {
 				return e; });
 
 			svg.append("g")
@@ -185,7 +187,7 @@ d3.text('corr_diff.csv', function(error3, data3){
 				.style("fill", function(d) { return fill(d.target.index); })
 				.on("mouseover", function(d,i){ return this.style("fill", function(){ return fill(d.target.index);})})
 				.style("opacity", 1);
-	
+
 					// Returns an array of tick angles and labels, given a group.
 			function groupTicks(d) {
 			  var k = (d.endAngle - d.startAngle) / d.value;
@@ -208,6 +210,6 @@ d3.text('corr_diff.csv', function(error3, data3){
 			}
 
 		});
-	 
+
 
 </script>
