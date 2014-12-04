@@ -12,26 +12,86 @@ body {
   stroke-width: .5px;
 }
 
+div.tooltip {	
+    position: absolute;			
+    text-align: center;			
+    width: 150px;					
+    height: 100px;					
+    padding: 2px;				
+    font: 12px sans-serif;		
+    background: lightsteelblue;	
+    border: 0px;		
+    border-radius: 8px;			
+    pointer-events: none;			
+}
+
 </style>
 <body>
-Images selected: <input type="text" name="fname">
-<button type="button">Generate graph</button></br>
+#Images selected: <input type="text" name="fname" id="input_text" value="20">
+<button type="button"  id="generate_button">Generate diagram</button>
+<input type="range"  min="0" max="200" id="range_input" />
+Threshold filter: <label for="male" id="input_label">0</label>
+</br>
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="d3.js"></script>
 <script>
 
 //read file
+d3.text('color_mtx.csv', function(error3, data1){
+d3.text('gray_mtx.csv', function(error3, data2){	
+d3.text('correlation-chord-subtracted.csv', function(error3, data3){
+			
+			
+			
+			
+var corr_diff = d3.csv.parseRows(data3);
+var color_diff = d3.csv.parseRows(data1);
+var gray_diff = d3.csv.parseRows(data2);
+				
+console.log(corr_diff[5][11]);
+				
+//image comparison list by index
 
-		
-d3.text('corr_diff.csv', function(error3, data3){
+var t_list= [2,20,72,11,9,111,66,77,88];
+var t_len = t_list.length;
+
+
+//everything below filter dont show
+var threshold_filter = 0;
+
+
+d3.selectAll("#range_input").on("input", function(d,i){
+
+			threshold_filter = (this.value-100)/100;
 			
-			var corr_diff = d3.csv.parseRows(data3);
+			d3.selectAll("#input_label")
+				.html((this.value-100)/100);
+					
+});	
+
+var btn_click = d3.selectAll("#generate_button").on("click", function(){
 			
+			var scale_vals = d3.scale.linear()
+								.domain([-1,1])
+								.range([0,10]);
+
+			//var rand = Math.floor(Math.random() * 216);
+			
+			t_len = d3.select("#input_text")[0][0].value;
+
+			console.log(t_len);
+			
+			for(var i=0; i<t_len; i++){
+				t_list[i]=i;
+			}
+			
+			
+			
+			/*
+			//old script to take 10x10 from main matrix	
+			
+			var nr = 10;
 			var arr = [];
-			
-			var nr = 20;
-			
-			
 			for(var x = 0; x < nr; x++){
 				arr[x] = [];    
 				for(var y = 0; y < nr; y++){ 
@@ -40,79 +100,67 @@ d3.text('corr_diff.csv', function(error3, data3){
 				}    
 			}
 			
-			var min_val1 = d3.min(corr_diff);
-			var max_val2 = d3.max(corr_diff);
-			
-			var min_val = d3.min(min_val1);
-			var max_val = d3.max(max_val2);
-			
-			//console.log(min_val);
-			//console.log(max_val);
-
-			var aa = d3.scale.linear()
-					.domain([-0.1,0.25])
-					.range([0,1]);
-
-			
 			for(var x = 0; x < nr; x++){
 				for(var y = 0; y < nr; y++){ 
 				
-					arr[x][y] = aa(arr[x][y]);  
+					arr[x][y] = scale_vals(arr[x][y]);  
 					
 				}    
-			}
-			
+			}	
 			for(var i = 0; i<nr; i++){		
 				for(var j=0; j<=i; j++){			
 				arr[i][j] = 0;
 			
 				}
 			}
-
-			//console.log(arr);
-			
-			var t_list= [2,4,5,10,12,15,17,20];
-			
-			var t_len = t_list.length;
-			
-			console.log(t_len);
+*/
+				
+		
 			var new_arr = [];
 			
-			for(var i=0; i<t_len; i++){
-				
-				new_arr[i] = []
-				
+			//extract new matrix algorithm
+			for(var i=0; i<t_len; i++){			
+				new_arr[i] = []		
 				for(var j=0; j<=i; j++){
 				
-					new_arr[i][j] = 0;
-				
+					var val = scale_vals(corr_diff[t_list[i]][t_list[j]]);
+					
+					//filter below thershold
+					if (corr_diff[t_list[i]][t_list[j]] < threshold_filter || corr_diff[t_list[i]][t_list[j]]==1){
+						val = 0;			
+					}
+					
+					new_arr[i][j] = val;	
 				}		
 				for(var j=i+1; j<t_len; j++){
-				
-					var val = aa(corr_diff[t_list[i]][t_list[j]]);
+
+					var val = scale_vals(corr_diff[t_list[i]][t_list[j]]);
+					
+					//filter below thereshold
+					if (corr_diff[t_list[i]][t_list[j]] < threshold_filter || corr_diff[t_list[i]][t_list[j]]==1){		
+						val = 0;			
+					}
+					
 					new_arr[i][j] = val;//t_list[i] + "," + t_list[j];
 				}
 				
 			}
 			
-			console.log(new_arr);
-			console.log(corr_diff[3][19]);
-			console.log(corr_diff[3][14]);
-			
-			
-			
+	
 			var chord = d3.layout.chord()
 				.padding(.05)
 				.sortSubgroups(d3.descending)
-				.matrix(arr);
+				//.sortGroups(d3.descending)
+				.matrix(new_arr);
+
 				
-			var width = 960,
+			var width = 600,
 				height = 600,
 				innerRadius = Math.min(width, height) * .41,
 				outerRadius = innerRadius * 1.1;
 
 			var fill = d3.scale.ordinal()
-				.domain(d3.range(20))
+				.domain(d3.range(t_len))
 				.range([
 				 "#9ACD32"
 				,"#377DB8"
@@ -139,23 +187,109 @@ d3.text('corr_diff.csv', function(error3, data3){
 			var svg = d3.select("body").append("svg")
 				.attr("width", width)
 				.attr("height", height)
+				.style("float","left")
 			  .append("g")
-				.attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+			  .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
 			svg.append("g").selectAll("path")
 				.data(chord.groups)
 			  .enter().append("path")
 				.style("fill", function(d) { return fill(d.index); })
 				.style("stroke", function(d) { return fill(d.index); })
+				.style("float","left")
 				.attr("d", d3.svg.arc().innerRadius(innerRadius).outerRadius(outerRadius))
 				.on("mouseover", fade(.1))
-				.on("mouseout", fade(1));
+				.on("mouseout",fade(1));
 
+			var div = d3.select("body").append("div")	
+				.attr("class", "tooltip")				
+				.style("opacity", 0);
+
+			var div2 = d3.select("body").append("div")	
+				.attr("class", "pic_comparison")
+				.style("float","left")
+				.style("width","500px")
+				.style("opacity", 0);
+				
+				
+				svg.append("g")
+				.attr("class", "chord")
+				.selectAll("path")
+				.data(chord.chords)
+				.enter().append("path")
+				.attr("d", d3.svg.chord().radius(innerRadius))
+				.style("fill", function(d) { return fill(d.target.index); })
+				.on("click", function(d,e){
+				
+					var ind1 = d.source.index+1;
+					var ind2 = d.target.index+1;
+					
+					var im1 = "<img width='500px' height='300px' src='img/"+t_list[ind1] +  ".jpg'/>";
+					var im2 = "<img width='500px' height='300px' src='img/"+t_list[ind2] +  ".jpg'/>";
+					
+
+					
+					div2.transition()		
+						.duration(200)		
+						.style("opacity", .9);		
+									
+					div2.html(im1 + " " + ind1 + " vs "+ ind2 + " "+ im2
+							)	
+						.style("left", (d3.event.pageX +50) + "px")		
+						.style("top", (d3.event.pageY - 28) + "px");
+					
+					//window.open("Image "+ t_list[d.source.index] +" vs "+ "Image "+t_list[d.target.index]);
+					
+				
+				})
+				.on("mouseover", function(d,e){ 
+				
+					//fade(0.1);
+					svg.selectAll(".chord path")
+						.transition()
+						.style("opacity",.1);
+						
+					d3.select(this)
+						.transition()
+						.style("opacity", 1);				
+					
+					div.transition()		
+						.duration(200)		
+						.style("opacity", .9);		
+					
+					var ind1 = t_list[d.source.index]+1;
+					var ind2 = t_list[d.target.index]+1;
+						
+									
+					div.html("Image "+ind1 +" vs "+ "Image "+ind2+ "<br/><br/>"+ 
+									"correlation: " + corr_diff[t_list[d.source.index]][t_list[d.target.index]]+ "</br>"+
+									"color: " +   color_diff[t_list[d.source.index]][t_list[d.target.index]]+ "</br>"+
+									"gray: "+ gray_diff[t_list[d.source.index]][t_list[d.target.index]]		
+							)	
+						.style("left", (d3.event.pageX) + "px")		
+						.style("top", (d3.event.pageY - 28) + "px");
+
+						
+				
+				})
+				.on("mouseout",function(){ 
+				
+					d3.selectAll(".chord")
+						.selectAll("path")
+						.style("opacity",1);
+					
+					div.transition()		
+						.duration(200).style("opacity", 0);
+				});
+	
+				
+				
+				
 			var ticks = svg.append("g").selectAll("g")
 				.data(chord.groups)
-			  .enter().append("g").selectAll("g")
+				.enter().append("g").selectAll("g")
 				.data(groupTicks)
-			  .enter().append("g")
+				.enter().append("g")
 				.attr("transform", function(d) {
 				  return "rotate(" + (d.angle * 180 / Math.PI - 90) + ")"
 					  + "translate(" + outerRadius + ",0)";
@@ -174,18 +308,10 @@ d3.text('corr_diff.csv', function(error3, data3){
 				.attr("transform", function(d) { return d.angle > Math.PI ? "rotate(180)translate(-16)" : null; })
 				.style("text-anchor", function(d) { return d.angle > Math.PI ? "end" : null; })
 				.text(function(d,i,e) { 
-				return e; });
+				return t_list[e] + 1; });
 
-			svg.append("g")
-				.attr("class", "chord")
-			  .selectAll("path")
-				.data(chord.chords)
-			  .enter().append("path")
-				.attr("d", d3.svg.chord().radius(innerRadius))
-				.style("fill", function(d) { return fill(d.target.index); })
-				.on("mouseover", function(d,i){ return this.style("fill", function(){ return fill(d.target.index);})})
-				.style("opacity", 1);
-	
+			/*
+	*/
 					// Returns an array of tick angles and labels, given a group.
 			function groupTicks(d) {
 			  var k = (d.endAngle - d.startAngle) / d.value;
@@ -206,8 +332,12 @@ d3.text('corr_diff.csv', function(error3, data3){
 					.style("opacity", opacity);
 			  };
 			}
-
-		});
-	 
+			
+			
+			
+	});
+	});
+	});
+});
 
 </script>
