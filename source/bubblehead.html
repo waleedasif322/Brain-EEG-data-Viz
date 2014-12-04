@@ -152,6 +152,11 @@ d3.text("positions.txt", function(dataa) {
 						//var ind2 = t_list[d.target.index]+1;
 							
 						var e1 = e +1;
+						
+						d3.select(this)
+								.transition()
+								.attr("stroke", "yellow");
+						
 						div.html("channel: "+ e1 + "<br/>val: "+ d[frame][ctr2]	
 								)	
 							.style("left", (d3.event.pageX) + "px")		
@@ -161,9 +166,13 @@ d3.text("positions.txt", function(dataa) {
 				
 					}).on("mouseout",function(){ 
 			
-					
+							d3.select(this)
+								.transition()
+								.attr("stroke", "black");
+								
 						div.transition()		
 							.duration(200).style("opacity", 0);
+							
 					}).on("click",function(d,e,i){
 				
 						console.log("here");
@@ -216,7 +225,7 @@ d3.text("positions.txt", function(dataa) {
 
 		z_list[i] = d3.scale.linear()
 						.domain([min,max])
-						.range(["white","green"]);
+						.range(["white","red"]);
 			
 	}
 	
