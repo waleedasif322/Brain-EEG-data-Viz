@@ -41,10 +41,11 @@ Timeline <input type="range" style="width:800px" min="1" max="139" value=1 id="r
 
 //read file
 d3.text('30fps_data.txt', function(error3, data1){
-
+d3.text("positions.txt", function(dataa) {
 
 	var json_frames = JSON.parse(data1);
-
+	var poss = d3.csv.parseRows(dataa);
+	
 	 //console.log(json_frames);
 					
 
@@ -70,9 +71,9 @@ d3.text('30fps_data.txt', function(error3, data1){
 	var rang = d3.selectAll("#range_input")[0][0];
 
 	body.html("<img width='500px' height='300px' src='img/1.jpg'/>");
-	var margin = {top: 30, right: 20, bottom: 30, left: 50},
-    width = 600 - margin.left - margin.right,
-    height = 270 - margin.top - margin.bottom;
+	var margin = {top: -55, right: 0, bottom: 0, left: -35},
+    width = 1000 - margin.left - margin.right,
+    height = 1000 - margin.top - margin.bottom;
 
 // Parse the date / time
 
@@ -96,8 +97,12 @@ d3.text('30fps_data.txt', function(error3, data1){
 
 
 	var svg = d3.select("body").append("svg")
-		.attr("width", 570)
-		.attr("height", 570);
+		.attr("width", 850)
+		.attr("height", 850)
+		.style("background-image","url(unnamed.PNG)")
+		.append("g").attr("transform", 
+								"translate(" + margin.left + "," + margin.top + ")");
+		
 		//.style("background-image","url(head_img.jpg)");
 	
 	var div = d3.select("body").append("div")	
@@ -118,8 +123,8 @@ d3.text('30fps_data.txt', function(error3, data1){
 					.enter()
 					.append("circle")
 					.attr("r",function (d,i){   return d[frame][ctr2]/1000;  })
-					.attr("cx",function(d,i){ console.log(i); return ((i%8) * 50) + 150;})
-					.attr("cy",function(d,i){ return ((Math.floor(i/8)) * 50) + 150;})
+					.attr("cx",function(d,i){ return poss[i*2];})
+					.attr("cy",function(d,i){ return poss[i*2+1];})
 					.style("opacity", 0.9)
 					.on("mouseover", function(d,e,i){ 
 				
@@ -290,7 +295,7 @@ d3.text('30fps_data.txt', function(error3, data1){
 	
 	
 	
-
+})
 });
 
 </script>
