@@ -122,7 +122,18 @@ d3.text("positions.txt", function(dataa) {
 					.data(json_frames)
 					.enter()
 					.append("circle")
-					.attr("r",function (d,i){   return d[frame][ctr2]/1000;  })
+					.attr("r",function (d,i){ 
+					
+					if(i == 63 || i == 62){
+					
+					return d[frame][ctr2]/3000;
+					}
+					console.log(i.toString() + d[frame][ctr2]/200);
+					return d[frame][ctr2]/200;
+				
+
+
+					})
 					.attr("cx",function(d,i){ return poss[i*2];})
 					.attr("cy",function(d,i){ return poss[i*2+1];})
 					.style("opacity", 0.9)
@@ -264,7 +275,18 @@ d3.text("positions.txt", function(dataa) {
 			circles.attr("fill",function(d,i){
 				console.log(frame);
 				return z_list[i](cols[i]);	
-			});
+			}).attr("r",function (d,i){ 
+					
+					if(i == 63 || i == 62){
+					
+					return cols[i]/3000;
+					}
+					//console.log(i.toString() + d[frame][ctr2]/200);
+					return cols[i]/200;
+				
+
+
+					});;
 			
 			//console.log(cols);
 			cols = [];
