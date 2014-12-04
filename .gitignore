@@ -1,4 +1,5 @@
 /images/*.jpg
+/source/img/*.jpg
 
 *.eeg
 *.vmrk
