@@ -47,7 +47,11 @@ d3.text("positions.txt", function(dataa) {
 	var poss = d3.csv.parseRows(dataa);
 	
 
-	var interval = 33; // one second
+	
+	
+	 // 33 milleseconds * 60 = 1980 miliseconds < 2000 : in other words display 60 images in 33 milisecond intervals, which adds up to almost 2 seconds total
+	var interval = 33; //callback interval update every 33 miliseconds
+	var interval2 = 33; //this is how often callback gets executed
 	var counter = 0;
 	var dx = 0;
 	var frame = 0;
@@ -59,7 +63,7 @@ d3.text("positions.txt", function(dataa) {
 	var rang = d3.selectAll("#range_input")[0][0];
 
 	body.html("<img width='500px' height='300px' src='img/1.jpg'/>");
-	var margin = {top: -55, right: 0, bottom: 0, left: -35},
+	var margin = {top: -55, right: 0, bottom: 0, left: -30},
     width = 1000 - margin.left - margin.right,
     height = 1000 - margin.top - margin.bottom;
 
@@ -78,8 +82,63 @@ d3.text("positions.txt", function(dataa) {
 				.attr("class", "tooltip")				
 				.style("opacity", 0);
 				
+	var colors = []
+	
+	for(var i=0; i<64; i++){
+						
+			colors[i] = json_frames[i][frame][30];
+						
+	}
+	var z_list = []
+	
+	
+	
+	var min_glob = [];
+	var max_glob = [];
+	
+	
+	
 
-			  
+	
+	for(var i =0; i<64; i++){
+	
+		var min_val =[];
+		var max_val = [];
+		
+		for(var j = 0; j<140; j++){ 
+
+		
+			var min1 = d3.min(json_frames[i][j]);
+			
+			
+			var max1 = d3.max(json_frames[i][j]);
+			
+		
+			min_val[j] =  min1;
+			max_val[j] = max1;
+		}
+		var min = Math.ceil(d3.min(min_val));
+		
+		var max = Math.ceil(d3.max(max_val));
+		
+		z_list[i] = d3.scale.linear()
+						.domain([min,max])
+						.range(["white","red"]);
+		min_glob[i] = min;
+		max_glob[i] = max;
+	}	
+	//console.log(min_glob);
+	//console.log(max_glob);
+	min_glob = Math.ceil(d3.min(min_glob));
+	max_glob = Math.ceil(d3.max(max_glob));
+	//console.log(min_glob);
+	//console.log(max_glob);
+	
+	
+	
+	
+	
+	
 	var circles = svg.selectAll("circle")
 					.data(json_frames)
 					.enter()
@@ -90,7 +149,7 @@ d3.text("positions.txt", function(dataa) {
 							return d[frame][ctr2]/3000;
 						}
 					
-						console.log(i.toString() + d[frame][ctr2]/200);
+						//console.log(i.toString() + d[frame][ctr2]/200);
 						return d[frame][ctr2]/200;
 					
 
@@ -98,6 +157,13 @@ d3.text("positions.txt", function(dataa) {
 					})
 					.attr("cx",function(d,i){ return poss[i*2];})
 					.attr("cy",function(d,i){ return poss[i*2+1];})
+					.attr("fill",function(d,i){
+					
+					 
+					return z_list[i](colors[i]);
+					
+
+					})
 					.style("opacity", 0.9)
 					.on("mouseover", function(d,e,i){ 
 				
@@ -110,7 +176,7 @@ d3.text("positions.txt", function(dataa) {
 							.duration(200)		
 							.style("opacity", .9);		
 						
-						console.log(e);
+						//console.log(e);
 							
 						var e1 = e +1;
 						
@@ -140,28 +206,10 @@ d3.text("positions.txt", function(dataa) {
 								
 				
 					})
-					.attr("fill","blue").attr("stroke","black").attr("stroke-width",3);
+					.attr("stroke","black").attr("stroke-width",3);
 
 
-	var z_list = []
 
-	for(var i =0; i<64; i++){
-
-		var min1 = d3.min(json_frames[i]);
-		
-		
-		var min = Math.ceil(d3.min(min1));
-		var max1 = d3.max(json_frames[i]);
-		var max = Math.ceil(d3.max(max1));
-	
-		console.log(min);
-		console.log(max);
-
-		z_list[i] = d3.scale.linear()
-						.domain([min,max])
-						.range(["white","red"]);
-			
-	}
 	
 	var btn_click = d3.selectAll("#start_button").on("click", function(){
 	
@@ -198,7 +246,7 @@ d3.text("positions.txt", function(dataa) {
 					ctr2 = 0;
 				}
 				
-			ctr2 = ctr2 + 1;
+				ctr2 = ctr2 + 1;
 			
 				d3.timer(makeCallback(),interval);
 			
@@ -208,11 +256,10 @@ d3.text("positions.txt", function(dataa) {
 				//d3.timer(makeCallback(),0);
 			
 			}
-			
 
 			
 			var cols = []
-			
+			//
 			for(var i=0; i<64; i++){
 				
 				cols[i] = json_frames[i][frame][ctr2-1];
@@ -220,23 +267,24 @@ d3.text("positions.txt", function(dataa) {
 			}
 			
 			circles.attr("fill",function(d,i){
-				console.log(frame);
+			
+				//console.log(frame);
 				return z_list[i](cols[i]);	
+			
 			}).attr("r",function (d,i){ 
 					
 					if(i == 63 || i == 62){
 					
-					return cols[i]/3000;
+						return cols[i]/3000;
 					
 					}
-					return cols[i]/200;
-				
+						return cols[i]/200;
 
 					});
 
 			cols = [];
 			
-			counter =  counter+33;
+			counter =  counter+interval2;
 
 			return true;
 		}
@@ -245,21 +293,48 @@ d3.text("positions.txt", function(dataa) {
 	d3.selectAll("#range_input")
 		.on("input", function(d,i){
 
-					threshold_filter = this.value;			
+					threshold_filter = this.value;	
+					
 					d3.selectAll("#input_label")
 						.html(this.value);
 						
 					var vv = parseInt(rang.value);
 					var im1 = "</br><img width='500px' height='300px' src='img/"+ vv+  ".jpg'/>";
 					frame = vv;
-					d3.timer(makeCallback(),0);
-						body.html(im1).transition();	
+					console.log("hi");
+							
+					var cols = []
+					for(var i=0; i<64; i++){
+						
+						cols[i] = json_frames[i][frame][30];
+						
+					}
+					
+					
+					circles.attr("fill",function(d,i){
+					
+						//console.log(frame);
+						return z_list[i](cols[i]);	
+					
+					}).attr("r",function (d,i){ 
+							
+						if(i == 63 || i == 62){
+						
+							return cols[i]/3000;
+						
+						}
+							return cols[i]/200;
+
+					});	
+						
+						
+						
+						
+						
 											
 		});	
 		
-		
-	d3.timer(makeCallback(),interval);
-	
+	d3.selectAll("#range_input").value(1);
 	
 	
 })
