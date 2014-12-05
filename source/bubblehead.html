@@ -44,19 +44,20 @@ d3.text('30fps_data.txt', function(error3, data1){
 d3.text("positions.txt", function(dataa) {
 
 	var json_frames = JSON.parse(data1);
-	var poss = d3.csv.parseRows(dataa);
-	
-
-	
+	var positions = d3.csv.parseRows(dataa);
 	
 	 // 33 milleseconds * 60 = 1980 miliseconds < 2000 : in other words display 60 images in 33 milisecond intervals, which adds up to almost 2 seconds total
 	var interval = 33; //callback interval update every 33 miliseconds
 	var interval2 = 33; //this is how often callback gets executed
-	var counter = 0;
-	var dx = 0;
-	var frame = 0;
-	var ctr2 = 0;
-
+	var counter = 0; //counts frames
+	var dx = 0; //change for times 0=stop 1=start
+	var frame = 0; //current picture displayed
+	var ctr2 = 0; //counter for each frame; for color change inbetween images 30fps depends on intervals
+	var z_list = [] //this is array of color scales for nodes
+	var min_glob = []; //this is global min value for all nodes at all times
+	var max_glob = []; //this is global max value for all nodes at all times
+	var PI = 3.141592653;
+	
 	var body = d3.selectAll("body").append("div").style("float","left").style("margin-top", "150px");
 
 
@@ -78,47 +79,33 @@ d3.text("positions.txt", function(dataa) {
 								"translate(" + margin.left + "," + margin.top + ")");
 		
 	
-	var div = d3.select("body").append("div")	
+	var tooltip = d3.select("body").append("div")	
 				.attr("class", "tooltip")				
 				.style("opacity", 0);
 				
-	var colors = []
 	
+	//this is for initial colors for frame 0
+	var colors = []
 	for(var i=0; i<64; i++){
 						
 			colors[i] = json_frames[i][frame][30];
 						
 	}
-	var z_list = []
-	
-	
-	
-	var min_glob = [];
-	var max_glob = [];
-	
-	
-	
 
-	
+
+	//find max and min for each channel and create a color scale for each
 	for(var i =0; i<64; i++){
 	
 		var min_val =[];
 		var max_val = [];
 		
 		for(var j = 0; j<140; j++){ 
-
-		
 			var min1 = d3.min(json_frames[i][j]);
-			
-			
 			var max1 = d3.max(json_frames[i][j]);
-			
-		
 			min_val[j] =  min1;
 			max_val[j] = max1;
 		}
-		var min = Math.ceil(d3.min(min_val));
-		
+		var min = Math.ceil(d3.min(min_val));		
 		var max = Math.ceil(d3.max(max_val));
 		
 		z_list[i] = d3.scale.linear()
@@ -134,29 +121,28 @@ d3.text("positions.txt", function(dataa) {
 	//console.log(min_glob);
 	//console.log(max_glob);
 	
-	
-	
-	
-	
-	
+	var size_scale = d3.scale.linear()
+						.domain([min_glob,max_glob])
+						.range([1,10000]);
+						
 	var circles = svg.selectAll("circle")
 					.data(json_frames)
 					.enter()
 					.append("circle")
 					.attr("r",function (d,i){ 
 					
-						if(i == 63 || i == 62){	
-							return d[frame][ctr2]/3000;
-						}
+						//if(i == 63 || i == 62){	
+						//	return d[frame][ctr2]/3000;
+						//}
 					
 						//console.log(i.toString() + d[frame][ctr2]/200);
-						return d[frame][ctr2]/200;
-					
-
+						//return d[frame][ctr2]/200;
+							var val  = Math.sqrt(size_scale(d[frame][ctr2])/PI);
+							return val;
 
 					})
-					.attr("cx",function(d,i){ return poss[i*2];})
-					.attr("cy",function(d,i){ return poss[i*2+1];})
+					.attr("cx",function(d,i){ return positions[i*2];})
+					.attr("cy",function(d,i){ return positions[i*2+1];})
 					.attr("fill",function(d,i){
 					
 					 
@@ -172,7 +158,7 @@ d3.text("positions.txt", function(dataa) {
 							.transition()
 							.style("opacity", 1);				
 						
-						div.transition()		
+						tooltip.transition()		
 							.duration(200)		
 							.style("opacity", .9);		
 						
@@ -184,7 +170,7 @@ d3.text("positions.txt", function(dataa) {
 								.transition()
 								.attr("stroke", "yellow");
 						
-						div.html("channel: "+ e1 + "<br/>val: "+ d[frame][ctr2]	
+						tooltip.html("channel: "+ e1 + "<br/>val: "+ d[frame][ctr2]	
 								)	
 							.style("left", (d3.event.pageX) + "px")		
 							.style("top", (d3.event.pageY - 28) + "px");
@@ -197,7 +183,7 @@ d3.text("positions.txt", function(dataa) {
 								.transition()
 								.attr("stroke", "black");
 								
-						div.transition()		
+							tooltip.transition()		
 							.duration(200).style("opacity", 0);
 							
 					}).on("click",function(d,e,i){
@@ -273,13 +259,15 @@ d3.text("positions.txt", function(dataa) {
 			
 			}).attr("r",function (d,i){ 
 					
-					if(i == 63 || i == 62){
+					/*if(i == 63 || i == 62){
 					
 						return cols[i]/3000;
 					
 					}
 						return cols[i]/200;
-
+*/
+							var val  = Math.sqrt(size_scale(d[frame][ctr2])/PI);
+							return val;
 					});
 
 			cols = [];
@@ -318,13 +306,16 @@ d3.text("positions.txt", function(dataa) {
 					
 					}).attr("r",function (d,i){ 
 							
-						if(i == 63 || i == 62){
+					/*	if(i == 63 || i == 62){
 						
 							return cols[i]/3000;
 						
 						}
 							return cols[i]/200;
+					*/
 
+						var val  = Math.sqrt(size_scale(d[frame][ctr2])/PI);
+								return val;
 					});	
 						
 						
