@@ -46,18 +46,6 @@ d3.text("positions.txt", function(dataa) {
 	var json_frames = JSON.parse(data1);
 	var poss = d3.csv.parseRows(dataa);
 	
-	 //console.log(json_frames);
-					
-
-					
-	//image comparison list by index
-
-	var t_list= [2,20,72,11,9,111,66,77,88];
-	var t_len = t_list.length;
-
-
-	//everything below filter dont show
-	var threshold_filter = 0;
 
 	var interval = 33; // one second
 	var counter = 0;
@@ -75,25 +63,7 @@ d3.text("positions.txt", function(dataa) {
     width = 1000 - margin.left - margin.right,
     height = 1000 - margin.top - margin.bottom;
 
-// Parse the date / time
 
-	// Set the ranges
-	var x = d3.time.scale().range([0, width]);
-	var y = d3.scale.linear().range([height, 0]);
-
-	// Define the axes
-	var xAxis = d3.svg.axis().scale(x)
-		.orient("bottom").ticks(5);
-
-	var yAxis = d3.svg.axis().scale(y)
-		.orient("left").ticks(5);
-
-	// Define the line
-	var valueline = d3.svg.line()
-		.x(function(d,i) { return x(i); })
-		.y(function(d) { console.log(d);return y(d); });
-		
-	// Adds the svg canvas
 
 
 	var svg = d3.select("body").append("svg")
@@ -103,19 +73,11 @@ d3.text("positions.txt", function(dataa) {
 		.append("g").attr("transform", 
 								"translate(" + margin.left + "," + margin.top + ")");
 		
-		//.style("background-image","url(head_img.jpg)");
 	
 	var div = d3.select("body").append("div")	
 				.attr("class", "tooltip")				
 				.style("opacity", 0);
 				
-	var svg2 = d3.select("body")
-		.append("svg")
-			.attr("width", width + margin.left + margin.right)
-			.attr("height", height + margin.top + margin.bottom)
-		.append("g")
-			.attr("transform", 
-				  "translate(" + margin.left + "," + margin.top + ")");		
 
 			  
 	var circles = svg.selectAll("circle")
@@ -124,13 +86,13 @@ d3.text("positions.txt", function(dataa) {
 					.append("circle")
 					.attr("r",function (d,i){ 
 					
-					if(i == 63 || i == 62){
+						if(i == 63 || i == 62){	
+							return d[frame][ctr2]/3000;
+						}
 					
-					return d[frame][ctr2]/3000;
-					}
-					console.log(i.toString() + d[frame][ctr2]/200);
-					return d[frame][ctr2]/200;
-				
+						console.log(i.toString() + d[frame][ctr2]/200);
+						return d[frame][ctr2]/200;
+					
 
 
 					})
@@ -149,7 +111,6 @@ d3.text("positions.txt", function(dataa) {
 							.style("opacity", .9);		
 						
 						console.log(e);
-						//var ind2 = t_list[d.target.index]+1;
 							
 						var e1 = e +1;
 						
@@ -175,46 +136,19 @@ d3.text("positions.txt", function(dataa) {
 							
 					}).on("click",function(d,e,i){
 				
-						console.log("here");
-						x.domain([0,140]);
-						y.domain([0, 100000]);
-
-					// Add the valueline path.
-						for(var j =0; j<140; j++){
-						
-							//console.log(valueline(d[j][30]));
-							var b = d[j][30];
-							
-							console.log(valueline(b));
-							svg2.append("path")
-								.attr("class", "line")
-								.attr("d", valueline(d[j],j));
-							
-						}
-					
-					// Add the X Axis
-						svg2.append("g")
-							.attr("class", "x axis")
-							.attr("transform", "translate(0," + height + ")")
-							.call(xAxis);
-
-						// Add the Y Axis
-						svg2.append("g")
-							.attr("class", "y axis")
-							.call(yAxis);
+						//this needs to be filled up by raj
 								
 				
 					})
 					.attr("fill","blue").attr("stroke","black").attr("stroke-width",3);
 
 
-	console.log(circles);
-
 	var z_list = []
 
 	for(var i =0; i<64; i++){
 
 		var min1 = d3.min(json_frames[i]);
+		
 		
 		var min = Math.ceil(d3.min(min1));
 		var max1 = d3.max(json_frames[i]);
@@ -230,18 +164,22 @@ d3.text("positions.txt", function(dataa) {
 	}
 	
 	var btn_click = d3.selectAll("#start_button").on("click", function(){
+	
 			dx=1;
 			d3.timer(makeCallback(),interval);
+			
 	});
+	
 
 	var btn_click2 = d3.selectAll("#stop_button").on("click", function(){
+	
 			dx=0;
+			
 	});
 
 
 	var makeCallback = function() {
 
-		// note that we're returning a new callback function each time
 		return function() {
 		
 			if(dx>0){
@@ -259,19 +197,19 @@ d3.text("positions.txt", function(dataa) {
 					frame = rang.value;
 					ctr2 = 0;
 				}
+				
 			ctr2 = ctr2 + 1;
-			d3.timer(makeCallback(),interval);
+			
+				d3.timer(makeCallback(),interval);
+			
 			}
 			else{
 			
-			//d3.timer(makeCallback(),0);
+				//d3.timer(makeCallback(),0);
 			
 			}
-			//console.log(frame);
-			//console.log(json_frames[frame][ctr2++]);
-			//var val = json_frames[frame][ctr2++];
-			//console.log(val);
 			
+
 			
 			var cols = []
 			
@@ -289,15 +227,13 @@ d3.text("positions.txt", function(dataa) {
 					if(i == 63 || i == 62){
 					
 					return cols[i]/3000;
+					
 					}
-					//console.log(i.toString() + d[frame][ctr2]/200);
 					return cols[i]/200;
 				
 
+					});
 
-					});;
-			
-			//console.log(cols);
 			cols = [];
 			
 			counter =  counter+33;
