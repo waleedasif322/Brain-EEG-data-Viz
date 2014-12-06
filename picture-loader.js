@@ -1,4 +1,4 @@
-var app = angular.module('data-viz-proj', ['ui.bootstrap']);
+var app = angular.module('data-viz-proj', ['ui.bootstrap', 'iso.directives']);
 
 app.controller('MainCtrl', function($scope) {
 
@@ -6,10 +6,10 @@ app.controller('MainCtrl', function($scope) {
 
   $scope.images = {}
   $scope.createImages = function(){
-    for (var i=0; i<216; i++){
-        $scope.images[i] = '/images/' + i + '.jpg'
+    for (var i=1; i<140; i++){
+        $scope.images[i] = '/thumbs/' + $scope.images_order[i] + '.jpg'
     }
-    console.log($scope.images);
+    console.log($scope.images[1]);
   }
 
   $scope.showPath = function (imageNumber) {

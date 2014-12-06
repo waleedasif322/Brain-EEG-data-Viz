@@ -8,36 +8,59 @@
     <script src="/libs/angular/angular.min.js"></script>
     <script src="/libs/angular-bootstrap/ui-bootstrap.min.js"></script>
     <script src="/libs/d3/d3.v3.min.js"></script>
-
+    <script src="/libs/angular-isotope-master/demo/scripts/vendor/jquery.isotope.min.js"></script>
+    <script src="/libs/angular-isotope-master/dist/angular-isotope.js"></script>
     <script src="/picture-loader.js"></script>
+
+    <style>
+
+    </style>
+
   </head>
   <body>
   <br>
   <h1>Brain EEG Data Visualization Project</h1>
-<!--   <div class="row">
-    <div class="col-md-4">
-      <input class="form-control" type="text" ng-model="yourName" placeholder="Enter a name here">
-      <h1>Hello, {{ yourName }}!</h1>
-    </div>
-  </div> -->
   <hr>
-  <div class="container">
+  <div ng-controller="MainCtrl" class="container">
     <div class ="row">
-      <div ng-controller="MainCtrl" class="col-md-6">
-      <button ng-click="createImages()">Load Images</button>
-      <br>
-      <input class="form-control" type="text" ng-model="imageNumber" placeholder="Enter an image number to see path">
-      <button ng-click="showPath(imageNumber)">Show Image</button> <img ng-src="http://localhost:8000{{showPath(imageNumber)}}">
+      <div  class="col-md-6">
+        <button ng-click="createImages()">Load Images</button>
+        <br>
+        <input class="form-control" type="text" ng-model="imageNumber" placeholder="Enter an image number to see path">
+        <button ng-click="showPath(imageNumber)">Show Image</button> <img ng-src="http://localhost:8000{{showPath(imageNumber)}}">
+      </div>
+      <div class="col-md-6">
+              <div id="correlation"></div>
       </div>
     </div>
-  </div>
-  <script>
+    <br>
+    <div class="row">
+<!--
+    <div class="col-md-6">
+      <ul isotope-container>
+          <li ng-repeat="x in images track by $index" isotope-item>
+          {{x}}
+          <img ng-src="http://localhost:8000{{x}}">
+          </li>
+      </ul>
+    </div> -->
+  <div class="col-md-6">
+    <script>
 
+    d3.json("data.json", function (data) {
 
+    var images_order = [136, 189, 3, 158, 87, 90, 54, 9, 10, 171, 129, 11, 103, 141, 216, 43, 156, 39, 2, 166, 58, 92, 67, 78, 26, 173, 101, 175, 32, 102, 208, 138, 48, 139, 18, 199, 167, 19, 40, 192, 120, 106, 127, 13, 165, 211, 95, 118, 57, 169, 203, 111, 112, 200, 96, 114, 35, 198, 182, 145, 152, 22, 168, 5, 178, 150, 162, 47, 122, 31, 181, 213, 204, 98, 44, 89, 135, 159, 66, 29, 8, 7, 187, 1, 121, 79, 23, 52, 212, 17, 176, 113, 20, 123, 137, 144, 151, 46, 147, 196, 28, 84, 85, 201, 172, 12, 214, 131, 94, 42, 190, 61, 206, 80, 153, 34, 69, 33, 210, 119, 185, 55, 108, 27, 4, 160, 70, 107, 76, 163, 155, 91, 142, 143, 64, 75, 125, 130, 21, 194];
 
-    d3.csv("correlation-chord-subtracted.csv", function (data) {
-      //console.log(data);
-        var height = 450;
+    var images = {}
+    var createImages = function(){
+      for (var i=0; i<140; i++){
+          images[i] = images_order[i];
+      }
+      console.log(images[1]);
+    }
+    createImages();
+
+        var height = 500;
         var width = height;
         var pad = {
               left:70,
@@ -59,20 +82,27 @@
             .attr("id", "corr_plot")
             .attr("transform", "translate(" + pad.left + "," + pad.right + ")");
 
-        var n_index = data.length;
-        var n_var = data.length;
+        var n_index = data.corr.length;
+        var n_var = data.corr.length;
 
         var corrXscale = d3.scale.ordinal().domain(d3.range(n_var)).rangeBands([0, width]);
         var corrYscale = d3.scale.ordinal().domain(d3.range(n_var)).rangeBands([width, 0]);
         var corrZscale = d3.scale.linear().domain([-1,0,1]).range(["darkslateblue", "white", "crimson"]);
 
+        var i=0, j=0;
         var corr = []
-        for (var i in data){
-          for (var j in data[i]){
-            corr.push({row:i, col:j, value:data[i][j]});
+        for (i in data.corr){
+          for (j in data.corr[i]){
+            corr.push({row:i, col:j, value:data.corr[i][j]});
           }
         };
-            console.log(corr);
+
+        var tooltip = d3.select("div#correlation")
+            .append("div")
+            .style("position", "absolute")
+            .style("z-index", "10")
+            .style("visibility", "hidden")
+            .text("a simple tooltip");
 
         var cells = corr_plot.selectAll("empty")
             .data(corr)
@@ -86,35 +116,20 @@
             .attr("fill", function(d){ return corrZscale(d.value); })
             .attr("stroke", "none")
             .attr("stroke-width", 2)
-            .on("mouseover", function(d) { return d3.select(this).attr("id", "corrtext").text(d3.format(".2f")(d.value))});
+            .on("mouseover", function(d) { var a =  tooltip.style("visibility", "visible").text("Correlation: " + d.value + " | image One: " + images[d.col] + " & image Two: " + images[d.row])
+            .append("img")
+            .attr("src", "/thumbs/" + images[d.col] + ".jpg")
+            .attr("style", "float:left");
+            tooltip
+            .append("img")
+            .attr("src", "/thumbs/" + images[d.row] + ".jpg")
+            .attr("style", "float:right");
+            return a;});
 
     })
 
-  </script>
+        </script>
+      </div>
+    </div>
   </body>
 </html>
-
-
-<!-- /*    var diameter = 960,
-        radius = diameter /2,
-        innerRadius = radius - 120;
-
-    var cluster = d3.layout.cluster()
-        .size([360, innerRadius])
-        .sort(null)
-        .value(function(d) { d.size; });
-
-    var bundle = d3.layout.bundle();
-
-    var line = d3.svg.line.radial()
-        .interpolate("bundle")
-        .tension(.85)
-        .radius(function(d) { return d.y; })
-        .angle(function(d) { return d.x / 180 * Math.PI; });
-
-    var svg = d3.select("body").append("svg")
-        .attr("width", diameter)
-        .attr("height", diameter)
-        .append("g")
-        .attr("transform", "translate(" + radius + "," + radius + ")");*/
- -->
