@@ -57,4 +57,27 @@ The script will take about 1GB of ram on your PC, so make sure you close other p
 
 The code will probably crash at the end since I am still working on that right now.
 
+To push your changes to git,
 
+	git add .
+
+To commit changes that are staged:
+
+	git commit -m "put message here"
+
+
+To push changes to GitHub:
+
+	git push origin [[your_branch_name_here]]
+
+
+Whatever part of the project you are working on, make an issue on github. I am assigning issues to you guys right now.
+Once you push changes, if an issue is completed, close the issue on github or comment on it. This will send an email to everyone.
+
+Once I merge everyone's changes, I will email to tell you guys to pull the latest changes:
+
+	git pull origin master
+
+To make the above command work, you must commit your changes first. You might have to fix conflicts first, but I'll explain how to do that later.
+
+If you have any questions, please let me know.

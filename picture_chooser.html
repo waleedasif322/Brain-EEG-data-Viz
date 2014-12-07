@@ -32,12 +32,89 @@
     </div>
   </div>
   <script>
-  var dataset;
-    d3.csv("/corr_diff.csv", function (data) {
-      dataset = data;
-    })
-    d3.select("body").append("p").text("New paragraph!");
 
-  </script
+
+
+    d3.csv("correlation-chord-subtracted.csv", function (data) {
+      //console.log(data);
+        var height = 450;
+        var width = height;
+        var pad = {
+              left:70,
+              top:40,
+              right:5,
+              bottom:70
+            };
+          var innerPad = 5;
+
+        var totalHeight = height + pad.top + pad.bottom;
+        var totalWidth = (width + pad.left + pad.right)*2;
+
+        var svg = d3.select("body")
+            .append("svg")
+            .attr("width", totalWidth)
+            .attr("height", totalHeight);
+
+        var corr_plot = svg.append("g")
+            .attr("id", "corr_plot")
+            .attr("transform", "translate(" + pad.left + "," + pad.right + ")");
+
+        var n_index = data.length;
+        var n_var = data.length;
+
+        var corrXscale = d3.scale.ordinal().domain(d3.range(n_var)).rangeBands([0, width]);
+        var corrYscale = d3.scale.ordinal().domain(d3.range(n_var)).rangeBands([width, 0]);
+        var corrZscale = d3.scale.linear().domain([-1,0,1]).range(["darkslateblue", "white", "crimson"]);
+
+        var corr = []
+        for (var i in data){
+          for (var j in data[i]){
+            corr.push({row:i, col:j, value:data[i][j]});
+          }
+        };
+            console.log(corr);
+
+        var cells = corr_plot.selectAll("empty")
+            .data(corr)
+            .enter()
+            .append("rect")
+            .attr("class", "cell")
+            .attr("x", function(d){  return corrXscale(d.col); })
+            .attr("y", function(d){ return corrYscale(d.row); })
+            .attr("width", corrXscale.rangeBand())
+            .attr("height", corrYscale.rangeBand())
+            .attr("fill", function(d){ return corrZscale(d.value); })
+            .attr("stroke", "none")
+            .attr("stroke-width", 2)
+            .on("mouseover", function(d) { return d3.select(this).attr("id", "corrtext").text(d3.format(".2f")(d.value))});
+
+    })
+
+  </script>
   </body>
 </html>
+
+
+<!-- /*    var diameter = 960,
+        radius = diameter /2,
+        innerRadius = radius - 120;
+
+    var cluster = d3.layout.cluster()
+        .size([360, innerRadius])
+        .sort(null)
+        .value(function(d) { d.size; });
+
+    var bundle = d3.layout.bundle();
+
+    var line = d3.svg.line.radial()
+        .interpolate("bundle")
+        .tension(.85)
+        .radius(function(d) { return d.y; })
+        .angle(function(d) { return d.x / 180 * Math.PI; });
+
+    var svg = d3.select("body").append("svg")
+        .attr("width", diameter)
+        .attr("height", diameter)
+        .append("g")
+        .attr("transform", "translate(" + radius + "," + radius + ")");*/
+ -->

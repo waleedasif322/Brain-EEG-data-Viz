@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+body {
+  font: 10px sans-serif;
+}
+
+.chord path {
+  fill-opacity: .67;
+  stroke: #000;
+  stroke-width: .5px;
+}
+
+div.tooltip {	
+    position: absolute;			
+    text-align: center;			
+    width: 150px;					
+    height: 100px;					
+    padding: 2px;				
+    font: 12px sans-serif;		
+    background: lightsteelblue;	
+    border: 0px;		
+    border-radius: 8px;			
+    pointer-events: none;			
+}
+
+</style>
+<body>
+
+Timeline <input type="range" style="width:800px" min="1" max="139" value=1 id="range_input" />
+<label for="male" id="input_label">1</label>s
+</br>
+<button type="button"  id="start_button">Start</button>
+<button type="button"  id="stop_button">Stop</button>
+</br>
+
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="d3.js"></script>
+<script>
+
+//read file
+d3.text('30fps_data.txt', function(error3, data1){
+d3.text("positions.txt", function(dataa) {
+
+	var json_frames = JSON.parse(data1);
+	var positions = d3.csv.parseRows(dataa);
+	
+	 // 33 milleseconds * 60 = 1980 miliseconds < 2000 : in other words display 60 images in 33 milisecond intervals, which adds up to almost 2 seconds total
+	var interval = 33; //callback interval update every 33 miliseconds
+	var interval2 = 33; //this is how often callback gets executed
+	var counter = 0; //counts frames
+	var dx = 0; //change for times 0=stop 1=start
+	var frame = 0; //current picture displayed
+	var ctr2 = 0; //counter for each frame; for color change inbetween images 30fps depends on intervals
+	var z_list = [] //this is array of color scales for nodes
+	var min_glob = []; //this is global min value for all nodes at all times
+	var max_glob = []; //this is global max value for all nodes at all times
+	var PI = 3.141592653;
+	
+	var body = d3.selectAll("body").append("div").style("float","left").style("margin-top", "150px");
+
+
+	var rang = d3.selectAll("#range_input")[0][0];
+
+	body.html("<img width='500px' height='300px' src='img/1.jpg'/>");
+	var margin = {top: -55, right: 0, bottom: 0, left: -30},
+    width = 1000 - margin.left - margin.right,
+    height = 1000 - margin.top - margin.bottom;
+
+
+
+
+	var svg = d3.select("body").append("svg")
+		.attr("width", 850)
+		.attr("height", 850)
+		.style("background-image","url(unnamed.PNG)")
+		.append("g").attr("transform", 
+								"translate(" + margin.left + "," + margin.top + ")");
+		
+	
+	var tooltip = d3.select("body").append("div")	
+				.attr("class", "tooltip")				
+				.style("opacity", 0);
+				
+	
+	//this is for initial colors for frame 0
+	var colors = []
+	for(var i=0; i<64; i++){
+						
+			colors[i] = json_frames[i][frame][30];
+						
+	}
+
+
+	//find max and min for each channel and create a color scale for each
+	for(var i =0; i<64; i++){
+	
+		var min_val =[];
+		var max_val = [];
+		
+		for(var j = 0; j<140; j++){ 
+			var min1 = d3.min(json_frames[i][j]);
+			var max1 = d3.max(json_frames[i][j]);
+			min_val[j] =  min1;
+			max_val[j] = max1;
+		}
+		var min = Math.ceil(d3.min(min_val));		
+		var max = Math.ceil(d3.max(max_val));
+		
+		z_list[i] = d3.scale.linear()
+						.domain([min,max])
+						.range(["white","red"]);
+		min_glob[i] = min;
+		max_glob[i] = max;
+	}	
+	//console.log(min_glob);
+	//console.log(max_glob);
+	min_glob = Math.ceil(d3.min(min_glob));
+	max_glob = Math.ceil(d3.max(max_glob));
+	//console.log(min_glob);
+	//console.log(max_glob);
+	
+	var size_scale = d3.scale.linear()
+						.domain([min_glob,max_glob])
+						.range([1,10000]);
+						
+	var circles = svg.selectAll("circle")
+					.data(json_frames)
+					.enter()
+					.append("circle")
+					.attr("r",function (d,i){ 
+					
+						//if(i == 63 || i == 62){	
+						//	return d[frame][ctr2]/3000;
+						//}
+					
+						//console.log(i.toString() + d[frame][ctr2]/200);
+						//return d[frame][ctr2]/200;
+							var val  = Math.sqrt(size_scale(d[frame][ctr2])/PI);
+							return val;
+
+					})
+					.attr("cx",function(d,i){ return positions[i*2];})
+					.attr("cy",function(d,i){ return positions[i*2+1];})
+					.attr("fill",function(d,i){
+					
+					 
+					return z_list[i](colors[i]);
+					
+
+					})
+					.style("opacity", 0.9)
+					.on("mouseover", function(d,e,i){ 
+				
+						
+						d3.select(this)
+							.transition()
+							.style("opacity", 1);				
+						
+						tooltip.transition()		
+							.duration(200)		
+							.style("opacity", .9);		
+						
+						//console.log(e);
+							
+						var e1 = e +1;
+						
+						d3.select(this)
+								.transition()
+								.attr("stroke", "yellow");
+						
+						tooltip.html("channel: "+ e1 + "<br/>val: "+ d[frame][ctr2]	
+								)	
+							.style("left", (d3.event.pageX) + "px")		
+							.style("top", (d3.event.pageY - 28) + "px");
+
+						
+				
+					}).on("mouseout",function(){ 
+			
+							d3.select(this)
+								.transition()
+								.attr("stroke", "black");
+								
+							tooltip.transition()		
+							.duration(200).style("opacity", 0);
+							
+					}).on("click",function(d,e,i){
+				
+						//this needs to be filled up by raj
+								
+				
+					})
+					.attr("stroke","black").attr("stroke-width",3);
+
+
+
+	
+	var btn_click = d3.selectAll("#start_button").on("click", function(){
+	
+			dx=1;
+			d3.timer(makeCallback(),interval);
+			
+	});
+	
+
+	var btn_click2 = d3.selectAll("#stop_button").on("click", function(){
+	
+			dx=0;
+			
+	});
+
+
+	var makeCallback = function() {
+
+		return function() {
+		
+			if(dx>0){
+			
+				if(counter>1960){
+				
+					var vv = parseInt(rang.value) +1 ;
+					var im1 = "</br><img width='500px' height='300px' src='img/"+ vv+  ".jpg'/>";
+					body.html(im1);
+					d3.selectAll("#input_label").html(rang.value);
+				
+					rang.value = parseInt(rang.value) + dx;
+					
+					counter=0;
+					frame = rang.value;
+					ctr2 = 0;
+				}
+				
+				ctr2 = ctr2 + 1;
+			
+				d3.timer(makeCallback(),interval);
+			
+			}
+			else{
+			
+				//d3.timer(makeCallback(),0);
+			
+			}
+
+			
+			var cols = []
+			//
+			for(var i=0; i<64; i++){
+				
+				cols[i] = json_frames[i][frame][ctr2-1];
+				
+			}
+			
+			circles.attr("fill",function(d,i){
+			
+				//console.log(frame);
+				return z_list[i](cols[i]);	
+			
+			}).attr("r",function (d,i){ 
+					
+					/*if(i == 63 || i == 62){
+					
+						return cols[i]/3000;
+					
+					}
+						return cols[i]/200;
+*/
+							var val  = Math.sqrt(size_scale(d[frame][ctr2])/PI);
+							return val;
+					});
+
+			cols = [];
+			
+			counter =  counter+interval2;
+
+			return true;
+		}
+	};
+  
+	d3.selectAll("#range_input")
+		.on("input", function(d,i){
+
+					threshold_filter = this.value;	
+					
+					d3.selectAll("#input_label")
+						.html(this.value);
+						
+					var vv = parseInt(rang.value);
+					var im1 = "</br><img width='500px' height='300px' src='img/"+ vv+  ".jpg'/>";
+					frame = vv;
+					console.log("hi");
+							
+					var cols = []
+					for(var i=0; i<64; i++){
+						
+						cols[i] = json_frames[i][frame][30];
+						
+					}
+					
+					
+					circles.attr("fill",function(d,i){
+					
+						//console.log(frame);
+						return z_list[i](cols[i]);	
+					
+					}).attr("r",function (d,i){ 
+							
+					/*	if(i == 63 || i == 62){
+						
+							return cols[i]/3000;
+						
+						}
+							return cols[i]/200;
+					*/
+
+						var val  = Math.sqrt(size_scale(d[frame][ctr2])/PI);
+								return val;
+					});	
+						
+						
+						
+						
+						
+											
+		});	
+		
+	d3.selectAll("#range_input").value(1);
+	
+	
+})
+});
+
+</script>
