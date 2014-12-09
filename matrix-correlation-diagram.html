@@ -47,16 +47,16 @@
   <div class="col-md-6">
     <script>
 
-    d3.json("data.json", function (data) {
+    d3.json("python-scripts/data.json", function (data) {
 
-    var images_order = [136, 189, 3, 158, 87, 90, 54, 9, 10, 171, 129, 11, 103, 141, 216, 43, 156, 39, 2, 166, 58, 92, 67, 78, 26, 173, 101, 175, 32, 102, 208, 138, 48, 139, 18, 199, 167, 19, 40, 192, 120, 106, 127, 13, 165, 211, 95, 118, 57, 169, 203, 111, 112, 200, 96, 114, 35, 198, 182, 145, 152, 22, 168, 5, 178, 150, 162, 47, 122, 31, 181, 213, 204, 98, 44, 89, 135, 159, 66, 29, 8, 7, 187, 1, 121, 79, 23, 52, 212, 17, 176, 113, 20, 123, 137, 144, 151, 46, 147, 196, 28, 84, 85, 201, 172, 12, 214, 131, 94, 42, 190, 61, 206, 80, 153, 34, 69, 33, 210, 119, 185, 55, 108, 27, 4, 160, 70, 107, 76, 163, 155, 91, 142, 143, 64, 75, 125, 130, 21, 194];
-
+    //var images_order = [136, 189, 3, 158, 87, 90, 54, 9, 10, 171, 129, 11, 103, 141, 216, 43, 156, 39, 2, 166, 58, 92, 67, 78, 26, 173, 101, 175, 32, 102, 208, 138, 48, 139, 18, 199, 167, 19, 40, 192, 120, 106, 127, 13, 165, 211, 95, 118, 57, 169, 203, 111, 112, 200, 96, 114, 35, 198, 182, 145, 152, 22, 168, 5, 178, 150, 162, 47, 122, 31, 181, 213, 204, 98, 44, 89, 135, 159, 66, 29, 8, 7, 187, 1, 121, 79, 23, 52, 212, 17, 176, 113, 20, 123, 137, 144, 151, 46, 147, 196, 28, 84, 85, 201, 172, 12, 214, 131, 94, 42, 190, 61, 206, 80, 153, 34, 69, 33, 210, 119, 185, 55, 108, 27, 4, 160, 70, 107, 76, 163, 155, 91, 142, 143, 64, 75, 125, 130, 21, 194];
+    //images are labelled by number so we can just make a hash
     var images = {}
     var createImages = function(){
-      for (var i=0; i<140; i++){
-          images[i] = images_order[i];
+      for (var i=1; i<=216; i++){
+          images[i] = '/thumbs/' + i + '.jpg';
       }
-      console.log(images[1]);
+//      console.log(images[1]);
     }
     createImages();
 
@@ -82,13 +82,15 @@
             .attr("id", "corr_plot")
             .attr("transform", "translate(" + pad.left + "," + pad.right + ")");
 
-        var n_index = data.corr.length;
-        var n_var = data.corr.length;
+        //number of columns and rows respectively
+        var n_index = data.ind.length;
+        var n_var = data.var.length;
 
         var corrXscale = d3.scale.ordinal().domain(d3.range(n_var)).rangeBands([0, width]);
         var corrYscale = d3.scale.ordinal().domain(d3.range(n_var)).rangeBands([width, 0]);
         var corrZscale = d3.scale.linear().domain([-1,0,1]).range(["darkslateblue", "white", "crimson"]);
 
+        //making data easier to work with
         var i=0, j=0;
         var corr = []
         for (i in data.corr){
@@ -104,6 +106,7 @@
             .style("visibility", "hidden")
             .text("a simple tooltip");
 
+        //each cell needs to be colored according to value
         var cells = corr_plot.selectAll("empty")
             .data(corr)
             .enter()
@@ -116,15 +119,21 @@
             .attr("fill", function(d){ return corrZscale(d.value); })
             .attr("stroke", "none")
             .attr("stroke-width", 2)
-            .on("mouseover", function(d) { var a =  tooltip.style("visibility", "visible").text("Correlation: " + d.value + " | image One: " + images[d.col] + " & image Two: " + images[d.row])
+            .on("mouseover", function(d) { var a =  tooltip.style("visibility", "visible").text("Correlation: " + d.value + " | image One: " + images[data.ind[d.col]] + " & image Two: " + images[data.var[d.row]])
             .append("img")
-            .attr("src", "/thumbs/" + images[d.col] + ".jpg")
+            .attr("src", "/thumbs/" + data.ind[d.col] + ".jpg")
             .attr("style", "float:left");
             tooltip
             .append("img")
-            .attr("src", "/thumbs/" + images[d.row] + ".jpg")
+            .attr("src", "/thumbs/" + data.var[d.row] + ".jpg")
             .attr("style", "float:right");
-            return a;});
+            return a;})
+            .on("click", function(d){ showBubble(d.col, d.row) });
+
+        //integrating Matt's bubble diagram so that it displays two head diagrams on clickin inside of the matrix
+        function showBubble(i,j){
+
+        }
 
     })
 
