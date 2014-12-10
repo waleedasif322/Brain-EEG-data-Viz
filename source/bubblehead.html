@@ -113,6 +113,7 @@ d3.text("positions.txt", function(dataa) {
 						.range(["white","red"]);
 		min_glob[i] = min;
 		max_glob[i] = max;
+		// console.log(z_list);
 	}	
 	//console.log(min_glob);
 	//console.log(max_glob);
@@ -124,6 +125,63 @@ d3.text("positions.txt", function(dataa) {
 	var size_scale = d3.scale.linear()
 						.domain([min_glob,max_glob])
 						.range([1,10000]);
+
+	function lineplot (data, index, error) 
+	{
+		var margin = {top: 20, right: 20, bottom: 30, left: 50},
+		    width = 960 - margin.left - margin.right,
+		    height = 500 - margin.top - margin.bottom;
+
+		
+		var x = d3.scale.ordinal()
+		    .rangeRoundBands([0, width], .1);
+
+		var y = d3.scale.linear()
+		    .range([height, 0]);
+
+		var xAxis = d3.svg.axis()
+		    .scale(x)
+		    .orient("bottom");
+
+		var yAxis = d3.svg.axis()
+		    .scale(y)
+		    .orient("left");
+
+		var chan_xdata = [];
+		var chan_ydata = [];
+		var valueline = d3.svg.line()
+		.x(function(d,i) { chan_xdata.push(x(i)); return x(i); })
+		.y(function(d) { chan_ydata.push(y(d)); return y(d); });
+		//var line = d3.svg.line()
+		  //  .x(function(d) { return x(d); })
+		    //.y(function(d) { return y(d); });
+
+		x.domain(data.map(function(d){ return d; }));
+		y.domain([0, d3.max(data, function(d, index) { return d[index]; })]);
+		var svg = d3.select("body").append("svg");
+		
+		svg.append("g")
+      		.attr("class", "x axis")
+      		.attr("transform", "translate(0," + height + ")")
+      		.call(xAxis);
+
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("nodes ");
+
+  svg.append("path")
+      .datum(data)
+      .attr("class", "line")
+      .attr("d", line);
+
+
+	}
 						
 	var circles = svg.selectAll("circle")
 					.data(json_frames)
@@ -137,8 +195,8 @@ d3.text("positions.txt", function(dataa) {
 					
 						//console.log(i.toString() + d[frame][ctr2]/200);
 						//return d[frame][ctr2]/200;
-							var val  = Math.sqrt(size_scale(d[frame][ctr2])/PI);
-							return val;
+						var val  = Math.sqrt(size_scale(d[frame][ctr2])/PI);
+						return val;
 
 					})
 					.attr("cx",function(d,i){ return positions[i*2];})
@@ -162,7 +220,6 @@ d3.text("positions.txt", function(dataa) {
 							.duration(200)		
 							.style("opacity", .9);		
 						
-						//console.log(e);
 							
 						var e1 = e +1;
 						
@@ -190,7 +247,13 @@ d3.text("positions.txt", function(dataa) {
 				
 						//this needs to be filled up by raj
 								
-				
+						console.log(d[i]);
+						console.log(d);
+						console.log(e);
+						console.log(i);	
+						//console.log(d[i]);
+						lineplot(d, e, i);
+
 					})
 					.attr("stroke","black").attr("stroke-width",3);
 
@@ -249,6 +312,7 @@ d3.text("positions.txt", function(dataa) {
 			for(var i=0; i<64; i++){
 				
 				cols[i] = json_frames[i][frame][ctr2-1];
+				console.log(cols);
 				
 			}
 			
