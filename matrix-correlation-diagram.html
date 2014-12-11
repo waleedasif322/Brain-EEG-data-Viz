@@ -247,10 +247,10 @@
 
 
           var svg = d3.select(div_tag).append("svg")
-              .attr("width", 635)
-              .attr("height", 635)
+              .attr("width", 476)
+              .attr("height", 476)
               .attr("id", "bubble" + pos)
-              .style("background-image","url(source/unnamed.png)")
+              .style("background-image","url(source/nodes.jpeg)")
               .append("g").attr("transform",
                           "translate(" + margin.left + "," + margin.top + ")");
 
@@ -299,8 +299,8 @@
                       var val  = Math.sqrt(size_scale(d[frame][ctr2])/PI);
                       return val;
                   })
-                  .attr("cx",function(d,i){ return (positions[i*2])*.75;})
-                  .attr("cy",function(d,i){ return (positions[i*2+1])*.75;})
+                  .attr("cx",function(d,i){ return ((positions[i*2])*.75)*.78;})
+                  .attr("cy",function(d,i){ return ((positions[i*2+1])*.75)*.78;})
                   .attr("fill",function(d,i){ return z_list[i](colors[i]); })
                   .style("opacity", 0.9)
                   .on("mouseover", function(d,e,i){
@@ -349,12 +349,12 @@
                     if(dx>0){
                       if(counter>1960){
                         var vv = imageNumber ;
-                        var im1 = "</br><img width='500px' height='300px' src='source/img/"+ vv+  ".jpg'/>";
+                        var im1 = "</br><img src='source/img/"+ vv + ".jpg'/>";
                         body.html(im1);
                         d3.selectAll("#input_label").html(rang.value);
                         rang.value = parseInt(rang.value) + dx;
                         counter=0;
-                        frame = rang.value;
+                        //frame = rang.value;
                         ctr2 = 0;
                       }
                       ctr2 = ctr2 + 1;
@@ -387,7 +387,7 @@
                           .html(this.value);
 
                         var vv = parseInt(rang.value);
-                        var im1 = "</br><img width='500px' height='300px' src='img/"+ vv+  ".jpg'/>";
+                        var im1 = "</br><img src='source/img/"+ vv+  ".jpg'/>";
                         frame = vv;
                         console.log("hi");
 
