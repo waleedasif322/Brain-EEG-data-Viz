@@ -12,17 +12,17 @@ body {
   stroke-width: .5px;
 }
 
-div.tooltip {	
-    position: absolute;			
-    text-align: center;			
-    width: 150px;					
-    height: 100px;					
-    padding: 2px;				
-    font: 12px sans-serif;		
-    background: lightsteelblue;	
-    border: 0px;		
-    border-radius: 8px;			
-    pointer-events: none;			
+div.tooltip {
+    position: absolute;
+    text-align: center;
+    width: 150px;
+    height: 100px;
+    padding: 2px;
+    font: 12px sans-serif;
+    background: lightsteelblue;
+    border: 0px;
+    border-radius: 8px;
+    pointer-events: none;
 }
 
 </style>
@@ -38,13 +38,13 @@ less than filter: <label for="male" id="input_label2">1</label>
 <script src="d3.js"></script>
 <script>
 
-//read file	
-d3.text('correlation-chord-subtracted.csv', function(error3, data3){
-			
-			
+//read file
+d3.text('../python-scripts/node-node-corr.csv', function(error3, data3){
+
+
 var corr_diff = d3.csv.parseRows(data3);
 
-				
+
 //image comparison list by index
 var t_list= [2,20,72,11,9,111,66,77,88];
 var t_len = t_list.length;
@@ -57,114 +57,114 @@ var threshold_filter2 = 1;
 d3.selectAll("#range_input").on("input", function(d,i){
 
 			threshold_filter = (this.value-100)/100;
-			
+
 			d3.selectAll("#input_label")
-				.html((this.value-100)/100);					
-});	
+				.html((this.value-100)/100);
+});
 d3.selectAll("#range_input2").on("input", function(d,i){
 
 			threshold_filter2 = (this.value-100)/100;
 			d3.selectAll("#input_label2")
-				.html((this.value-100)/100);					
-});	
+				.html((this.value-100)/100);
+});
 
 
 
 
 
 var btn_click = d3.selectAll("#generate_button").on("click", function(){
-			
+
 			var scale_vals = d3.scale.linear()
 								.domain([-1,1])
 								.range([0,10]);
 
 			//var rand = Math.floor(Math.random() * 216);
-			
+
 			t_len = d3.select("#input_text")[0][0].value;
 
 			//console.log(t_len);
-			
+
 			for(var i=0; i<t_len; i++){
 				t_list[i]=i;
 			}
-			
-			
-			
+
+
+
 			/*
-			//old script to take 10x10 from main matrix	
-			
+			//old script to take 10x10 from main matrix
+
 			var nr = 10;
 			var arr = [];
 			for(var x = 0; x < nr; x++){
-				arr[x] = [];    
-				for(var y = 0; y < nr; y++){ 
-				
-					arr[x][y] = corr_diff[x][y];  
-				}    
+				arr[x] = [];
+				for(var y = 0; y < nr; y++){
+
+					arr[x][y] = corr_diff[x][y];
+				}
 			}
-			
+
 			for(var x = 0; x < nr; x++){
-				for(var y = 0; y < nr; y++){ 
-				
-					arr[x][y] = scale_vals(arr[x][y]);  
-					
-				}    
-			}	
-			for(var i = 0; i<nr; i++){		
-				for(var j=0; j<=i; j++){			
+				for(var y = 0; y < nr; y++){
+
+					arr[x][y] = scale_vals(arr[x][y]);
+
+				}
+			}
+			for(var i = 0; i<nr; i++){
+				for(var j=0; j<=i; j++){
 				arr[i][j] = 0;
-			
+
 				}
 			}
 */
-				
-		
+
+
 			var new_arr = [];
-			
+
 			//extract new matrix algorithm
-			for(var i=0; i<t_len; i++){			
-				new_arr[i] = []		
+			for(var i=0; i<t_len; i++){
+				new_arr[i] = []
 				for(var j=0; j<=i; j++){
-				
+
 					var val = scale_vals(corr_diff[t_list[i]][t_list[j]]);
-					
+
 					//filter below thershold and above
-					if (corr_diff[t_list[i]][t_list[j]] < threshold_filter 
+					if (corr_diff[t_list[i]][t_list[j]] < threshold_filter
 						|| corr_diff[t_list[i]][t_list[j]] == 1
 						|| corr_diff[t_list[i]][t_list[j]] > threshold_filter2){
-						
-						val = 0;		
 
-						
+						val = 0;
+
+
 					}
-					
-					new_arr[i][j] = val;	
-				}		
+
+					new_arr[i][j] = val;
+				}
 				for(var j=i+1; j<t_len; j++){
 
 					var val = scale_vals(corr_diff[t_list[i]][t_list[j]]);
-					
+
 					//filter below thereshold and above
 					if (corr_diff[t_list[i]][t_list[j]] < threshold_filter
 						|| corr_diff[t_list[i]][t_list[j]] == 1
-						|| corr_diff[t_list[i]][t_list[j]] > threshold_filter2){	
-						
-						val = 0;			
+						|| corr_diff[t_list[i]][t_list[j]] > threshold_filter2){
+
+						val = 0;
 					}
-					
+
 					new_arr[i][j] = val;//t_list[i] + "," + t_list[j];
 				}
-				
+
 			}
-			
-	
+
+
 			var chord = d3.layout.chord()
 				.padding(.05)
 				.sortSubgroups(d3.descending)
 				//.sortGroups(d3.descending)
 				.matrix(new_arr);
 
-				
+
 			var width = 600,
 				height = 600,
 				innerRadius = Math.min(width, height) * .41,
@@ -192,7 +192,7 @@ var btn_click = d3.selectAll("#generate_button").on("click", function(){
 				,"#FFF5EE"
 				,"#2E8B57"
 				,"#F4A460"
-				,"#FA8072"	
+				,"#FA8072"
 				]);
 
 			var svg = d3.select("body").append("svg")
@@ -212,17 +212,17 @@ var btn_click = d3.selectAll("#generate_button").on("click", function(){
 				.on("mouseover", fade(.1))
 				.on("mouseout",fade(1));
 
-			var div = d3.select("body").append("div")	
-				.attr("class", "tooltip")				
+			var div = d3.select("body").append("div")
+				.attr("class", "tooltip")
 				.style("opacity", 0);
 
-			var div2 = d3.select("body").append("div")	
+			var div2 = d3.select("body").append("div")
 				.attr("class", "pic_comparison")
 				.style("float","left")
 				.style("width","500px")
 				.style("opacity", 0);
-				
-				
+
+
 				svg.append("g")
 				.attr("class", "chord")
 				.selectAll("path")
@@ -231,74 +231,74 @@ var btn_click = d3.selectAll("#generate_button").on("click", function(){
 				.attr("d", d3.svg.chord().radius(innerRadius))
 				.style("fill", function(d) { return fill(d.target.index); })
 				.on("click", function(d,e){
-				
+
 					var ind1 = d.source.index+1;
 					var ind2 = d.target.index+1;
-					
+
 					var im1 = "<img width='500px' height='300px' src='img/"+t_list[ind1] +  ".jpg'/>";
 					var im2 = "<img width='500px' height='300px' src='img/"+t_list[ind2] +  ".jpg'/>";
-					
 
-					
-					div2.transition()		
-						.duration(200)		
-						.style("opacity", .9);		
-									
+
+
+					div2.transition()
+						.duration(200)
+						.style("opacity", .9);
+
 					div2.html(im1 + " " + ind1 + " vs "+ ind2 + " "+ im2
-							)	
-						.style("left", (d3.event.pageX +50) + "px")		
+							)
+						.style("left", (d3.event.pageX +50) + "px")
 						.style("top", (d3.event.pageY - 28) + "px");
-					
+
 					//window.open("Image "+ t_list[d.source.index] +" vs "+ "Image "+t_list[d.target.index]);
-					
-				
+
+
 				})
-				.on("mouseover", function(d,e){ 
-				
+				.on("mouseover", function(d,e){
+
 					//fade(0.1);
 					svg.selectAll(".chord path")
 						.transition()
 						.style("opacity",.1);
-						
+
 					d3.select(this)
 						.transition()
-						.style("opacity", 1);				
-					
-					div.transition()		
-						.duration(200)		
-						.style("opacity", .9);		
-					
+						.style("opacity", 1);
+
+					div.transition()
+						.duration(200)
+						.style("opacity", .9);
+
 					var ind1 = t_list[d.source.index]+1;
 					var ind2 = t_list[d.target.index]+1;
-						
+
 					var tt = corr_diff[t_list[d.source.index]][t_list[d.target.index]];
 					console.log(tt);
 					var t2 = parseFloat(tt).toFixed(6);
 					console.log(t2);
-					div.html("Image "+ind1 +" vs "+ "Image "+ind2+ "<br/><br/>"+ 
+					div.html("Image "+ind1 +" vs "+ "Image "+ind2+ "<br/><br/>"+
 									"correlation: " + t2 + "</br>"
 									//"color: " +   color_diff[t_list[d.source.index]][t_list[d.target.index]]+ "</br>"+
-									//"gray: "+ gray_diff[t_list[d.source.index]][t_list[d.target.index]]		
-							)	
-						.style("left", (d3.event.pageX) + "px")		
+									//"gray: "+ gray_diff[t_list[d.source.index]][t_list[d.target.index]]
+							)
+						.style("left", (d3.event.pageX) + "px")
 						.style("top", (d3.event.pageY - 28) + "px");
 
-						
-				
+
+
 				})
-				.on("mouseout",function(){ 
-				
+				.on("mouseout",function(){
+
 					d3.selectAll(".chord")
 						.selectAll("path")
 						.style("opacity",1);
-					
-					div.transition()		
+
+					div.transition()
 						.duration(200).style("opacity", 0);
 				});
-	
-				
-				
-				
+
+
+
+
 			var ticks = svg.append("g").selectAll("g")
 				.data(chord.groups)
 				.enter().append("g").selectAll("g")
@@ -321,7 +321,7 @@ var btn_click = d3.selectAll("#generate_button").on("click", function(){
 				.attr("dy", ".35em")
 				.attr("transform", function(d) { return d.angle > Math.PI ? "rotate(180)translate(-16)" : null; })
 				.style("text-anchor", function(d) { return d.angle > Math.PI ? "end" : null; })
-				.text(function(d,i,e) { 
+				.text(function(d,i,e) {
 				return t_list[e] + 1; });
 
 			/*
@@ -346,9 +346,9 @@ var btn_click = d3.selectAll("#generate_button").on("click", function(){
 					.style("opacity", opacity);
 			  };
 			}
-			
-			
-			
+
+
+
 	});
 	});
 
