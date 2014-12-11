@@ -11,12 +11,27 @@
     <script src="/libs/angular-isotope-master/dist/angular-isotope.js"></script>
     <script src="/picture-loader.js"></script>
 
+    <style>
+      #img1{
+        margin-left: auto;
+        margin-right: auto;
+      }
+      #img2{
+        margin-left: auto;
+        margin-right: auto;
+      }
+    </style>
+
   </head>
   <body>
     <br>
     <h1 style="text-align:center">Brain EEG Data Visualization Project</h1>
-    <p>A person was shown 140 images </p>
+    <div class="col-md-12">
+      <p>A person was shown 140 images and asked to try and remember each image. Images were abstract landscapes, which means the person viewing the images doesn't give a name to each image.
+      This allows us to see which images trigger which part of the brain, and how each part of the brain is linked with another.</p>
+    </div>
     <hr>
+    <br>
     <div class="container">
       <div class ="row">
         <div  class="col-md-6">
@@ -28,11 +43,20 @@
       </div>
       <br>
       <div class="row">
+        <div style="text-align:center;">
+          <button type="button" id="start_button">Play</button>
+          <button type="button" id="stop_button">Pause</button>
+        </div>
+        <br>
         <div class="col-md-6">
-          <div id="slot1"></div>
+          <div id="slot1">
+            <input type="range" min="0" max="60" value=1 id="range_input1"/>
+          </div>
         </div>
         <div class="col-md-6">
-          <div id="slot2"></div>
+          <div id="slot2">
+            <input type="range" min="0" max="60" value=1 id="range_input2"/>
+          </div>
         </div>
       </div>
     </div>
@@ -108,7 +132,9 @@
             .style("position", "absolute")
             .style("z-index", "10")
             .style("visibility", "hidden")
-            .text("a simple tooltip");
+            .style("font-size", "large");
+
+        var format_corr = d3.format(".3f");
 
         //each cell needs to be colored according to value
         var cells = corr_plot.selectAll("empty")
@@ -123,21 +149,67 @@
             .attr("fill", function(d){ return corrZscale(d.value); })
             .attr("stroke", "none")
             .attr("stroke-width", 2)
-            .on("mouseover", function(d) { var a =  tooltip.style("visibility", "visible").text("Correlation: " + d.value + " | image One: " + images[data.ind[d.col]] + " & image Two: " + images[data.var[d.row]])
-                .append("img")
-                .attr("src", "/thumbs/" + data.ind[d.col] + ".jpg")
-                .attr("style", "float:left");
+            .on("mouseover", function(d) { var a =  tooltip.style("visibility", "visible").text("Correlation: " + format_corr(d.value) + " | First Image: #" + data.ind[d.col] + " Second Image: #" + data.var[d.row])
+                  .append("img")
+                  .attr("src", "/thumbs/" + data.ind[d.col] + ".jpg")
+                  .attr("style", "float:left");
                 tooltip
-                .append("img")
-                .attr("src", "/thumbs/" + data.var[d.row] + ".jpg")
-                .attr("style", "float:right");
+                  .append("img")
+                  .attr("src", "/thumbs/" + data.var[d.row] + ".jpg")
+                  .attr("style", "float:right");
+                corr_plot.append("text").attr("id", "corrtext").text(d3.format(".2f")(d.value))
+                  .attr("x", function () {
+                    var mult = -1;
+                    if(d.col < n_var/2){
+                      mult = 1;
+                    }
+                    return corrXscale(d.col) + mult * 30;
+                  })
+                  .attr("y", function () {
+                      var mult = 1;
+                      if(d.row < n_var/2){
+                        mult = -1;
+                      }
+                      return corrYscale(d.row) + mult * 30;
+                  })
+                  .attr("fill", "black")
+                  .attr("dominant-baseline", "middle")
+                  .attr("text-anchor", "middle");
+                corr_plot.append("text")
+                  .attr("class", "corrlabel")
+                  .attr("x", corrXscale(d.col))
+                  .attr("y", height + pad.bottom * 0.2)
+                  .text(data["ind"][d.col])
+                  .attr("dominant-baseline", "middle")
+                  .attr("text-anchor", "middle");
+                corr_plot.append("text")
+                  .attr("class", "corrlabel")
+                  .attr("y", corrYscale(d.row))
+                  .attr("x", -pad.left * 0.1)
+                  .text(data["var"][d.row])
+                  .attr("dominant-baseline", "middle")
+                  .attr("text-anchor", "end");
               return a;})
+            .on("mouseout", function(){
+                 d3.selectAll("text.corrlabel").remove();
+                 d3.selectAll("text#corrtext").remove();
+                 d3.select(this).attr("stroke","none");
+            })
             .on("click", function(d){ showBubble(data.ind[d.col], data.var[d.row]) });
+
+          corr_plot.append("rect")
+                 .attr("height", height)
+                 .attr("width", width)
+                 .attr("fill", "none")
+                 .attr("stroke", "black")
+                 .attr("stroke-width", 1)
+                 .attr("pointer-events", "none");
 
         //integrating Matt's bubble diagram so that it displays two head diagrams on clickin inside of the matrix
         function showBubble(firstImage, secondImage){
+          d3.selectAll("circle").remove();
           drawBubble(firstImage, 1);
-          //drawBubble(secondImage, 2);
+          drawBubble(secondImage, 2);
 
         }
 
@@ -156,12 +228,18 @@
           var PI = 3.141592653;
           var location_picture = "pic_slot_" + pos;
           var location_nodes = "nodes_slot_" + pos;
-            var div_tag = "div#slot" + pos;
+          var div_tag = "div#slot" + pos;
 
-          var body = d3.selectAll(div_tag).append("div").style("float","left").style("margin-top", "150px");
+          d3.selectAll("img#img" + pos).remove();
+          d3.selectAll("svg#bubble" + pos).remove();
+
+          var body = d3.selectAll(div_tag).append("div").style("float","left");
           var rang = d3.selectAll("#range_input")[0][0];
 
-          body.html("<img width='500px' height='300px' src='source/img/" + imageNumber +  ".jpg'/>");
+          body.append("img")
+              .attr("src", "source/img/" + imageNumber + ".jpg")
+              .attr("id", "img" + pos)
+              .attr("align", "middle");
 
           var margin = {top: -55, right: 0, bottom: 0, left: -30},
               width = 1000 - margin.left - margin.right,
@@ -171,6 +249,7 @@
           var svg = d3.select(div_tag).append("svg")
               .attr("width", 635)
               .attr("height", 635)
+              .attr("id", "bubble" + pos)
               .style("background-image","url(source/unnamed.png)")
               .append("g").attr("transform",
                           "translate(" + margin.left + "," + margin.top + ")");
