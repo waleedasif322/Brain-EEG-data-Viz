@@ -35,8 +35,10 @@ Timeline <input type="range" style="width:800px" min="1" max="139" value=1 id="r
 <button type="button"  id="stop_button">Stop</button>
 </br>
 
+<script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="d3.js"></script>
 <script>
+
 //read file
 d3.text('30fps_data.txt', function(error3, data1){
 d3.text("positions.txt", function(dataa) {
@@ -124,90 +126,65 @@ d3.text("positions.txt", function(dataa) {
 						.domain([min_glob,max_glob])
 						.range([1,10000]);
 
-	function lineplot (d, e, i) 
+	function lineplot (data, index, error) 
 	{
-		d3.select("#visualisation").selectAll("g").remove();
-		d3.select("#visualisation").selectAll("path").remove();
+		var margin = {top: 20, right: 20, bottom: 30, left: 50},
+		    width = 960 - margin.left - margin.right,
+		    height = 500 - margin.top - margin.bottom;
+
 		
-		var y = [];
+		var x = d3.scale.ordinal()
+		    .rangeRoundBands([0, width], .1);
 
-		for (var k = 0; k < d.length; k++)
-		{
-			for (var j = 0; j < d[k].length; j++)
-			{
-				if (j == 30)
-					y.push(d[k][j]);
-			}
-		}
+		var y = d3.scale.linear()
+		    .range([height, 0]);
 
-		var x = new Array(140);
-		for (var l = 0; l < x.length; l++)
-		{
-			x[l] = l;
-		}
+		var xAxis = d3.svg.axis()
+		    .scale(x)
+		    .orient("bottom");
 
-		var lineData = []
-		for (var q = 0; q < d.length; q++)
-		{
-			lineData.push({ x: x[q], y: y[q]});
-		}
+		var yAxis = d3.svg.axis()
+		    .scale(y)
+		    .orient("left");
 
-		console.log(lineData);
+		var chan_xdata = [];
+		var chan_ydata = [];
+		var valueline = d3.svg.line()
+		.x(function(d,i) { chan_xdata.push(x(i)); return x(i); })
+		.y(function(d) { chan_ydata.push(y(d)); return y(d); });
+		//var line = d3.svg.line()
+		  //  .x(function(d) { return x(d); })
+		    //.y(function(d) { return y(d); });
 
-		var vis = d3.select('body').select("#visualisation"),
-				    WIDTH = 1000,
-				    HEIGHT = 500,
-				    MARGINS = {
-				      top: 20,
-				      right: 20,
-				      bottom: 20,
-				      left: 50
-				    },
-				    xRange = d3.scale.linear().range([MARGINS.left, WIDTH - MARGINS.right]).domain([d3.min(lineData, function(d) {
-				      return d.x;
-				    }), d3.max(lineData, function(d) {
-				      return d.x;
-				    })]),
-				    yRange = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([d3.min(lineData, function(d) {
-				      return d.y;
-				    }), d3.max(lineData, function(d) {
-				      return d.y;
-				    })]),
-				    xAxis = d3.svg.axis()
-				      .scale(xRange)
-				      .tickSize(5)
-				      .tickSubdivide(true),
-				    yAxis = d3.svg.axis()
-				      .scale(yRange)
-				      .tickSize(5)
-				      .orient('left')
-				      .tickSubdivide(true);
-				 
-				vis.append('svg:g')
-				  .attr('class', 'x axis')
-				  .attr('transform', 'translate(0,' + (HEIGHT - MARGINS.bottom) + ')')
-				  .call(xAxis);
-				 
-				vis.append('svg:g')
-				  .attr('class', 'y axis')
-				  .attr('transform', 'translate(' + (MARGINS.left) + ',0)')
-				  .call(yAxis);
+		x.domain(data.map(function(d){ return d; }));
+		y.domain([0, d3.max(data, function(d, index) { return d[index]; })]);
+		var svg = d3.select("body").append("svg");
+		
+		svg.append("g")
+      		.attr("class", "x axis")
+      		.attr("transform", "translate(0," + height + ")")
+      		.call(xAxis)
+      		.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("x", 6)
+      .style("text-anchor", "end")
+      .text("images");
 
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("correlation ");
 
-				var lineFunc = d3.svg.line()
-									  .x(function(d) {
-									    return xRange(d.x);
-									  })
-									  .y(function(d) {
-									    return yRange(d.y);
-									  })
-									  .interpolate('linear');
+  svg.append("path")
+      .datum(data)
+      .attr("class", "line")
+      .attr("d", line);
 
-				vis.append('svg:path')
-					  .attr('d', lineFunc(lineData))
-					  .attr('stroke', 'blue')
-					  .attr('stroke-width', 2)
-					  .attr('fill', 'none');
 
 	}
 						
@@ -274,7 +251,11 @@ d3.text("positions.txt", function(dataa) {
 					}).on("click",function(d,e,i){
 				
 						//this needs to be filled up by raj
-							
+								
+						console.log(d[i]);
+						console.log(d);
+						console.log(e);
+						console.log(i);	
 						//console.log(d[i]);
 						lineplot(d, e, i);
 
@@ -420,9 +401,3 @@ d3.text("positions.txt", function(dataa) {
 });
 
 </script>
-
-<p>
-	<svg id="visualisation" width="1000" height="500"></svg>
-</p>
-
-</body>
