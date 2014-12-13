@@ -34,11 +34,12 @@ Timeline <input type="range" style="width:800px" min="1" max="139" value=1 id="r
 <button type="button"  id="start_button">Start</button>
 <button type="button"  id="stop_button">Stop</button>
 </br>
+<div id="bubblediv" style="float:left"></div>
 
+<div id="gadgets"></div>
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="d3.js"></script>
 <script>
-
 //read file
 d3.text('30fps_data.txt', function(error3, data1){
 d3.text("positions.txt", function(dataa) {
@@ -58,20 +59,21 @@ d3.text("positions.txt", function(dataa) {
 	var max_glob = []; //this is global max value for all nodes at all times
 	var PI = 3.141592653;
 	
-	var body = d3.selectAll("body").append("div").style("float","left").style("margin-top", "150px");
+	var body = d3.selectAll("body").append("div");
 
-
+	
+	var gadgets = d3.select("#gadgets");
+	
 	var rang = d3.selectAll("#range_input")[0][0];
 
-	body.html("<img width='500px' height='300px' src='img/1.jpg'/>");
+	gadgets.html("<img width='500px' height='300px' src='img/1.jpg'/>");
 	var margin = {top: -55, right: 0, bottom: 0, left: -30},
     width = 1000 - margin.left - margin.right,
     height = 1000 - margin.top - margin.bottom;
 
 
 
-
-	var svg = d3.select("body").append("svg")
+	var svg = d3.select("#bubblediv").append("svg")
 		.attr("width", 850)
 		.attr("height", 850)
 		.style("background-image","url(unnamed.PNG)")
@@ -113,6 +115,7 @@ d3.text("positions.txt", function(dataa) {
 						.range(["white","red"]);
 		min_glob[i] = min;
 		max_glob[i] = max;
+		// console.log(z_list);
 	}	
 	//console.log(min_glob);
 	//console.log(max_glob);
@@ -124,6 +127,93 @@ d3.text("positions.txt", function(dataa) {
 	var size_scale = d3.scale.linear()
 						.domain([min_glob,max_glob])
 						.range([1,10000]);
+
+	function lineplot (d, e, i) 
+	{
+		d3.select("#visualisation").selectAll("g").remove();
+		d3.select("#visualisation").selectAll("path").remove();
+		
+		var y = [];
+
+		for (var k = 0; k < d.length; k++)
+		{
+			for (var j = 0; j < d[k].length; j++)
+			{
+				if (j == 30)
+					y.push(d[k][j]);
+			}
+		}
+
+		var x = new Array(140);
+		for (var l = 0; l < x.length; l++)
+		{
+			x[l] = l;
+		}
+
+		var lineData = []
+		for (var q = 0; q < d.length; q++)
+		{
+			lineData.push({ x: x[q], y: y[q]});
+		}
+
+		console.log(lineData);
+
+		var vis = d3.select('body').select("#visualisation"),
+				    WIDTH = 500,
+				    HEIGHT = 200,
+				    MARGINS = {
+				      top: 20,
+				      right: 20,
+				      bottom: 20,
+				      left: 50
+				    },
+				    xRange = d3.scale.linear().range([MARGINS.left, WIDTH - MARGINS.right]).domain([d3.min(lineData, function(d) {
+				      return d.x;
+				    }), d3.max(lineData, function(d) {
+				      return d.x;
+				    })]),
+				    yRange = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([d3.min(lineData, function(d) {
+				      return d.y;
+				    }), d3.max(lineData, function(d) {
+				      return d.y;
+				    })]),
+				    xAxis = d3.svg.axis()
+				      .scale(xRange)
+				      .tickSize(5)
+				      .tickSubdivide(true),
+				    yAxis = d3.svg.axis()
+				      .scale(yRange)
+				      .tickSize(5)
+				      .orient('left')
+				      .tickSubdivide(true);
+				 
+				vis.append('svg:g')
+				  .attr('class', 'x axis')
+				  .attr('transform', 'translate(0,' + (HEIGHT - MARGINS.bottom) + ')')
+				  .call(xAxis);
+				 
+				vis.append('svg:g')
+				  .attr('class', 'y axis')
+				  .attr('transform', 'translate(' + (MARGINS.left) + ',0)')
+				  .call(yAxis);
+
+
+				var lineFunc = d3.svg.line()
+									  .x(function(d) {
+									    return xRange(d.x);
+									  })
+									  .y(function(d) {
+									    return yRange(d.y);
+									  })
+									  .interpolate('linear');
+
+				vis.append('svg:path')
+					  .attr('d', lineFunc(lineData))
+					  .attr('stroke', 'blue')
+					  .attr('stroke-width', 2)
+					  .attr('fill', 'none');
+
+	}
 						
 	var circles = svg.selectAll("circle")
 					.data(json_frames)
@@ -137,8 +227,8 @@ d3.text("positions.txt", function(dataa) {
 					
 						//console.log(i.toString() + d[frame][ctr2]/200);
 						//return d[frame][ctr2]/200;
-							var val  = Math.sqrt(size_scale(d[frame][ctr2])/PI);
-							return val;
+						var val  = Math.sqrt(size_scale(d[frame][ctr2])/PI);
+						return val;
 
 					})
 					.attr("cx",function(d,i){ return positions[i*2];})
@@ -162,7 +252,6 @@ d3.text("positions.txt", function(dataa) {
 							.duration(200)		
 							.style("opacity", .9);		
 						
-						//console.log(e);
 							
 						var e1 = e +1;
 						
@@ -189,8 +278,10 @@ d3.text("positions.txt", function(dataa) {
 					}).on("click",function(d,e,i){
 				
 						//this needs to be filled up by raj
-								
-				
+							
+						//console.log(d[i]);
+						lineplot(d, e, i);
+
 					})
 					.attr("stroke","black").attr("stroke-width",3);
 
@@ -222,7 +313,7 @@ d3.text("positions.txt", function(dataa) {
 				
 					var vv = parseInt(rang.value) +1 ;
 					var im1 = "</br><img width='500px' height='300px' src='img/"+ vv+  ".jpg'/>";
-					body.html(im1);
+					gadgets.html(im1);
 					d3.selectAll("#input_label").html(rang.value);
 				
 					rang.value = parseInt(rang.value) + dx;
@@ -249,6 +340,7 @@ d3.text("positions.txt", function(dataa) {
 			for(var i=0; i<64; i++){
 				
 				cols[i] = json_frames[i][frame][ctr2-1];
+				console.log(cols);
 				
 			}
 			
@@ -289,8 +381,9 @@ d3.text("positions.txt", function(dataa) {
 					var vv = parseInt(rang.value);
 					var im1 = "</br><img width='500px' height='300px' src='img/"+ vv+  ".jpg'/>";
 					frame = vv;
-					console.log("hi");
-							
+					//console.log("hi");
+					gadgets.html(im1).transition();
+					
 					var cols = []
 					for(var i=0; i<64; i++){
 						
@@ -332,3 +425,8 @@ d3.text("positions.txt", function(dataa) {
 });
 
 </script>
+
+	<svg id="visualisation" width="500" height="200" style="float:left" ></svg>
+
+
+</body>
