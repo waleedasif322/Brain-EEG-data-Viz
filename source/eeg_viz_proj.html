@@ -126,7 +126,7 @@ d3.text("positions.txt", function(ps) {
 						.range([1,10000]);
 						
 	//generate thumbnails
-	for( var i=1; i<216; i++){
+	for( var i=1; i<140; i++){
 		var img = document.createElement("img");
 		img.src = "eeg-thumbs/"+i+".jpg";
 		img.id = "img_"+ i;
@@ -184,7 +184,20 @@ d3.selectAll("#range_input_size").on("input", function(d,i){
 			.style("background-size",newwidth+"px "+newheight+"px")
 			.selectAll("circle")
 			.attr("cx",function(d,i){ return val*positions[i*2];})
-						.attr("cy",function(d,i){ return val*positions[i*2+1];})
+			.attr("cy",function(d,i){ return val*positions[i*2+1];})
+			.attr("r", function(d,i){ 
+
+					var val2  = Math.sqrt(size_scale(d[frame][ctr2])/PI);
+					//console.log(val*val2);
+					return val*val2;
+	
+
+			 });
+
+
+
+
+
 
 		
 });	
