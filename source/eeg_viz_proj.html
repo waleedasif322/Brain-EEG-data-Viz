@@ -49,8 +49,8 @@ more than filter: <label for="male" id="input_label">0</label>
 less than filter: <label for="male" id="input_label2">1</label>
 </br>
 <button type="button"  id="generate_bubbles">Generate bubbles</button>
-size:<input type="range"  min="0" max="100" value = 100 id="range_input_size" />
-
+scale:<input type="range"  min="0" max="100" value = 100 id="range_input_scale" />
+size:<input type="range"  min="0" max="200" value = 100 id="range_input_size" />
 
 </br>
 <script>
@@ -84,6 +84,8 @@ d3.text("positions.txt", function(ps) {
 	var threshold_filter2 = 1;
 	
 	var bub_scale = 1;
+	
+	var bub_size_scale = 1;
 	
 	var margin = {top: -55*bub_scale, right: 0, bottom: 0, left: -40*bub_scale};
 	
@@ -129,7 +131,7 @@ d3.text("positions.txt", function(ps) {
 						.range([1,10000]);
 						
 	//generate thumbnails
-	for( var i=1; i<216; i++){
+	for( var i=1; i<140; i++){
 		var img = document.createElement("img");
 		img.src = "eeg-thumbs/"+i+".jpg";
 		img.id = "img_"+ i;
@@ -167,19 +169,27 @@ d3.selectAll("img").style("margin",5).style("padding",5).on("click", function(i,
 		});
 			
 
-d3.selectAll("#range_input_size").on("input", function(d,i){
+d3.selectAll("#range_input_scale").on("input", function(d,i){
 
 		
 			//console.log(svgs);
 			
 			var val = (this.value)/100;
+			bub_scale = val;
 			
 			console.log(val);
 			
 			var newwidth = width * val;
 			var newheight = height *val;
 			
+			
+			
+		
+				var innerRadius = Math.min(newwidth, newheight) * .41
+				var outerRadius = innerRadius * 1.1;
+				
 			//d3.selectAll(svgs[0]).each().remove();
+	
 			
 			d3.selectAll("svg")
 			.attr("height",newheight)
@@ -187,13 +197,38 @@ d3.selectAll("#range_input_size").on("input", function(d,i){
 			.style("background-size",newwidth+"px "+newheight+"px")
 			.select("g").attr("transform", 
 									"translate(" + margin.left*val + "," + margin.top*val + ")")
+			//.select("g:chord").attr("d", d3.svg.arc().innerRadius(innerRadius).outerRadius(outerRadius))
 			.selectAll("circle")
 			.attr("cx",function(d,i){ return val*positions[i*2];})
 						.attr("cy",function(d,i){ return val*positions[i*2+1];})
 						.attr("r", function(d,i){ 
 						
 							var val2  = Math.sqrt(size_scale(((d[i][30])/PI)));
-							return val*val2;
+							return bub_size_scale*val*val2;
+								
+								});
+
+		
+});	
+
+d3.selectAll("#range_input_size").on("input", function(d,i){
+
+		
+			//console.log(svgs);
+			
+			var val = (this.value)/100;
+			bub_size_scale = val;
+			console.log(val);
+
+			//d3.selectAll(svgs[0]).each().remove();
+	
+			
+			d3.selectAll("svg")
+			.selectAll("circle")
+						.attr("r", function(d,i){ 
+						
+							var val2  = Math.sqrt(size_scale(((d[i][30])/PI)));
+							return bub_scale*val*val2;
 								
 								});
 
@@ -357,9 +392,9 @@ function draw_chord(){
 				.matrix(new_arr);
 
 				
-			var width = 600,
-				height = 600,
-				innerRadius = Math.min(width, height) * .41,
+			var width2 = width
+				height2 = height,
+				innerRadius = Math.min(width2, height2) * .41,
 				outerRadius = innerRadius * 1.1;
 
 			var fill = d3.scale.ordinal()
@@ -388,11 +423,11 @@ function draw_chord(){
 				]);
 
 			var svg = d3.select("body").append("svg")
-				.attr("width", width)
-				.attr("height", height)
+				.attr("width", width2)
+				.attr("height", height2)
 				.style("float","left")
 			  .append("g")
-			  .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+			  .attr("transform", "translate(" + width2 / 2 + "," + height2 / 2 + ")");
 			
 			
 			
