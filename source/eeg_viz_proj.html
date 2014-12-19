@@ -85,7 +85,7 @@ d3.text("positions.txt", function(ps) {
 	
 	var bub_scale = 1;
 	
-	var margin = {top: -55*bub_scale, right: 0, bottom: 0, left: -30*bub_scale};
+	var margin = {top: -55*bub_scale, right: 0, bottom: 0, left: -40*bub_scale};
 	
 	var svgs = [];
 	
@@ -192,8 +192,8 @@ d3.selectAll("#range_input_size").on("input", function(d,i){
 						.attr("cy",function(d,i){ return val*positions[i*2+1];})
 						.attr("r", function(d,i){ 
 						
-							var val2  = Math.sqrt(size_scale(val*((d[i][30])/PI)));
-							return val2;
+							var val2  = Math.sqrt(size_scale(((d[i][30])/PI)));
+							return val*val2;
 								
 								});
 
