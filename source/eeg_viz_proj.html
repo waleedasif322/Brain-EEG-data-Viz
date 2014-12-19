@@ -87,6 +87,8 @@ d3.text("positions.txt", function(ps) {
 	
 	var bub_size_scale = 1;
 	
+	var border_width =1;
+	
 	var margin = {top: -55*bub_scale, right: 0, bottom: 0, left: -40*bub_scale};
 	
 	var svgs = [];
@@ -183,7 +185,7 @@ d3.selectAll("#range_input_scale").on("input", function(d,i){
 			var newheight = height *val;
 			
 			
-			
+			border_width = val;
 		
 				var innerRadius = Math.min(newwidth, newheight) * .41
 				var outerRadius = innerRadius * 1.1;
@@ -206,7 +208,7 @@ d3.selectAll("#range_input_scale").on("input", function(d,i){
 							var val2  = Math.sqrt(size_scale(((d[i][30])/PI)));
 							return bub_size_scale*val*val2;
 								
-								});
+								}).attr("stroke-width",border_width);
 
 		
 });	
@@ -643,7 +645,7 @@ function draw_bubbleheadr(frame){
 									
 					
 						})
-						.attr("stroke","black").attr("stroke-width",3);
+						.attr("stroke","black").attr("stroke-width",border_width);
 						
 			return svg;			
 
