@@ -34,7 +34,10 @@ div.tooltip {
 <body>
 <script src="d3.js"></script>
 <script src="d3.min.js"></script>
-<div id="divs"></div>
+<div id="divs" style="
+    height: 400px;
+    overflow: auto;
+"></div>
 </body>
 
 
@@ -182,9 +185,17 @@ d3.selectAll("#range_input_size").on("input", function(d,i){
 			.attr("height",newheight)
 			.attr("width",newwidth)
 			.style("background-size",newwidth+"px "+newheight+"px")
+			.select("g").attr("transform", 
+									"translate(" + margin.left*val + "," + margin.top*val + ")")
 			.selectAll("circle")
 			.attr("cx",function(d,i){ return val*positions[i*2];})
 						.attr("cy",function(d,i){ return val*positions[i*2+1];})
+						.attr("r", function(d,i){ 
+						
+							var val2  = Math.sqrt(size_scale(val*((d[i][30])/PI)));
+							return val2;
+								
+								});
 
 		
 });	
