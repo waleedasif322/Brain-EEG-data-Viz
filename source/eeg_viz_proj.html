@@ -34,28 +34,68 @@ pointer-events: none;
 <script src="http://d3js.org/d3.v3.min.js"></script>
 
 </header>
-<body>
+
 <script src="d3.js"></script>
 <script src="d3.min.js"></script>
+
+<h1>EEG VIZ</h1>
+<h3>CLICK TO SELECT IMAGES</h3>
 <div id="divs" style="
     height: 400px;
     overflow: auto;
 "></div>
-</body>
+
 
 
 <body>
-<button type="button"  id="generate_button">Generate diagram</button>
-<input type="range"  min="0" max="200" id="range_input" />
-more than filter: <label for="male" id="input_label">0</label>
-<input type="range"  min="0" max="200" id="range_input2" value=200 />
-less than filter: <label for="male" id="input_label2">1</label>
-</br>
-<button type="button"  id="generate_bubbles">Generate bubbles</button>
-scale:<input type="range"  min="0" max="100" value = 100 id="range_input_scale" />
-size:<input type="range"  min="0" max="300" value = 100 id="range_input_size" />
+<br><br>
 
-</br>
+
+<h1>MENU</h1>
+<h3>Generate one of the visualizations for the selected images after adjusting the parameters</h3>
+<div style="float:left" >
+<table >
+<tr>
+
+<td><button type="button"  id="generate_button">Generate chord diagram</button></td>
+<td>Min Filter: <label for="male" id="input_label">0</label></td>
+<td><input type="range"  min="0" max="200" id="range_input" /></td>
+
+
+</tr>
+<tr>
+
+<td></td>
+<td>Max Filter: <label for="male" id="input_label2">1</label></td>
+<td><input type="range"  min="0" max="200" id="range_input2" value=200 /></td>
+
+</tr>
+</table>
+</div>
+<div>
+
+<table>
+
+<tr>
+
+<td><button type="button"  id="generate_bubbles">Generate bubbles heads</button></td>
+<td>Scale:</td>
+<td><input type="range"  min="0" max="100" value = 100 id="range_input_scale" /></td>
+</tr>
+<tr>
+
+<td></td>
+<td>Size:</td>
+<td><input type="range"  min="0" max="300" value = 100 id="range_input_size" /></td>
+
+</tr>
+
+</table>
+</div>
+
+
+
+
 <script>
 
 
