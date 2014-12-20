@@ -16,7 +16,7 @@ div.tooltip {
 position: absolute;
 text-align: center;
 width: 210px;
-height: 100px;
+height: 110px;
 padding-top: 7px;
 font-size: 16px;
 font-family: cursive;
@@ -30,7 +30,10 @@ pointer-events: none;
 
 </style>
 <body>
-
+<h2>Time Line</h2>
+<h4>click play to play the experiment(30fps) or click anywhere on timeline to fastforward</h4>
+<br/>
+<br/>
 Timeline <input type="range" style="width:800px" min="1" max="139" value=1 id="range_input" />
 <label for="male" id="input_label">1</label>s
 </br>
@@ -38,7 +41,7 @@ Timeline <input type="range" style="width:800px" min="1" max="139" value=1 id="r
 <button type="button"  id="stop_button">Stop</button>
 </br>
 <div id="bubblediv" style="float:left"></div>
-
+<h2>Image Shown</h2>
 <div id="gadgets"></div>
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="d3.js"></script>
@@ -274,7 +277,7 @@ d3.text("imagecount.txt", function(imct) {
 								.attr("stroke", "yellow");
 						
 						tooltip.html("Node: "+ e1 + "<br/>Value now: <b>"+ d[frame][ctr2].toFixed(2)	
-									+"</b> eV<br/>Max val:<b> "+max_arr64[e1-1]+" </b>eV<br/>Min val:<b> "+min_arr64[e1-1]+"</b> eV"
+									+"</b> eV<br/>Max val:<b> "+max_arr64[e1-1]+" </b>eV<br/>Min val:<b> "+min_arr64[e1-1]+"</b> eV<br/><span style='font-size:12px'>click to show plot</span>"
 								)	
 							.style("left", (d3.event.pageX) + "px")		
 							.style("top", (d3.event.pageY - 28) + "px");
@@ -433,7 +436,7 @@ d3.text("imagecount.txt", function(imct) {
 });
 });
 </script>
-
+<h2>Node values plot for node</h2> <label>1</label>
 	<svg id="visualisation" width="500" height="200" style="float:left" ></svg>
 
 
