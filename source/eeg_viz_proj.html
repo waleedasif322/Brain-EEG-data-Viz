@@ -117,6 +117,7 @@ d3.text("imagecount.txt", function(imct) {
 	
 	console.log(imagecount);
 	
+	document.getElementById("range_input_scale").disabled = true;
 	
 	//var frame = 0; //current picture displayed
 	var ctr2 = 0; //counter for each frame; for color change inbetween images 30fps depends on intervals
@@ -335,6 +336,7 @@ var btn_click = d3.select("#generate_bubbles").on("click", function(){
 	
 	t_list=[];
 	t_len=0;
+	document.getElementById("range_input_scale").disabled = false;
 	
 });
 
