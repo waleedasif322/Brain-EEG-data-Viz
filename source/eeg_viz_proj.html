@@ -63,12 +63,17 @@ size:<input type="range"  min="0" max="200" value = 100 id="range_input_size" />
 d3.text('correlation-chord-subtracted.csv', function(error1, data3){
 d3.text('30fps_data.txt', function(error2, data1){
 d3.text("positions.txt", function(ps) {
+d3.text("imagecount.txt", function(imct) {
 
 	var json_frames = JSON.parse(data1);
 	var positions = d3.csv.parseRows(ps);
+	var imagecount = d3.csv.parseRows(imct);
 	var corr_diff = d3.csv.parseRows(data3);
 	
 	 // 33 milleseconds * 60 = 1980 miliseconds < 2000 : in other words display 60 images in 33 milisecond intervals, which adds up to almost 2 seconds total
+	
+	console.log(imagecount);
+	
 	
 	//var frame = 0; //current picture displayed
 	var ctr2 = 0; //counter for each frame; for color change inbetween images 30fps depends on intervals
@@ -76,6 +81,9 @@ d3.text("positions.txt", function(ps) {
 	var min_glob = []; //this is global min value for all nodes at all times
 	var max_glob = []; //this is global max value for all nodes at all times
 	var PI = 3.141592653;
+	
+	
+	
 	
 	var t_list = []
 	var t_len = 0;
@@ -135,7 +143,7 @@ d3.text("positions.txt", function(ps) {
 	//generate thumbnails
 	for( var i=1; i<140; i++){
 		var img = document.createElement("img");
-		img.src = "eeg-thumbs/"+i+".jpg";
+		img.src = "eeg-thumbs/"+imagecount[i]+".jpg";
 		img.id = "img_"+ i;
 		var src = document.getElementById("divs");
 		src.appendChild(img);
@@ -468,8 +476,8 @@ function draw_chord(){
 					
 					console.log(d);
 					
-					var im1 = "<img width='500px' height='300px' src='img/"+t_list[ind1] +  ".jpg'/>";
-					var im2 = "<img width='500px' height='300px' src='img/"+t_list[ind2] +  ".jpg'/>";
+					var im1 = "<img width='500px' height='300px' src='img/"+imagecount[t_list[ind1]] +  ".jpg'/>";
+					var im2 = "<img width='500px' height='300px' src='img/"+imagecount[t_list[ind2]] +  ".jpg'/>";
 					
 
 					
@@ -565,10 +573,13 @@ function draw_chord(){
 
 function draw_bubbleheadr(frame){
 
+		//console.log(t_list);
 		var frame = t_list[frame];
 
 		//this is for initial colors for frame 0
-		var colors = []
+		var colors = [];
+		console.log(json_frames[0][0][30]);
+		
 		for(var i=0; i<64; i++){
 							
 				colors[i] = json_frames[i][frame][30];
@@ -578,7 +589,7 @@ function draw_bubbleheadr(frame){
 		var background_width = 250*bub_scale;
 		var background_height = 120*bub_scale;
 		//
-		var svg = d3.select("body").append("div").style("float","left").html("</br><img width='"+background_width+"px' height='"+background_height+"px' src='img/"+frame+".jpg'/>").append("svg")
+		var svg = d3.select("body").append("div").style("float","left").html("</br><img width='"+background_width+"px' height='"+background_height+"px' src='img/"+imagecount[frame]+".jpg'/>").append("svg")
 			.attr("width", width)
 			.attr("height", height)
 			.style("background-image","url(unnamed.PNG)").style("background-size", width+"px "+height+"px")
@@ -669,7 +680,7 @@ var btn_click2 = d3.select("#generate_button").on("click", function(){
 });
 });
 });
-	
+});
 
 	
 	
