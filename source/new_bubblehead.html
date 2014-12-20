@@ -34,7 +34,10 @@ Timeline <input type="range" style="width:800px" min="1" max="139" value=1 id="r
 <button type="button"  id="start_button">Start</button>
 <button type="button"  id="stop_button">Stop</button>
 </br>
-
+</br>
+<button type="button"  id="single_plot_button">Graph_single_lineplot</button>
+<button type="button"  id="multiplot_button">Graph_multiple_lineplot</button>
+</br>
 <script src="d3.js"></script>
 <script>
 //read file
@@ -135,6 +138,7 @@ d3.text("positions.txt", function(dataa) {
 		{
 			for (var j = 0; j < d[k].length; j++)
 			{
+				//d3.median(d[,k])
 				if (j == 30)
 					y.push(d[k][j]);
 			}
@@ -173,7 +177,7 @@ d3.text("positions.txt", function(dataa) {
 				    }), d3.max(lineData, function(d) {
 				      return d.y;
 				    })]),
-				    xAxis = d3.svg.axis()
+				    xAxis = d3.svg.axis(Line {stroke:lightgrey;})
 				      .scale(xRange)
 				      .tickSize(5)
 				      .tickSubdivide(true),
@@ -298,6 +302,19 @@ d3.text("positions.txt", function(dataa) {
 			
 	});
 
+	var btn_click2 = d3.selectAll("#stop_button").on("click", function(){
+	
+			dx=0;
+			
+	});
+
+var btn_click3 = d3.selectAll("#single_plot_button").on("click", function(){
+	
+			dx=3;
+			d3.line(lineplot(d, e, i));
+			
+	});
+	
 
 	var makeCallback = function() {
 

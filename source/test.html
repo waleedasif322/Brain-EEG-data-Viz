@@ -25,8 +25,29 @@ div.tooltip {
     pointer-events: none;			
 }
 
+.container {
+   height: auto;
+   overflow: hidden;
+}
+
+.right {
+    width: 50%;
+    float: right;
+    background: #aafed6;
+}
+
+.left {
+    float: none;
+    background: #e8f6fe;
+    width: 50%;
+    overflow: hidden;
+}​​
+
+right
+
 </style>
 <body>
+
 
 Timeline <input type="range" style="width:800px" min="1" max="139" value=1 id="range_input" />
 <label for="male" id="input_label">1</label>s
@@ -38,6 +59,7 @@ Timeline <input type="range" style="width:800px" min="1" max="139" value=1 id="r
 <script src="d3.js"></script>
 <script>
 //read file
+
 d3.text('30fps_data.txt', function(error3, data1){
 d3.text("positions.txt", function(dataa) {
 
@@ -65,8 +87,6 @@ d3.text("positions.txt", function(dataa) {
 	var margin = {top: -55, right: 0, bottom: 0, left: -30},
     width = 1000 - margin.left - margin.right,
     height = 1000 - margin.top - margin.bottom;
-
-
 
 
 	var svg = d3.select("body").append("svg")
@@ -126,8 +146,8 @@ d3.text("positions.txt", function(dataa) {
 
 	function lineplot (d, e, i) 
 	{
-		d3.select("#visualisation").selectAll("g").remove();
-		d3.select("#visualisation").selectAll("path").remove();
+		//d3.select("#visualisation").selectAll("g").remove();
+		//d3.select("#visualisation").selectAll("path").remove();
 		
 		var y = [];
 
@@ -168,11 +188,13 @@ d3.text("positions.txt", function(dataa) {
 				    }), d3.max(lineData, function(d) {
 				      return d.x;
 				    })]),
-				    yRange = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([d3.min(lineData, function(d) {
-				      return d.y;
-				    }), d3.max(lineData, function(d) {
-				      return d.y;
-				    })]),
+				    yRange = d3.scale.linear().
+				    			range([HEIGHT - MARGINS.top, MARGINS.bottom]).
+				    			domain([d3.min(lineData, function(d) {
+											      return d.y;
+											    }), d3.max(lineData, function(d) {
+											      return d.y;
+											    })]),
 				    xAxis = d3.svg.axis()
 				      .scale(xRange)
 				      .tickSize(5)
@@ -404,11 +426,7 @@ d3.text("positions.txt", function(dataa) {
 
 						var val  = Math.sqrt(size_scale(d[frame][ctr2])/PI);
 								return val;
-					});	
-						
-						
-						
-						
+					});
 						
 											
 		});	
@@ -420,9 +438,4 @@ d3.text("positions.txt", function(dataa) {
 });
 
 </script>
-
-<p>
-	<svg id="visualisation" width="1000" height="500"></svg>
-</p>
-
 </body>
