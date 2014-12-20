@@ -217,16 +217,18 @@ d3.text("positions.txt", function(dataa) {
 
 var showData = ["Graph_single_lineplot", "Graph_multiple_lineplot"], j=0; //choosing Graph+single_lineplot as default
 var form = d3.select("body").append("form");
-labels = form.selectAll("label").data("showData").enter()
-.append("label").text(function(d) {return d;})
-.append("input")
+var labelSelect = form.selectAll("label").data("showData").enter()
+.append("span");
+
+labelSelect.append("input")
 .attr({
 	type: "radio",
 	class:"shape",
 	name:"mode",
 	value: function(d,i) {return i;}
 })
-.attr(function(d, i) {return i==j?"selected":null;});
+labelSelect.append("label").text(function(d) {return d;});
+
 	function lineplotall (d, e, i) 	{
 		d3.select("#visualisation").selectAll("g");
 		d3.select("#visualisation").selectAll("path");
