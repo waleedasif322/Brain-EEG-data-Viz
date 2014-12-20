@@ -13,16 +13,19 @@ body {
 }
 
 div.tooltip {	
-    position: absolute;			
-    text-align: center;			
-    width: 150px;					
-    height: 100px;					
-    padding: 2px;				
-    font: 12px sans-serif;		
-    background: lightsteelblue;	
-    border: 0px;		
-    border-radius: 8px;			
-    pointer-events: none;			
+position: absolute;
+text-align: center;
+width: 210px;
+height: 100px;
+padding-top: 7px;
+font-size: 16px;
+font-family: cursive;
+background: rgb(244, 247, 250);
+border-width: 2px;
+border-style: solid;
+border-color: black;
+border-radius: 10px;
+pointer-events: none;		
 }
 
 </style>
@@ -62,6 +65,10 @@ d3.text("imagecount.txt", function(imct) {
 	var min_glob = []; //this is global min value for all nodes at all times
 	var max_glob = []; //this is global max value for all nodes at all times
 	var PI = 3.141592653;
+	var border_width = 1;
+	
+	var	min_arr64 = [];
+	var	max_arr64 = [];
 	
 	var body = d3.selectAll("body").append("div");
 
@@ -97,7 +104,7 @@ d3.text("imagecount.txt", function(imct) {
 			colors[i] = json_frames[i][frame][30];
 						
 	}
-
+	
 
 	//find max and min for each channel and create a color scale for each
 	for(var i =0; i<64; i++){
@@ -117,8 +124,13 @@ d3.text("imagecount.txt", function(imct) {
 		z_list[i] = d3.scale.linear()
 						.domain([min,max])
 						.range(["white","red"]);
+						
+		min_arr64[i] = min;
+		max_arr64[i] = max;
+		
 		min_glob[i] = min;
 		max_glob[i] = max;
+		
 		// console.log(z_list);
 	}	
 	//console.log(min_glob);
@@ -263,7 +275,8 @@ d3.text("imagecount.txt", function(imct) {
 								.transition()
 								.attr("stroke", "yellow");
 						
-						tooltip.html("channel: "+ e1 + "<br/>val: "+ d[frame][ctr2]	
+						tooltip.html("Node: "+ e1 + "<br/>Value now: <b>"+ d[frame][ctr2].toFixed(2)	
+									+"</b> eV<br/>Max val:<b> "+max_arr64[e1-1]+" </b>eV<br/>Min val:<b> "+min_arr64[e1-1]+"</b> eV"
 								)	
 							.style("left", (d3.event.pageX) + "px")		
 							.style("top", (d3.event.pageY - 28) + "px");
@@ -287,7 +300,7 @@ d3.text("imagecount.txt", function(imct) {
 						lineplot(d, e, i);
 
 					})
-					.attr("stroke","black").attr("stroke-width",3);
+					.attr("stroke","black").attr("stroke-width",border_width);
 
 
 
@@ -350,18 +363,10 @@ d3.text("imagecount.txt", function(imct) {
 			
 			circles.attr("fill",function(d,i){
 			
-				//console.log(frame);
 				return z_list[i](cols[i]);	
 			
 			}).attr("r",function (d,i){ 
 					
-					/*if(i == 63 || i == 62){
-					
-						return cols[i]/3000;
-					
-					}
-						return cols[i]/200;
-*/
 							var val  = Math.sqrt(size_scale(d[frame][ctr2])/PI);
 							return val;
 					});
