@@ -53,7 +53,7 @@ less than filter: <label for="male" id="input_label2">1</label>
 </br>
 <button type="button"  id="generate_bubbles">Generate bubbles</button>
 scale:<input type="range"  min="0" max="100" value = 100 id="range_input_scale" />
-size:<input type="range"  min="0" max="200" value = 100 id="range_input_size" />
+size:<input type="range"  min="0" max="300" value = 100 id="range_input_size" />
 
 </br>
 <script>
@@ -220,7 +220,11 @@ d3.selectAll("#range_input_scale").on("input", function(d,i){
 			.attr("cx",function(d,i){ return val*positions[i*2];})
 						.attr("cy",function(d,i){ return val*positions[i*2+1];})
 						.attr("r", function(d,i){ 
+									if(i == 63 || i == 62){
 						
+									return 0;
+						
+									}
 							var val2  = Math.sqrt(size_scale(((d[i][30])/PI)));
 							return bub_size_scale*val*val2;
 								
@@ -244,7 +248,11 @@ d3.selectAll("#range_input_size").on("input", function(d,i){
 			d3.selectAll("svg")
 			.selectAll("circle")
 						.attr("r", function(d,i){ 
+								if(i == 63 || i == 62){
 						
+							return 0;
+						
+						}
 							var val2  = Math.sqrt(size_scale(((d[i][30])/PI)));
 							return bub_scale*val*val2;
 								
@@ -603,7 +611,7 @@ function draw_bubbleheadr(frame){
 			.style("background-image","url(unnamed.PNG)").style("background-size", width+"px "+height+"px")
 			.style("float","left")
 			.append("g").attr("transform", 
-									"translate(" + margin.left + "," + margin.top + ")");
+									"translate(" + margin.left* bub_scale+ "," + margin.top*bub_scale + ")");
 
 
 			var circles = svg.selectAll("circle")
@@ -611,6 +619,11 @@ function draw_bubbleheadr(frame){
 						.enter()
 						.append("circle")
 						.attr("r",function (d,i){ 
+								if(i == 63 || i == 62){
+						
+									return 0;
+						
+								}
 								var val  = Math.sqrt(size_scale(d[frame][ctr2])/PI);
 								return bub_scale*val;
 
