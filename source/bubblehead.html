@@ -43,13 +43,17 @@ Timeline <input type="range" style="width:800px" min="1" max="139" value=1 id="r
 //read file
 d3.text('30fps_data.txt', function(error3, data1){
 d3.text("positions.txt", function(dataa) {
+d3.text("imagecount.txt", function(imct) {
+
+
 
 	var json_frames = JSON.parse(data1);
 	var positions = d3.csv.parseRows(dataa);
+	var imagecount = d3.csv.parseRows(imct);
 	
 	 // 33 milleseconds * 60 = 1980 miliseconds < 2000 : in other words display 60 images in 33 milisecond intervals, which adds up to almost 2 seconds total
 	var interval = 33; //callback interval update every 33 miliseconds
-	var interval2 = 33; //this is how often callback gets executed
+	var interval2 =40; //this is how often callback gets executed
 	var counter = 0; //counts frames
 	var dx = 0; //change for times 0=stop 1=start
 	var frame = 0; //current picture displayed
@@ -66,7 +70,7 @@ d3.text("positions.txt", function(dataa) {
 	
 	var rang = d3.selectAll("#range_input")[0][0];
 
-	gadgets.html("<img width='500px' height='300px' src='img/1.jpg'/>");
+	gadgets.html("<img width='500px' height='300px' src='img/"+imagecount[0]+".jpg'/>");
 	var margin = {top: -55, right: 0, bottom: 0, left: -30},
     width = 1000 - margin.left - margin.right,
     height = 1000 - margin.top - margin.bottom;
@@ -311,8 +315,8 @@ d3.text("positions.txt", function(dataa) {
 			
 				if(counter>1960){
 				
-					var vv = parseInt(rang.value) +1 ;
-					var im1 = "</br><img width='500px' height='300px' src='img/"+ vv+  ".jpg'/>";
+					var vv = parseInt(rang.value) ;
+					var im1 = "</br><img width='500px' height='300px' src='img/"+ imagecount[vv]+  ".jpg'/>";
 					gadgets.html(im1);
 					d3.selectAll("#input_label").html(rang.value);
 				
@@ -379,7 +383,7 @@ d3.text("positions.txt", function(dataa) {
 						.html(this.value);
 						
 					var vv = parseInt(rang.value);
-					var im1 = "</br><img width='500px' height='300px' src='img/"+ vv+  ".jpg'/>";
+					var im1 = "</br><img width='500px' height='300px' src='img/"+ imagecount[vv]+  ".jpg'/>";
 					frame = vv;
 					//console.log("hi");
 					gadgets.html(im1).transition();
@@ -423,7 +427,7 @@ d3.text("positions.txt", function(dataa) {
 	
 })
 });
-
+});
 </script>
 
 	<svg id="visualisation" width="500" height="200" style="float:left" ></svg>
