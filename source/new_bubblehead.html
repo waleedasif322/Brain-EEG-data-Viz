@@ -37,7 +37,8 @@ Timeline <input type="range" style="width:800px" min="1" max="139" value=1 id="r
 </br>
 <button type="button"  id="single_plot_button">Graph_single_lineplot</button>
 <button type="button"  id="multiplot_button">Graph_multiple_lineplot</button>
-</br>
+</br><form><label type ="radio" id="single_plot_button">Graph_single_lineplot</label>
+<label type ="radio" id="multiplot_button">Graph_multiple_lineplot</label></form>
 <script src="d3.js"></script>
 <script>
 //read file
@@ -221,15 +222,15 @@ var labelSelect = form.selectAll("label")
 				.data("showData")
 				.enter()
 				.append("label")
-				.text(function(d,i) {return i;});
+				.text(function(d,i) {return i;})
 				.insert("input")
 					.attr({
 						type: "radio",
 						class:"shape",
 						name:"mode",
-						value: 
+						value: function(d,i) {return i;}
 				})
-				.property("checked", (function(d, i) {return i===j;});
+				.property("checked", function(d, i) {return i===j;});
 
 	function lineplotall (d, e, i) 	{
 		d3.select("#visualisation").selectAll("g");
