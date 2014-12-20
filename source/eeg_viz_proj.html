@@ -141,7 +141,7 @@ d3.text("imagecount.txt", function(imct) {
 						.range([1,10000]);
 						
 	//generate thumbnails
-	for( var i=1; i<140; i++){
+	for( var i=0; i<140; i++){
 		var img = document.createElement("img");
 		img.src = "eeg-thumbs/"+imagecount[i]+".jpg";
 		img.id = "img_"+ i;
@@ -153,8 +153,8 @@ d3.text("imagecount.txt", function(imct) {
 
 d3.selectAll("img").style("margin",5).style("padding",5).on("click", function(i,d){
 
-				t_list[t_len] = d+1;
-				var a = "#img_"+(d+1);
+				t_list[t_len] = d;
+				var a = "#img_"+d;
 				console.log(a);
 
 				d3.select(a).style("border-color","red").style("border-width","5px").style("border-style","solid");
@@ -163,14 +163,14 @@ d3.selectAll("img").style("margin",5).style("padding",5).on("click", function(i,
 		}).on("mouseover", function(i,d){
 
 				
-				var a = "#img_"+(d+1);
+				var a = "#img_"+d;
 
 				//d3.select(a).style("border-color","yellow").style("border-width","5px").style("border-style","solid");
 				
 
 		}).on("mouseout", function(i,d){
 
-				var a = "#img_"+(d+1);
+				var a = "#img_"+d;
 
 				//d3.select(a).style("border-color","white").style("border-width","5px").style("border-style","solid");
 
