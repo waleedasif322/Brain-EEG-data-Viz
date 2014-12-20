@@ -13,40 +13,53 @@ body {
 }
 
 div.tooltip {	
-    position: absolute;			
-    text-align: center;			
-    width: 150px;					
-    height: 100px;					
-    padding: 2px;				
-    font: 12px sans-serif;		
-    background: lightsteelblue;	
-    border: 0px;		
-    border-radius: 8px;			
-    pointer-events: none;			
+position: absolute;
+text-align: center;
+width: 210px;
+height: 110px;
+padding-top: 7px;
+font-size: 16px;
+font-family: cursive;
+background: rgb(244, 247, 250);
+border-width: 2px;
+border-style: solid;
+border-color: black;
+border-radius: 10px;
+pointer-events: none;		
 }
 
 </style>
 <body>
-
+<h2>Time Line</h2>
+<h4>click play to play the experiment(30fps) or click anywhere on timeline to fastforward</h4>
+<br/>
+<br/>
 Timeline <input type="range" style="width:800px" min="1" max="139" value=1 id="range_input" />
 <label for="male" id="input_label">1</label>s
 </br>
 <button type="button"  id="start_button">Start</button>
 <button type="button"  id="stop_button">Stop</button>
 </br>
-
+<div id="bubblediv" style="float:left"></div>
+<h2>Image Shown</h2>
+<div id="gadgets"></div>
+<script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="d3.js"></script>
 <script>
 //read file
 d3.text('30fps_data.txt', function(error3, data1){
 d3.text("positions.txt", function(dataa) {
+d3.text("imagecount.txt", function(imct) {
+
+
 
 	var json_frames = JSON.parse(data1);
 	var positions = d3.csv.parseRows(dataa);
+	var imagecount = d3.csv.parseRows(imct);
 	
 	 // 33 milleseconds * 60 = 1980 miliseconds < 2000 : in other words display 60 images in 33 milisecond intervals, which adds up to almost 2 seconds total
 	var interval = 33; //callback interval update every 33 miliseconds
-	var interval2 = 33; //this is how often callback gets executed
+	var interval2 =40; //this is how often callback gets executed
 	var counter = 0; //counts frames
 	var dx = 0; //change for times 0=stop 1=start
 	var frame = 0; //current picture displayed
@@ -55,21 +68,27 @@ d3.text("positions.txt", function(dataa) {
 	var min_glob = []; //this is global min value for all nodes at all times
 	var max_glob = []; //this is global max value for all nodes at all times
 	var PI = 3.141592653;
+	var border_width = 1;
 	
-	var body = d3.selectAll("body").append("div").style("float","left").style("margin-top", "150px");
+	var	min_arr64 = [];
+	var	max_arr64 = [];
+	var bub_scale = 2;
+	
+	var body = d3.selectAll("body").append("div");
 
-
+	
+	var gadgets = d3.select("#gadgets");
+	
 	var rang = d3.selectAll("#range_input")[0][0];
 
-	body.html("<img width='500px' height='300px' src='img/1.jpg'/>");
+	gadgets.html("<img width='500px' height='300px' src='img/"+imagecount[0]+".jpg'/>");
 	var margin = {top: -55, right: 0, bottom: 0, left: -30},
     width = 1000 - margin.left - margin.right,
     height = 1000 - margin.top - margin.bottom;
 
 
 
-
-	var svg = d3.select("body").append("svg")
+	var svg = d3.select("#bubblediv").append("svg")
 		.attr("width", 850)
 		.attr("height", 850)
 		.style("background-image","url(unnamed.PNG)")
@@ -89,7 +108,7 @@ d3.text("positions.txt", function(dataa) {
 			colors[i] = json_frames[i][frame][30];
 						
 	}
-
+	
 
 	//find max and min for each channel and create a color scale for each
 	for(var i =0; i<64; i++){
@@ -109,16 +128,18 @@ d3.text("positions.txt", function(dataa) {
 		z_list[i] = d3.scale.linear()
 						.domain([min,max])
 						.range(["white","red"]);
+						
+		min_arr64[i] = min;
+		max_arr64[i] = max;
+		
 		min_glob[i] = min;
 		max_glob[i] = max;
-		// console.log(z_list);
+	
 	}	
-	//console.log(min_glob);
-	//console.log(max_glob);
+
 	min_glob = Math.ceil(d3.min(min_glob));
 	max_glob = Math.ceil(d3.max(max_glob));
-	//console.log(min_glob);
-	//console.log(max_glob);
+;
 	
 	var size_scale = d3.scale.linear()
 						.domain([min_glob,max_glob])
@@ -140,7 +161,7 @@ d3.text("positions.txt", function(dataa) {
 			}
 		}
 
-		var x = new Array(d.length);
+		var x = new Array(140);
 		for (var l = 0; l < x.length; l++)
 		{
 			x[l] = l;
@@ -155,8 +176,8 @@ d3.text("positions.txt", function(dataa) {
 		console.log(lineData);
 
 		var vis = d3.select('body').select("#visualisation"),
-				    WIDTH = 1000,
-				    HEIGHT = 500,
+				    WIDTH = 500,
+				    HEIGHT = 200,
 				    MARGINS = {
 				      top: 20,
 				      right: 20,
@@ -217,14 +238,14 @@ d3.text("positions.txt", function(dataa) {
 					.append("circle")
 					.attr("r",function (d,i){ 
 					
-						//if(i == 63 || i == 62){	
-						//	return d[frame][ctr2]/3000;
-						//}
+						if(i == 63 || i == 62){	
+							return 0;
+						}
 					
 						//console.log(i.toString() + d[frame][ctr2]/200);
 						//return d[frame][ctr2]/200;
-						var val  = Math.sqrt(size_scale(d[frame][ctr2])/PI);
-						return val;
+						var val  = Math.sqrt(size_scale((d[frame][ctr2]))/PI);
+						return  bub_scale*val;
 
 					})
 					.attr("cx",function(d,i){ return positions[i*2];})
@@ -255,7 +276,8 @@ d3.text("positions.txt", function(dataa) {
 								.transition()
 								.attr("stroke", "yellow");
 						
-						tooltip.html("channel: "+ e1 + "<br/>val: "+ d[frame][ctr2]	
+						tooltip.html("Node: "+ e1 + "<br/>Value now: <b>"+ d[frame][ctr2].toFixed(2)	
+									+"</b> eV<br/>Max val:<b> "+max_arr64[e1-1]+" </b>eV<br/>Min val:<b> "+min_arr64[e1-1]+"</b> eV<br/><span style='font-size:12px'>click to show plot</span>"
 								)	
 							.style("left", (d3.event.pageX) + "px")		
 							.style("top", (d3.event.pageY - 28) + "px");
@@ -279,7 +301,7 @@ d3.text("positions.txt", function(dataa) {
 						lineplot(d, e, i);
 
 					})
-					.attr("stroke","black").attr("stroke-width",3);
+					.attr("stroke","black").attr("stroke-width",border_width);
 
 
 
@@ -307,9 +329,9 @@ d3.text("positions.txt", function(dataa) {
 			
 				if(counter>1960){
 				
-					var vv = parseInt(rang.value) +1 ;
-					var im1 = "</br><img width='500px' height='300px' src='img/"+ vv+  ".jpg'/>";
-					body.html(im1);
+					var vv = parseInt(rang.value) ;
+					var im1 = "</br><img width='500px' height='300px' src='img/"+ imagecount[vv]+  ".jpg'/>";
+					gadgets.html(im1);
 					d3.selectAll("#input_label").html(rang.value);
 				
 					rang.value = parseInt(rang.value) + dx;
@@ -342,20 +364,16 @@ d3.text("positions.txt", function(dataa) {
 			
 			circles.attr("fill",function(d,i){
 			
-				//console.log(frame);
 				return z_list[i](cols[i]);	
 			
 			}).attr("r",function (d,i){ 
-					
-					/*if(i == 63 || i == 62){
-					
-						return cols[i]/3000;
-					
-					}
-						return cols[i]/200;
-*/
+						if(i == 63 || i == 62){
+						
+							return 0;
+						
+						}
 							var val  = Math.sqrt(size_scale(d[frame][ctr2])/PI);
-							return val;
+							return  bub_scale*val;
 					});
 
 			cols = [];
@@ -375,10 +393,11 @@ d3.text("positions.txt", function(dataa) {
 						.html(this.value);
 						
 					var vv = parseInt(rang.value);
-					var im1 = "</br><img width='500px' height='300px' src='img/"+ vv+  ".jpg'/>";
+					var im1 = "</br><img width='500px' height='300px' src='img/"+ imagecount[vv]+  ".jpg'/>";
 					frame = vv;
-					console.log("hi");
-							
+					//console.log("hi");
+					gadgets.html(im1).transition();
+					
 					var cols = []
 					for(var i=0; i<64; i++){
 						
@@ -394,16 +413,13 @@ d3.text("positions.txt", function(dataa) {
 					
 					}).attr("r",function (d,i){ 
 							
-					/*	if(i == 63 || i == 62){
+						if(i == 63 || i == 62){
 						
-							return cols[i]/3000;
+							return 0;
 						
 						}
-							return cols[i]/200;
-					*/
-
 						var val  = Math.sqrt(size_scale(d[frame][ctr2])/PI);
-								return val;
+								return bub_scale*val;
 					});	
 						
 						
@@ -418,11 +434,10 @@ d3.text("positions.txt", function(dataa) {
 	
 })
 });
-
+});
 </script>
+<h2>Node values plot for node</h2> <label>1</label>
+	<svg id="visualisation" width="500" height="200" style="float:left" ></svg>
 
-<p>
-	<svg id="visualisation" width="1000" height="500"></svg>
-</p>
 
 </body>

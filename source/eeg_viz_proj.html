@@ -1,0 +1,753 @@
+<html>
+<style>
+
+body {
+  font: 10px sans-serif;
+}
+
+.chord path {
+  fill-opacity: .67;
+  stroke: #000;
+  stroke-width: .5px;
+}
+
+div.tooltip {	
+position: absolute;
+text-align: center;
+width: 210px;
+height: 100px;
+padding-top: 7px;
+font-size: 16px;
+font-family: cursive;
+background: rgb(244, 247, 250);
+border-width: 2px;
+border-style: solid;
+border-color: black;
+border-radius: 10px;
+pointer-events: none;		
+}
+
+</style>
+
+<header>
+
+<script src="http://d3js.org/d3.v3.min.js"></script>
+
+</header>
+
+<script src="d3.js"></script>
+<script src="d3.min.js"></script>
+
+<h1>EEG VIZ</h1>
+<h3>CLICK TO SELECT IMAGES</h3>
+<div id="divs" style="
+    height: 400px;
+    overflow: auto;
+"></div>
+
+
+
+<body>
+<br><br>
+
+
+<h1>MENU</h1>
+<h3>Generate one of the visualizations for the selected images after adjusting the parameters</h3>
+<div style="float:left" >
+<table >
+<tr>
+
+<td><button type="button"  id="generate_button">Generate chord diagram</button></td>
+<td>Min Filter: <label for="male" id="input_label">0</label></td>
+<td><input type="range"  min="0" max="200" id="range_input" /></td>
+
+
+</tr>
+<tr>
+
+<td></td>
+<td>Max Filter: <label for="male" id="input_label2">1</label></td>
+<td><input type="range"  min="0" max="200" id="range_input2" value=200 /></td>
+
+</tr>
+</table>
+</div>
+<div>
+
+<table>
+
+<tr>
+
+<td><button type="button"  id="generate_bubbles">Generate bubbles heads</button></td>
+<td>Scale:</td>
+<td><input type="range"  min="0" max="100" value = 100 id="range_input_scale" /></td>
+</tr>
+<tr>
+
+<td></td>
+<td>Size:</td>
+<td><input type="range"  min="0" max="300" value = 100 id="range_input_size" /></td>
+
+</tr>
+
+</table>
+</div>
+
+
+
+
+<script>
+
+
+
+
+
+
+d3.text('correlation-chord-subtracted.csv', function(error1, data3){
+d3.text('30fps_data.txt', function(error2, data1){
+d3.text("positions.txt", function(ps) {
+d3.text("imagecount.txt", function(imct) {
+
+	var json_frames = JSON.parse(data1);
+	var positions = d3.csv.parseRows(ps);
+	var imagecount = d3.csv.parseRows(imct);
+	var corr_diff = d3.csv.parseRows(data3);
+	
+	 // 33 milleseconds * 60 = 1980 miliseconds < 2000 : in other words display 60 images in 33 milisecond intervals, which adds up to almost 2 seconds total
+	
+	console.log(imagecount);
+	
+	
+	//var frame = 0; //current picture displayed
+	var ctr2 = 0; //counter for each frame; for color change inbetween images 30fps depends on intervals
+	var z_list = [] //this is array of color scales for nodes
+	var min_glob = []; //this is global min value for all nodes at all times
+	var max_glob = []; //this is global max value for all nodes at all times
+	var PI = 3.141592653;
+	
+	
+	
+	
+	var t_list = []
+	var t_len = 0;
+	
+	var threshold_filter = 0;
+	var threshold_filter2 = 1;
+	
+	var bub_scale = 1;
+	
+	var bub_size_scale = 1;
+	
+	var border_width =1;
+	
+	var margin = {top: -55*bub_scale, right: 0, bottom: 0, left: -40*bub_scale};
+	
+	var svgs = [];
+	
+    var  width = (800 - margin.left - margin.right)*bub_scale;
+	
+    var height = (800 - margin.top - margin.bottom)*bub_scale;	
+	
+	var min_arr64 = [];
+	var max_arr64 = [];
+	
+	
+	
+	//find max and min for each channel and create a color scale for each
+	for(var i =0; i<64; i++){
+	
+		var min_val =[];
+		var max_val = [];
+		
+		for(var j = 0; j<140; j++){ 
+			
+			var min1 = d3.min(json_frames[i][j]);
+			var max1 = d3.max(json_frames[i][j]);
+			min_val[j] =  min1;
+			max_val[j] = max1;
+		}
+		
+		var min = Math.ceil(d3.min(min_val));		
+		var max = Math.ceil(d3.max(max_val));
+		
+		z_list[i] = d3.scale.linear()
+						.domain([min,max])
+						.range(["white","red"]);
+		
+		min_arr64[i] = min;
+		max_arr64[i] = max;
+		min_glob[i] = min;
+		max_glob[i] = max;
+	}	
+
+	min_glob = Math.ceil(d3.min(min_glob));
+	max_glob = Math.ceil(d3.max(max_glob));
+
+	//set scales for nodes
+	var size_scale = d3.scale.linear()
+						.domain([min_glob,max_glob])
+						.range([1,10000]);
+						
+	//generate thumbnails
+	for( var i=0; i<140; i++){
+		var img = document.createElement("img");
+		img.src = "eeg-thumbs/"+imagecount[i]+".jpg";
+		img.id = "img_"+ i;
+		var src = document.getElementById("divs");
+		src.appendChild(img);
+	}
+
+
+
+d3.selectAll("img").style("margin",5).style("padding",5).on("click", function(i,d){
+
+				t_list[t_len] = d;
+				var a = "#img_"+d;
+				console.log(a);
+
+				d3.select(a).style("border-color","red").style("border-width","5px").style("border-style","solid");
+
+				t_len = t_len+1;
+		}).on("mouseover", function(i,d){
+
+				
+				var a = "#img_"+d;
+
+				//d3.select(a).style("border-color","yellow").style("border-width","5px").style("border-style","solid");
+				
+
+		}).on("mouseout", function(i,d){
+
+				var a = "#img_"+d;
+
+				//d3.select(a).style("border-color","white").style("border-width","5px").style("border-style","solid");
+
+
+
+		});
+			
+
+d3.selectAll("#range_input_scale").on("input", function(d,i){
+
+		
+			//console.log(svgs);
+			
+			var val = (this.value)/100;
+			bub_scale = val;
+			
+			console.log(val);
+			
+			var newwidth = width * val;
+			var newheight = height *val;
+			
+			
+			border_width = val;
+		
+				var innerRadius = Math.min(newwidth, newheight) * .41
+				var outerRadius = innerRadius * 1.1;
+				
+			//d3.selectAll(svgs[0]).each().remove();
+	
+			
+			d3.selectAll("svg")
+			.attr("height",newheight)
+			.attr("width",newwidth)
+			.style("background-size",newwidth+"px "+newheight+"px")
+			.select("g").attr("transform", 
+									"translate(" + margin.left*val + "," + margin.top*val + ")")
+			//.select("g:chord").attr("d", d3.svg.arc().innerRadius(innerRadius).outerRadius(outerRadius))
+			.selectAll("circle")
+			.attr("cx",function(d,i){ return val*positions[i*2];})
+						.attr("cy",function(d,i){ return val*positions[i*2+1];})
+						.attr("r", function(d,i){ 
+									if(i == 63 || i == 62){
+						
+									return 0;
+						
+									}
+							var val2  = Math.sqrt(size_scale(((d[i][30])/PI)));
+							return bub_size_scale*val*val2;
+								
+								}).attr("stroke-width",border_width);
+
+		
+});	
+
+d3.selectAll("#range_input_size").on("input", function(d,i){
+
+		
+			//console.log(svgs);
+			
+			var val = (this.value)/100;
+			bub_size_scale = val;
+			console.log(val);
+
+			//d3.selectAll(svgs[0]).each().remove();
+	
+			
+			d3.selectAll("svg")
+			.selectAll("circle")
+						.attr("r", function(d,i){ 
+								if(i == 63 || i == 62){
+						
+							return 0;
+						
+						}
+							var val2  = Math.sqrt(size_scale(((d[i][30])/PI)));
+							return bub_scale*val*val2;
+								
+								});
+
+		
+});	
+
+d3.selectAll("#range_input").on("input", function(d,i){
+
+			threshold_filter = (this.value-100)/100;
+			
+			d3.selectAll("#input_label")
+				.html((this.value-100)/100);					
+});	
+
+d3.selectAll("#range_input2").on("input", function(d,i){
+
+			threshold_filter2 = (this.value-100)/100;
+			d3.selectAll("#input_label2")
+				.html((this.value-100)/100);					
+});	
+
+var tooltip = d3.select("body").append("div")	
+				.attr("class", "tooltip")				
+				.style("opacity", 0);
+				
+				
+var btn_click = d3.select("#generate_bubbles").on("click", function(){
+
+
+
+		//console.log(t_len);
+		
+		for(var k = 0; k<t_len; k++){
+		
+			svgs[k]  = draw_bubbleheadr(k);
+	
+		}
+	
+	//deselect pictures
+	d3.selectAll("img").style("border-color","white");
+	
+	t_list=[];
+	t_len=0;
+	
+});
+
+function groupTicks(d) {
+			  var k = (d.endAngle - d.startAngle) / d.value;
+			  return d3.range(0, d.value, 1000).map(function(v, i) {
+				return {
+				  angle: v * k + d.startAngle,
+				  label: i % 5 ? null : v / 1000 + "k"
+				};
+			  });
+}
+
+// Returns an event handler for fading a given chord group.
+function fade(opacity) {
+
+			  return function(g, i) {
+				svg.selectAll(".chord path")
+					.filter(function(d) { return d.source.index != i && d.target.index != i; })
+				  .transition()
+					.style("opacity", opacity);
+			  };
+}
+
+function draw_chord(){
+
+//var t_list = t_list;
+
+			
+			var scale_vals = d3.scale.linear()
+								.domain([-1,1])
+								.range([0,10]);
+
+			//var rand = Math.floor(Math.random() * 216);
+			
+			//t_len = d3.select("#input_text")[0][0].value;
+
+			//console.log(t_len);
+			
+			//for(var i=0; i<t_len; i++){
+			//	t_list[i]=i;
+			//}
+			
+			
+			
+			/*
+			//old script to take 10x10 from main matrix	
+			
+			var nr = 10;
+			var arr = [];
+			for(var x = 0; x < nr; x++){
+				arr[x] = [];    
+				for(var y = 0; y < nr; y++){ 
+				
+					arr[x][y] = corr_diff[x][y];  
+				}    
+			}
+			
+			for(var x = 0; x < nr; x++){
+				for(var y = 0; y < nr; y++){ 
+				
+					arr[x][y] = scale_vals(arr[x][y]);  
+					
+				}    
+			}	
+			for(var i = 0; i<nr; i++){		
+				for(var j=0; j<=i; j++){			
+				arr[i][j] = 0;
+			
+				}
+			}
+*/
+				
+		
+			var new_arr = [];
+			
+			//extract new matrix algorithm
+			for(var i=0; i<t_len; i++){			
+				new_arr[i] = []		
+				for(var j=0; j<=i; j++){
+				
+					var val = scale_vals(corr_diff[t_list[i]][t_list[j]]);
+					
+					//filter below thershold and above
+					if (corr_diff[t_list[i]][t_list[j]] < threshold_filter 
+						|| corr_diff[t_list[i]][t_list[j]] == 1
+						|| corr_diff[t_list[i]][t_list[j]] > threshold_filter2){
+						
+						val = 0;		
+
+						
+					}
+					
+					new_arr[i][j] = val;	
+				}		
+				for(var j=i+1; j<t_len; j++){
+
+					var val = scale_vals(corr_diff[t_list[i]][t_list[j]]);
+					
+					//filter below thereshold and above
+					if (corr_diff[t_list[i]][t_list[j]] < threshold_filter
+						|| corr_diff[t_list[i]][t_list[j]] == 1
+						|| corr_diff[t_list[i]][t_list[j]] > threshold_filter2){	
+						
+						val = 0;			
+					}
+					
+					new_arr[i][j] = val;//t_list[i] + "," + t_list[j];
+				}
+				
+			}
+			
+	
+			var chord = d3.layout.chord()
+				.padding(.05)
+				.sortSubgroups(d3.descending)
+				//.sortGroups(d3.descending)
+				.matrix(new_arr);
+
+				
+			var width2 = width
+				height2 = height,
+				innerRadius = Math.min(width2, height2) * .41,
+				outerRadius = innerRadius * 1.1;
+
+			var fill = d3.scale.ordinal()
+				.domain(d3.range(t_len))
+				.range([
+				 "#9ACD32"
+				,"#377DB8"
+				,"#F5DEB3"
+				,"#EE82EE"
+				,"#40E0D0"
+				,"#FF6347"
+				,"#D8BFD8"
+				,"#D2B48C"
+				,"#4682B4"
+				,"#00FF7F"
+				,"#FFFAFA"
+				,"#708090"
+				,"#708090"
+				,"#6A5ACD"
+				,"#87CEEB"
+				,"#A0522D"
+				,"#FFF5EE"
+				,"#2E8B57"
+				,"#F4A460"
+				,"#FA8072"	
+				]);
+
+			var svg = d3.select("body").append("svg")
+				.attr("width", width2)
+				.attr("height", height2)
+				.style("float","left")
+			  .append("g")
+			  .attr("transform", "translate(" + width2 / 2 + "," + height2 / 2 + ")");
+			
+			
+			
+			svg.append("g").selectAll("path")
+				.data(chord.groups)
+			  .enter().append("path")
+				.style("fill", function(d) { return fill(d.index); })
+				.style("stroke", function(d) { return fill(d.index); })
+				.style("float","left")
+				.attr("d", d3.svg.arc().innerRadius(innerRadius).outerRadius(outerRadius))
+				.on("mouseover", fade(.1))
+				.on("mouseout",fade(1));
+
+			var div = d3.select("body").append("div")	
+				.attr("class", "tooltip")				
+				.style("opacity", 0);
+
+			var div2 = d3.select("body").append("div")	
+				.attr("class", "pic_comparison")
+				.style("float","left")
+				.style("width","500px")
+				.style("opacity", 0);
+				
+				
+				svg.append("g")
+				.attr("class", "chord")
+				.selectAll("path")
+				.data(chord.chords)
+				.enter().append("path")
+				.attr("d", d3.svg.chord().radius(innerRadius))
+				.style("fill", function(d) { return fill(d.target.index); })
+				.on("click", function(d,e){
+				
+					var ind1 = d.source.index;
+					var ind2 = d.target.index;
+					
+					console.log(d);
+					
+					var im1 = "<img width='500px' height='300px' src='img/"+imagecount[t_list[ind1]] +  ".jpg'/>";
+					var im2 = "<img width='500px' height='300px' src='img/"+imagecount[t_list[ind2]] +  ".jpg'/>";
+					
+
+					
+					div2.transition()		
+						.duration(200)		
+						.style("opacity", .9);		
+									
+					div2.html(im1 + " " + (t_list[ind1]+1) + " vs "+ (t_list[ind2]+1) + " "+ im2
+							)	
+						.style("left", (d3.event.pageX +50) + "px")		
+						.style("top", (d3.event.pageY - 28) + "px");
+					
+					//window.open("Image "+ t_list[d.source.index] +" vs "+ "Image "+t_list[d.target.index]);
+					
+				
+				})
+				.on("mouseover", function(d,e){ 
+				
+					//fade(0.1);
+					svg.selectAll(".chord path")
+						.transition()
+						.style("opacity",.1);
+						
+					d3.select(this)
+						.transition()
+						.style("opacity", 1);				
+					
+					div.transition()		
+						.duration(200)		
+						.style("opacity", .9);		
+					
+					var ind1 = t_list[d.source.index]+1;
+					var ind2 = t_list[d.target.index]+1;
+					
+					console.log(t_list[d.target.index]);
+					
+					var tt = corr_diff[t_list[d.source.index]][t_list[d.target.index]];
+					
+					
+					console.log(tt);
+					var t2 = parseFloat(tt).toFixed(6);
+					console.log(t2);
+					div.html("Image "+ind1 +" vs "+ "Image "+ind2+ "<br/><br/>"+ 
+									"correlation: " + t2 + "</br>"
+									//"color: " +   color_diff[t_list[d.source.index]][t_list[d.target.index]]+ "</br>"+
+									//"gray: "+ gray_diff[t_list[d.source.index]][t_list[d.target.index]]		
+							)	
+						.style("left", (d3.event.pageX) + "px")		
+						.style("top", (d3.event.pageY - 28) + "px");
+
+						
+				
+				})
+				.on("mouseout",function(){ 
+				
+					d3.selectAll(".chord")
+						.selectAll("path")
+						.style("opacity",1);
+					
+					div.transition()		
+						.duration(200).style("opacity", 0);
+				});
+	
+				
+				
+				
+			var ticks = svg.append("g").selectAll("g")
+				.data(chord.groups)
+				.enter().append("g").selectAll("g")
+				.data(groupTicks)
+				.enter().append("g")
+				.attr("transform", function(d) {
+				  return "rotate(" + (d.angle * 180 / Math.PI - 90) + ")"
+					  + "translate(" + outerRadius + ",0)";
+				});
+
+			ticks.append("line")
+				.attr("x1", 1)
+				.attr("y1", 0)
+				.attr("x2", 5)
+				.attr("y2", 0)
+				.style("stroke", "#000");
+
+			ticks.append("text")
+				.attr("x", 8)
+				.attr("dy", ".35em")
+				.attr("transform", function(d) { return d.angle > Math.PI ? "rotate(180)translate(-16)" : null; })
+				.style("text-anchor", function(d) { return d.angle > Math.PI ? "end" : null; })
+				.text(function(d,i,e) { 
+				return t_list[e] + 1; });
+
+}
+
+function draw_bubbleheadr(frame){
+
+		//console.log(t_list);
+		var frame = t_list[frame];
+
+		//this is for initial colors for frame 0
+		var colors = [];
+		console.log(json_frames[0][0][30]);
+		
+		for(var i=0; i<64; i++){
+							
+				colors[i] = json_frames[i][frame][30];
+							
+		}
+
+		var background_width = 250*bub_scale;
+		var background_height = 120*bub_scale;
+		//
+		var svg = d3.select("body").append("div").style("float","left").html("</br><img width='"+background_width+"px' height='"+background_height+"px' src='img/"+imagecount[frame]+".jpg'/>").append("svg")
+			.attr("width", width)
+			.attr("height", height)
+			.style("background-image","url(unnamed.PNG)").style("background-size", width+"px "+height+"px")
+			.style("float","left")
+			.append("g").attr("transform", 
+									"translate(" + margin.left* bub_scale+ "," + margin.top*bub_scale + ")");
+
+
+			var circles = svg.selectAll("circle")
+						.data(json_frames)
+						.enter()
+						.append("circle")
+						.attr("r",function (d,i){ 
+								if(i == 63 || i == 62){
+						
+									return 0;
+						
+								}
+								var val  = Math.sqrt(size_scale(d[frame][ctr2])/PI);
+								return bub_scale*val;
+
+						})
+						.attr("cx",function(d,i){ return bub_scale*positions[i*2];})
+						.attr("cy",function(d,i){ return bub_scale*positions[i*2+1];})
+						.attr("fill",function(d,i){
+						
+						 
+						return z_list[i](colors[i]);
+						
+
+						})
+						.style("opacity", 0.9)
+						.on("mouseover", function(d,e,i){ 
+					
+							
+							d3.select(this)
+								.transition()
+								.style("opacity", 1);				
+							
+							tooltip.transition()		
+								.duration(200)		
+								.style("opacity", .9);		
+								
+							var e1 = e +1;
+							
+							d3.select(this)
+									.transition()
+									.attr("stroke", "yellow");
+							
+							tooltip.html("Node: <b>"+ e1 + "</b><br/>Value now: <b>"+ d[frame][ctr2].toFixed(2)	
+									+"</b> eV<br/>Max val:<b> "+max_arr64[e1-1]+" </b>eV<br/>Min val:<b> "+min_arr64[e1-1]+"</b> eV")	
+								.style("left", (d3.event.pageX) + "px")		
+								.style("top", (d3.event.pageY - 28) + "px");
+
+							
+					
+						}).on("mouseout",function(){ 
+				
+								d3.select(this)
+									.transition()
+									.attr("stroke", "black");
+									
+								tooltip.transition()		
+								.duration(200).style("opacity", 0);
+								
+						}).on("click",function(d,e,i){
+					
+							//this needs to be filled up by raj
+									
+					
+						})
+						.attr("stroke","black").attr("stroke-width",border_width);
+						
+			return svg;			
+
+
+}
+
+
+var btn_click2 = d3.select("#generate_button").on("click", function(){
+
+	draw_chord();
+	
+	//d3.selectAll("img").style("border-color","white");
+	
+	//t_list=[];
+	//t_len=0;
+	
+	});
+
+
+
+});
+});
+});
+});
+
+	
+	
+
+
+
+</script>
+
+</html>
