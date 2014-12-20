@@ -69,6 +69,7 @@ d3.text("imagecount.txt", function(imct) {
 	
 	var	min_arr64 = [];
 	var	max_arr64 = [];
+	var bub_scale = 2;
 	
 	var body = d3.selectAll("body").append("div");
 
@@ -130,15 +131,12 @@ d3.text("imagecount.txt", function(imct) {
 		
 		min_glob[i] = min;
 		max_glob[i] = max;
-		
-		// console.log(z_list);
+	
 	}	
-	//console.log(min_glob);
-	//console.log(max_glob);
+
 	min_glob = Math.ceil(d3.min(min_glob));
 	max_glob = Math.ceil(d3.max(max_glob));
-	//console.log(min_glob);
-	//console.log(max_glob);
+;
 	
 	var size_scale = d3.scale.linear()
 						.domain([min_glob,max_glob])
@@ -237,14 +235,14 @@ d3.text("imagecount.txt", function(imct) {
 					.append("circle")
 					.attr("r",function (d,i){ 
 					
-						//if(i == 63 || i == 62){	
-						//	return d[frame][ctr2]/3000;
-						//}
+						if(i == 63 || i == 62){	
+							return 0;
+						}
 					
 						//console.log(i.toString() + d[frame][ctr2]/200);
 						//return d[frame][ctr2]/200;
-						var val  = Math.sqrt(size_scale(d[frame][ctr2])/PI);
-						return val;
+						var val  = Math.sqrt(size_scale((d[frame][ctr2]))/PI);
+						return  bub_scale*val;
 
 					})
 					.attr("cx",function(d,i){ return positions[i*2];})
@@ -366,9 +364,13 @@ d3.text("imagecount.txt", function(imct) {
 				return z_list[i](cols[i]);	
 			
 			}).attr("r",function (d,i){ 
-					
+						if(i == 63 || i == 62){
+						
+							return 0;
+						
+						}
 							var val  = Math.sqrt(size_scale(d[frame][ctr2])/PI);
-							return val;
+							return  bub_scale*val;
 					});
 
 			cols = [];
@@ -408,16 +410,13 @@ d3.text("imagecount.txt", function(imct) {
 					
 					}).attr("r",function (d,i){ 
 							
-					/*	if(i == 63 || i == 62){
+						if(i == 63 || i == 62){
 						
-							return cols[i]/3000;
+							return 0;
 						
 						}
-							return cols[i]/200;
-					*/
-
 						var val  = Math.sqrt(size_scale(d[frame][ctr2])/PI);
-								return val;
+								return bub_scale*val;
 					});	
 						
 						
