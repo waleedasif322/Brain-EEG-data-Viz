@@ -35,10 +35,13 @@ Timeline <input type="range" style="width:800px" min="1" max="139" value=1 id="r
 <button type="button"  id="stop_button">Stop</button>
 </br>
 </br>
-<button type="button"  id="single_plot_button">Graph_single_lineplot</button>
-<button type="button"  id="multiplot_button">Graph_multiple_lineplot</button>
-</br><form><label type ="radio" id="single_plot_button">Graph_single_lineplot</label>
-<label type ="radio" id="multiplot_button">Graph_multiple_lineplot</label></form>
+<button type="button"  id="lineplot_button">Plot__lineGraph</button>
+<button type="button"  id="bargraph_button">Plot_BarGraph</button>
+</br>
+<form>
+<input type ="radio" name="plot" id="singleplot_button" checked>Plot_singleGraph
+<input type ="radio" name="plot" id="multiplot_button">Plot_multipleGraph
+</form>
 <script src="d3.js"></script>
 <script>
 //read file
@@ -127,6 +130,22 @@ d3.text("positions.txt", function(dataa) {
 	var size_scale = d3.scale.linear()
 						.domain([min_glob,max_glob])
 						.range([1,10000]);
+//var showData = ["Graph_single_lineplot", "Graph_multiple_lineplot"], j=0; //choosing Graph+single_lineplot as default
+//var form = d3.select("body").append("form");
+//var labelSelect = form.selectAll("label")
+//				.data("showData")
+//				.enter()
+//				.append("label")
+//				.text(function(d,i) {return i;})
+//				.insert("input")
+//					.attr({
+//						type: "radio",
+//						class:"shape",
+//						name:"mode",
+//						value: function(d,i) {return i;}
+//				})
+//				.property("checked", function(d, i) {return i===j;});
+
 
 	function lineplot (d, e, i) 
 	{
@@ -199,6 +218,7 @@ d3.text("positions.txt", function(dataa) {
 				  .call(yAxis);
 
 
+				
 				var lineFunc = d3.svg.line()
 									  .x(function(d) {
 									    return xRange(d.x);
@@ -210,27 +230,24 @@ d3.text("positions.txt", function(dataa) {
 
 				vis.append('svg:path')
 					  .attr('d', lineFunc(lineData))
-					  .attr('stroke', 'blue')
+					  .attr('stroke', 'steelblue')
 					  .attr('stroke-width', 2)
-					  .attr('fill', 'none');
+					  .attr('fill', 'none')
+					  .style("stroke", function(d) {return color(i)});
+
+				vis.append('text')
+				  .attr('transform',  'translate(' + (width /2) +',' + (height + margin.bottom) +')')
+				  .style('text-anchor', 'middle')
+				  .text('images')	
+
+				vis.append('text')
+				  .attr('transform',  'rotate(-90)')
+				  .attr('y', 6)
+				  .style('text-anchor', 'middle')
+				   	  .text('correlation value');	
+				
 
 	}
-
-var showData = ["Graph_single_lineplot", "Graph_multiple_lineplot"], j=0; //choosing Graph+single_lineplot as default
-var form = d3.select("body").append("form");
-var labelSelect = form.selectAll("label")
-				.data("showData")
-				.enter()
-				.append("label")
-				.text(function(d,i) {return i;})
-				.insert("input")
-					.attr({
-						type: "radio",
-						class:"shape",
-						name:"mode",
-						value: function(d,i) {return i;}
-				})
-				.property("checked", function(d, i) {return i===j;});
 
 	function lineplotall (d, e, i) 	{
 		d3.select("#visualisation").selectAll("g");
@@ -284,17 +301,23 @@ var labelSelect = form.selectAll("label")
 				    xAxis = d3.svg.axis()
 				      .scale(xRange)
 				      .tickSize(5)
+				      .style("text-anchor", "middle")
+				   	  .text("images")
 				      .tickSubdivide(true),
 				    yAxis = d3.svg.axis()
 				      .scale(yRange)
 				      .tickSize(5)
+				      .style("text-align", "-90")
+				      .text("correlation value")
 				      .orient('left')
 				      .tickSubdivide(true);
+
 				 
 				vis.append('svg:g')
 				  .attr('class', 'x axis')
-				  .attr('transform', 'translate(0,' + (HEIGHT - MARGINS.bottom) + ')')
+				  .attr('transform', 'translate(0,' + (HEIGHT - MARGINS.bottom) + ')')				  
 				  .call(xAxis);
+
 				 
 				vis.append('svg:g')
 				  .attr('class', 'y axis')
@@ -302,6 +325,18 @@ var labelSelect = form.selectAll("label")
 				  .call(yAxis);
 
 
+				svg.append("text")
+				  .attr("transform",  "translate(" + (width /2) +"," + (height + margin.bottom) +")")
+				  .style("text-anchor", "middle")
+				   	  .text("images");	
+
+				svg.append("text")
+				  .attr("transform",  "rotate(-90)")
+				  .attr("y", 0-  margin.left)
+				  .attr("x", 0-(height /2))
+				  .style("text-anchor", "middle")
+				   	  .text("correlation value");	
+				
 				var lineFunc = d3.svg.line()
 									  .x(function(d) {
 									    return xRange(d.x);
@@ -413,10 +448,10 @@ var labelSelect = form.selectAll("label")
 			
 	});
 
-var btn_click3 = d3.selectAll("#single_plot_button").on("click", function(){
+	var btn_click3 = d3.selectAll("#lineplot_button").on("click", function(){
 	
-			dx=3;
-			d3.line(lineplot(d, e, i));
+			dx=2;
+	//		d3.line(lineplot(d, e, i));
 			
 	});
 	
@@ -444,8 +479,7 @@ var btn_click3 = d3.selectAll("#single_plot_button").on("click", function(){
 				ctr2 = ctr2 + 1;
 			
 				d3.timer(makeCallback(),interval);
-			
-			}
+						}
 			else{
 			
 				//d3.timer(makeCallback(),0);
