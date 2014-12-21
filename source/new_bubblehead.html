@@ -236,22 +236,23 @@ d3.text("positions.txt", function(dataa) {
 					  .style("stroke", function(d) {return color(i)});
 
 				vis.append('text')
-				  .attr('transform',  'translate(' + (width /2) +',' + (height + margin.bottom) +')')
-				  .style('text-anchor', 'middle')
-				  .text('images')	
+					.attr('transform',  'translate(' + (width /2) +',' + (height + margin.bottom) +')')
+				  	.style('text-anchor', 'middle')
+				  	.text('images')	
 
-				vis.append('text')
-				  .attr('transform',  'rotate(-90)')
-				  .attr('y', 6)
-				  .style('text-anchor', 'middle')
-				   	  .text('correlation value');	
-				
+				vis.append("text")
+      				.attr("transform", "rotate(-90)")
+      				.attr("y", 6)
+      				.attr("dy", ".71em")
+      				.style("text-anchor", "end")
+      				.text("correlation ");
+
 
 	}
 
 	function lineplotall (d, e, i) 	{
-		d3.select("#visualisation").selectAll("g");
-		d3.select("#visualisation").selectAll("path");
+		d3.select("#visualisation").append("g");
+		d3.select("#visualisation").append("path");
 		
 		var y = [];
 
@@ -421,6 +422,7 @@ d3.text("positions.txt", function(dataa) {
 							
 						//console.log(d[i]);
 						lineplot(d, e, i);
+						//lineplotall(d, e, i);
 
 					})
 					.attr("stroke","black").attr("stroke-width",3);
