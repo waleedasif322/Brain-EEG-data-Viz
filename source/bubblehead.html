@@ -317,13 +317,13 @@ d3.text("imagecount.txt", function(imct) {
 							.duration(200).style("opacity", 0);
 							
 					}).on("click",function(d,e,i){
-						//($.extend(true, [], data));
+				lineplot(d,e,i);
 
-						//$( ".btn" ).click(function() 
-						{
+						 VIZ.stackBarChart($.extend(true, [], data));
+					 	$( ".btn" ).click(function() {
           					VIZ.clearAll();
           					if (this.id == 'sline') {
-            					VIZ.lineplot(d,e,i);
+            					VIZ.slineplot(d,e,i);
           					}
           				 	else if (this.id == 'mline') {
             					VIZ.mlineplot(d,e,i);
@@ -334,12 +334,14 @@ d3.text("imagecount.txt", function(imct) {
           				 	else {
             					VIZ.mbarplot(d,e,i);
           				} 
-        				}
         				});
 
 					})
 					.attr("stroke","black").attr("stroke-width",border_width);
 
+
+
+	
 	var btn_click = d3.selectAll("#start_button").on("click", function(){
 	
 			dx=1;
