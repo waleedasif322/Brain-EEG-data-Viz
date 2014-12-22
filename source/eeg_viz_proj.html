@@ -80,13 +80,13 @@ pointer-events: none;
 
 <td><button type="button"  id="generate_bubbles">Generate bubbles heads</button></td>
 <td>Scale:</td>
-<td><input type="range"  min="0" max="100" value = 100 id="range_input_scale" /></td>
+<td><input type="range"  min="0" max="200" value = 100 id="range_input_scale" /></td>
 </tr>
 <tr>
 
 <td></td>
 <td>Size:</td>
-<td><input type="range"  min="0" max="300" value = 100 id="range_input_size" /></td>
+<td><input type="range"  min="0" max="300" value = 200 id="range_input_size" /></td>
 
 </tr>
 
@@ -117,6 +117,7 @@ d3.text("imagecount.txt", function(imct) {
 	
 	console.log(imagecount);
 	
+	document.getElementById("range_input_scale").disabled = true;
 	
 	//var frame = 0; //current picture displayed
 	var ctr2 = 0; //counter for each frame; for color change inbetween images 30fps depends on intervals
@@ -136,7 +137,7 @@ d3.text("imagecount.txt", function(imct) {
 	
 	var bub_scale = 1;
 	
-	var bub_size_scale = 1;
+	var bub_size_scale = 2;
 	
 	var border_width =1;
 	
@@ -144,9 +145,9 @@ d3.text("imagecount.txt", function(imct) {
 	
 	var svgs = [];
 	
-    var  width = (800 - margin.left - margin.right)*bub_scale;
+    var  width = (800*bub_scale - margin.left - margin.right);
 	
-    var height = (800 - margin.top - margin.bottom)*bub_scale;	
+    var height = (800*bub_scale - margin.top - margin.bottom);	
 	
 	var min_arr64 = [];
 	var max_arr64 = [];
@@ -198,6 +199,10 @@ d3.text("imagecount.txt", function(imct) {
 	}
 
 
+var tooltip = d3.select("body").append("div")	
+				.attr("class", "tooltip")				
+				.style("opacity", 0);
+				
 
 d3.selectAll("img").style("margin",5).style("padding",5).on("click", function(i,d){
 
@@ -232,19 +237,18 @@ d3.selectAll("#range_input_scale").on("input", function(d,i){
 		
 			//console.log(svgs);
 			
-			var val = (this.value)/100;
-			bub_scale = val;
 			
-			console.log(val);
+			var val = (this.value)/100;
+			
+			
+			bub_scale = val;
+	
 			
 			var newwidth = width * val;
 			var newheight = height *val;
 			
 			
 			border_width = val;
-		
-				var innerRadius = Math.min(newwidth, newheight) * .41
-				var outerRadius = innerRadius * 1.1;
 				
 			//d3.selectAll(svgs[0]).each().remove();
 	
@@ -255,10 +259,9 @@ d3.selectAll("#range_input_scale").on("input", function(d,i){
 			.style("background-size",newwidth+"px "+newheight+"px")
 			.select("g").attr("transform", 
 									"translate(" + margin.left*val + "," + margin.top*val + ")")
-			//.select("g:chord").attr("d", d3.svg.arc().innerRadius(innerRadius).outerRadius(outerRadius))
 			.selectAll("circle")
-			.attr("cx",function(d,i){ return val*positions[i*2];})
-						.attr("cy",function(d,i){ return val*positions[i*2+1];})
+						.attr("cx",function(d,i){ return positions[i*2]*bub_scale;})
+						.attr("cy",function(d,i){ return positions[i*2+1]*bub_scale;})
 						.attr("r", function(d,i){ 
 									if(i == 63 || i == 62){
 						
@@ -266,7 +269,7 @@ d3.selectAll("#range_input_scale").on("input", function(d,i){
 						
 									}
 							var val2  = Math.sqrt(size_scale(((d[i][30])/PI)));
-							return bub_size_scale*val*val2;
+							return bub_size_scale*bub_scale*val2;
 								
 								}).attr("stroke-width",border_width);
 
@@ -314,12 +317,7 @@ d3.selectAll("#range_input2").on("input", function(d,i){
 			threshold_filter2 = (this.value-100)/100;
 			d3.selectAll("#input_label2")
 				.html((this.value-100)/100);					
-});	
-
-var tooltip = d3.select("body").append("div")	
-				.attr("class", "tooltip")				
-				.style("opacity", 0);
-				
+});				
 				
 var btn_click = d3.select("#generate_bubbles").on("click", function(){
 
@@ -338,6 +336,7 @@ var btn_click = d3.select("#generate_bubbles").on("click", function(){
 	
 	t_list=[];
 	t_len=0;
+	document.getElementById("range_input_scale").disabled = false;
 	
 });
 
@@ -364,53 +363,11 @@ function fade(opacity) {
 
 function draw_chord(){
 
-//var t_list = t_list;
-
 			
 			var scale_vals = d3.scale.linear()
 								.domain([-1,1])
 								.range([0,10]);
 
-			//var rand = Math.floor(Math.random() * 216);
-			
-			//t_len = d3.select("#input_text")[0][0].value;
-
-			//console.log(t_len);
-			
-			//for(var i=0; i<t_len; i++){
-			//	t_list[i]=i;
-			//}
-			
-			
-			
-			/*
-			//old script to take 10x10 from main matrix	
-			
-			var nr = 10;
-			var arr = [];
-			for(var x = 0; x < nr; x++){
-				arr[x] = [];    
-				for(var y = 0; y < nr; y++){ 
-				
-					arr[x][y] = corr_diff[x][y];  
-				}    
-			}
-			
-			for(var x = 0; x < nr; x++){
-				for(var y = 0; y < nr; y++){ 
-				
-					arr[x][y] = scale_vals(arr[x][y]);  
-					
-				}    
-			}	
-			for(var i = 0; i<nr; i++){		
-				for(var j=0; j<=i; j++){			
-				arr[i][j] = 0;
-			
-				}
-			}
-*/
-				
 		
 			var new_arr = [];
 			
@@ -530,7 +487,7 @@ function draw_chord(){
 					var ind1 = d.source.index;
 					var ind2 = d.target.index;
 					
-					console.log(d);
+					//console.log(d);
 					
 					var im1 = "<img width='500px' height='300px' src='img/"+imagecount[t_list[ind1]] +  ".jpg'/>";
 					var im2 = "<img width='500px' height='300px' src='img/"+imagecount[t_list[ind2]] +  ".jpg'/>";
@@ -568,7 +525,7 @@ function draw_chord(){
 					var ind1 = t_list[d.source.index]+1;
 					var ind2 = t_list[d.target.index]+1;
 					
-					console.log(t_list[d.target.index]);
+					//console.log(t_list[d.target.index]);
 					
 					var tt = corr_diff[t_list[d.source.index]][t_list[d.target.index]];
 					
@@ -639,7 +596,7 @@ function draw_bubbleheadr(frame){
 		for(var i=0; i<64; i++){
 							
 				colors[i] = json_frames[i][frame][30];
-							
+					
 		}
 
 		var background_width = 250*bub_scale;
@@ -664,12 +621,14 @@ function draw_bubbleheadr(frame){
 									return 0;
 						
 								}
+								
+								
 								var val  = Math.sqrt(size_scale(d[frame][ctr2])/PI);
-								return bub_scale*val;
+								return bub_size_scale*bub_scale*val;
 
 						})
-						.attr("cx",function(d,i){ return bub_scale*positions[i*2];})
-						.attr("cy",function(d,i){ return bub_scale*positions[i*2+1];})
+						.attr("cx",function(d,i){ return positions[i*2]*bub_scale;})
+						.attr("cy",function(d,i){ return positions[i*2+1]*bub_scale;})
 						.attr("fill",function(d,i){
 						
 						 

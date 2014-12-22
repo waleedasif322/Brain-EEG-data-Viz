@@ -246,13 +246,11 @@ d3.text("positions.txt", function(dataa) {
       				.attr("dy", ".71em")
       				.style("text-anchor", "end")
       				.text("correlation ");
-
-
 	}
 
 	function lineplotall (d, e, i) 	{
-		d3.select("#visualisation").append("g");
-		d3.select("#visualisation").append("path");
+		//d3.select("#visualisation").selectall('g').append("g");
+		//d3.select("#visualisation").append("path");
 		
 		var y = [];
 

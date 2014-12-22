@@ -30,6 +30,10 @@ pointer-events: none;
 
 </style>
 <body>
+<title>Bubble head diagram with time series</title>
+<h1><b>Welcome to Brain Visualization Project</b></h1>
+<h1>CS599.68 Data Visualization Class</h1>
+<h3>This Brain cells activity test is conducted by Dr. Timmothy Ellmore of Psychology Department. In this experiment, random abstract images were shown to the testing person. Each image will flash on the computer for a 2-3second time period. The person's job is to recognize the images shown matches with the previously shown images. This experiment is Brain data visualization illustrates Brain cells  activity on short memory test. In this experiment, the brain cells activity on 64 nodes will be shown on bubblehead diagram. The red bubbles shows the activity at peak level at that instance of time. The white bubble indicates litle/no activity on brain cell at that instance of time.</h3>
 <h2>Time Line</h2>
 <h4>click play to play the experiment(30fps) or click anywhere on timeline to fastforward</h4>
 <br/>
@@ -39,12 +43,30 @@ Timeline <input type="range" style="width:800px" min="1" max="139" value=1 id="r
 </br>
 <button type="button"  id="start_button">Start</button>
 <button type="button"  id="stop_button">Stop</button>
-</br>
+</br><h2>Bubble head Diagram</h2>
 <div id="bubblediv" style="float:left"></div>
 <h2>Image Shown</h2>
 <div id="gadgets"></div>
+	<div class="btn-group" data-toggle="buttons">
+        <label class="btn btn-primary active" id="sline">
+        <h2><b>Plotting Node values Graph for the selected Node/nodes</b></h2>
+          <input type="radio" name="options"> view single-line-Graph
+        </label>
+        <label class="btn btn-primary" id="mline">
+          <input type="radio" name="options"> view multi-line-Graphs
+        </label>
+        <label class="btn btn-primary" id="sbar">
+          <input type="radio" name="options"> view single-bar-Graph
+        </label>
+        <label class="btn btn-primary" id="mbar">
+          <input type="radio" name="options"> view multi-bar-Graphs
+        </label>
+    </div>
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="d3.js"></script>
+<script src="jquery.js"></script>
+<script src="bootstrap.js"></script>
+<script src="chart.js"></script>
 <script>
 //read file
 d3.text('30fps_data.txt', function(error3, data1){
@@ -67,10 +89,10 @@ d3.text("imagecount.txt", function(imct) {
 	var z_list = [] //this is array of color scales for nodes
 	var min_glob = []; //this is global min value for all nodes at all times
 	var max_glob = []; //this is global max value for all nodes at all times
-	var PI = 3.141592653;
-	var border_width = 1;
+	var PI = 3.141592653;//pi value
+	var border_width = 1;//border with =1
 	
-	var	min_arr64 = [];
+	var	min_arr64 = [];//min_array for all node
 	var	max_arr64 = [];
 	var bub_scale = 2;
 	
@@ -145,6 +167,7 @@ d3.text("imagecount.txt", function(imct) {
 						.domain([min_glob,max_glob])
 						.range([1,10000]);
 
+	//Plotting single line graph for the selected node
 	function lineplot (d, e, i) 
 	{
 		d3.select("#visualisation").selectAll("g").remove();
@@ -294,18 +317,29 @@ d3.text("imagecount.txt", function(imct) {
 							.duration(200).style("opacity", 0);
 							
 					}).on("click",function(d,e,i){
-				
-						//this needs to be filled up by raj
-							
-						//console.log(d[i]);
-						lineplot(d, e, i);
+						//($.extend(true, [], data));
+
+						//$( ".btn" ).click(function() 
+						{
+          					VIZ.clearAll();
+          					if (this.id == 'sline') {
+            					VIZ.lineplot(d,e,i);
+          					}
+          				 	else if (this.id == 'mline') {
+            					VIZ.mlineplot(d,e,i);
+          					}
+          				 	else if (this.id == 'area') {
+            					VIZ.sbarplot(d,e,i);
+          					}
+          				 	else {
+            					VIZ.mbarplot(d,e,i);
+          				} 
+        				}
+        				});
 
 					})
 					.attr("stroke","black").attr("stroke-width",border_width);
 
-
-
-	
 	var btn_click = d3.selectAll("#start_button").on("click", function(){
 	
 			dx=1;
@@ -421,23 +455,14 @@ d3.text("imagecount.txt", function(imct) {
 						var val  = Math.sqrt(size_scale(d[frame][ctr2])/PI);
 								return bub_scale*val;
 					});	
-						
-						
-						
-						
-						
-											
 		});	
 		
 	d3.selectAll("#range_input").value(1);
-	
-	
 })
 });
 });
 </script>
-<h2>Node values plot for node</h2> <label>1</label>
+ <label>1</label>
 	<svg id="visualisation" width="500" height="200" style="float:left" ></svg>
 
-
-</body>
+</body><HR><author>Waleed, Matt, and Raj, December 22, 2014</author>

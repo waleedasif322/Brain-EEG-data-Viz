@@ -16,10 +16,10 @@ def readEEGFile():
 	
 	
 #Generates new siglist file with filtered signals based on intervals and sampled at 30fps/sec	
-def generate_sig_file_30fps(siglist,channels,interval_file,mean_sig):
+def generate_sig_file_30fps(siglist,channels,interval_file):
 	siglist = siglist
 	interval = 2000
-	cuts = 60 #60 values for image instead of 2000 (30 per second)
+	cuts = 1
 	steps = int(math.floor(interval/cuts))
 	num_images  = 140
 	with open(interval_file) as f:
@@ -35,7 +35,7 @@ def generate_sig_file_30fps(siglist,channels,interval_file,mean_sig):
 				i = int(i)
 				#2000 miliseconds intervals
 				for j in range(0,interval):
-					arr[ctr].append(float(sig[i+j])-mean_sig[k])
+					arr[ctr].append(float(sig[i+j]))
 				ctr = ctr+1
 			for i in range(0,num_images):
 				newarr[k].append([])
@@ -85,27 +85,19 @@ def generate_30_fps_channel_sig():
 			
 sigfiles = readEEGFile()
 
-temp = []
-avg = 0
 
-for j in range(0,64):
-	sig1 = sigfiles[j]
-	avg = 0
-	for i in range(0,len(sig1)):
-		avg  += float(sig1[i])
-	temp.append(avg /len(sig1))
+#for i in range(0,100):
+#	print sig1[1334423+i]
 
-
-
-
+	
 #leng = len(sig1)
  
 #print leng
 #print sig1[leng-10000]
 
 
-rets = generate_sig_file_30fps(sigfiles,64,'intervals.txt',temp)
-with open('dump3.txt', 'w') as outfile:
+rets = generate_sig_file_30fps(sigfiles,64,'intervals.txt')
+with open('30fps_data', 'w') as outfile:
 			json.dump(rets, outfile)
 						
 			
