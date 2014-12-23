@@ -168,7 +168,7 @@ d3.text("imagecount.txt", function(imct) {
 						.range([1,10000]);
 
 	//Plotting single line graph for the selected node
-	function lineplot (d, e, i) 
+	function slineplot (d, e, i) 
 	{
 		d3.select("#visualisation").selectAll("g").remove();
 		d3.select("#visualisation").selectAll("path").remove();
@@ -252,13 +252,238 @@ d3.text("imagecount.txt", function(imct) {
 					  .attr('stroke', 'blue')
 					  .attr('stroke-width', 2)
 					  .attr('fill', 'none');
+				
+				vis.append("text")
+				.attr('class', 'x label')
+				.attr('text-anchor', 'center')
+				.attr('x', width)
+				.attr('y', height - 2)
+				.text(function(d) {return d;});
 
-	}
+				vis.append("text")
+				.attr('class', 'y label')
+				.attr('text-anchor', 'center')
+				.attr('y', 200)
+				.attr('dy', '.75e')
+				.attr('transform', 'rotate(-90)')
+				.text('Correlation values ');
+
+				tooltip.html("Node: "+ e1 + "<br/>Value now: <b>"+ d[frame][ctr2].toFixed(2)	
+									+"</b> eV<br/>Max val:<b> "+max_arr64[e1-1]+" </b>eV<br/>Min val:<b> "+min_arr64[e1-1]+"</b> eV<br/><span style='font-size:12px'>click to show plot</span>"
+								)	
+							.style("left", (d3.event.pageX) + "px")		
+							.style("top", (d3.event.pageY - 28) + "px");
+
 						
+	}
+				
+				//Plotting single line graph for the selected node
+	function mlineplot (d, e, i) 
+	{
+		d3.select("#visualisation").selectAll("g").append("g");
+		d3.select("#visualisation").selectAll("path").append("path");
+		
+		var y = [];
+
+		for (var k = 0; k < d.length; k++)
+		{
+			for (var j = 0; j < d[k].length; j++)
+			{
+				if (j == 30)
+					y.push(d[k][j]);
+			}
+		}
+
+		var x = new Array(140);
+		for (var l = 0; l < x.length; l++)
+		{
+			x[l] = l;
+		}
+
+		var lineData = []
+		for (var q = 0; q < d.length; q++)
+		{
+			lineData.push({ x: x[q], y: y[q]});
+		}
+
+		console.log(lineData);
+
+		var vis = d3.select('body').select("#visualisation"),
+				    WIDTH = 500,
+				    HEIGHT = 200,
+				    MARGINS = {
+				      top: 20,
+				      right: 20,
+				      bottom: 20,
+				      left: 50
+				    },
+				    xRange = d3.scale.linear().range([MARGINS.left, WIDTH - MARGINS.right]).domain([d3.min(lineData, function(d) {
+				      return d.x;
+				    }), d3.max(lineData, function(d) {
+				      return d.x;
+				    })]),
+				    yRange = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([d3.min(lineData, function(d) {
+				      return d.y;
+				    }), d3.max(lineData, function(d) {
+				      return d.y;
+				    })]),
+				    xAxis = d3.svg.axis()
+				      .scale(xRange)
+				      .tickSize(5)
+				      .tickSubdivide(true),
+				    yAxis = d3.svg.axis()
+				      .scale(yRange)
+				      .tickSize(5)
+				      .orient('left')
+				      .tickSubdivide(true);
+				 
+				vis.append('svg:g')
+				  .attr('class', 'x axis')
+				  .attr('transform', 'translate(0,' + (HEIGHT - MARGINS.bottom) + ')')
+				  .call(xAxis);
+				 
+				vis.append('svg:g')
+				  .attr('class', 'y axis')
+				  .attr('transform', 'translate(' + (MARGINS.left) + ',0)')
+				  .call(yAxis)
+				  .append('svg:text')
+				  .attr('transform', 'rotate(-90)')
+				  .attr('y', 6)
+				  .attr('dy', '.71em')
+				  .style('Correlation');
+
+
+				var lineFunc = d3.svg.line()
+									  .x(function(d) {
+									    return xRange(d.x);
+									  })
+									  .y(function(d) {
+									    return yRange(d.y);
+									  })
+									  .interpolate('linear');
+
+				vis.append('svg:path')
+					  .attr('d', lineFunc(lineData))
+					  .attr('stroke', function(d) { return color(d.name);)
+					  .attr('stroke-width', 2)
+					  .attr('fill', 'none');
+				
+				vis.append('svg:text')
+				.datum(function(d) { return {name: d.name, value: d.values[d.values.length -1]}})
+				.attr('transform', function(d) { return 'translate('+ x(d.value.i) + y(d.value.e) +')';})
+				.attr('x', 64)
+				.attr('y', height - 2)
+				.attr('dy', '.35em')
+				.text(function(d) {return d.name;});
+			}
+	
+				//Plotting single line graph for the selected node
+	function mbarplot (d, e, i) 
+	{
+		d3.select("#visualisation").selectAll("g").append("g");
+		d3.select("#visualisation").selectAll("path").append("path");
+		
+		var y = [];
+
+		for (var k = 0; k < d.length; k++)
+		{
+			for (var j = 0; j < d[k].length; j++)
+			{
+				if (j == 30)
+					y.push(d[k][j]);
+			}
+		}
+
+		var x = new Array(140);
+		for (var l = 0; l < x.length; l++)
+		{
+			x[l] = l;
+		}
+
+		var lineData = []
+		for (var q = 0; q < d.length; q++)
+		{
+			lineData.push({ x: x[q], y: y[q]});
+		}
+
+		console.log(lineData);
+
+		var vis = d3.select('body').select("#visualisation"),
+				    WIDTH = 500,
+				    HEIGHT = 200,
+				    MARGINS = {
+				      top: 20,
+				      right: 20,
+				      bottom: 20,
+				      left: 50
+				    },
+				    xRange = d3.scale.linear().range([MARGINS.left, WIDTH - MARGINS.right]).domain([d3.min(lineData, function(d) {
+				      return d.x;
+				    }), d3.max(lineData, function(d) {
+				      return d.x;
+				    })]),
+				    yRange = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([d3.min(lineData, function(d) {
+				      return d.y;
+				    }), d3.max(lineData, function(d) {
+				      return d.y;
+				    })]),
+				    xAxis = d3.svg.axis()
+				      .scale(xRange)
+				      .tickSize(5)
+				      .tickSubdivide(true),
+				    yAxis = d3.svg.axis()
+				      .scale(yRange)
+				      .tickSize(5)
+				      .orient('left')
+				      .tickSubdivide(true);
+				 
+				vis.append('svg:g')
+				  .attr('class', 'x axis')
+				  .attr('transform', 'translate(0,' + (HEIGHT - MARGINS.bottom) + ')')
+				  .call(xAxis);
+				 
+				vis.append('svg:g')
+				  .attr('class', 'y axis')
+				  .attr('transform', 'translate(' + (MARGINS.left) + ',0)')
+				  .call(yAxis);
+
+
+				var lineFunc = d3.svg.line()
+									  .x(function(d) {
+									    return xRange(d.x);
+									  })
+									  .y(function(d) {
+									    return yRange(d.y);
+									  })
+									  .interpolate('linear');
+
+				vis.append('svg:path')
+					  .attr('d', lineFunc(lineData))
+					  .attr('stroke', 'blue')
+					  .attr('stroke-width', 2)
+					  .attr('fill', 'none');
+				
+				vis.append("text")
+				.attr('class', 'x label')
+				.attr('text-anchor', 'center')
+				.attr('x', width)
+				.attr('y', height - 2)
+				.text(function(d) {return d;});
+
+				vis.append("text")
+				.attr('class', 'y label')
+				.attr('text-anchor', 'center')
+				.attr('y', 200)
+				.attr('dy', '.75e')
+				.attr('transform', 'rotate(-90)')
+				.text('Correlation values ');
+	}
+			
 	var circles = svg.selectAll("circle")
 					.data(json_frames)
 					.enter()
 					.append("circle")
+					//we are avoiding node 63 and 64 for the 
 					.attr("r",function (d,i){ 
 					
 						if(i == 63 || i == 62){	
@@ -317,7 +542,8 @@ d3.text("imagecount.txt", function(imct) {
 							.duration(200).style("opacity", 0);
 							
 					}).on("click",function(d,e,i){
-				lineplot(d,e,i);
+							//slineplot(d,e,i);
+							mlineplot(d,e,i);
 
 						 VIZ.stackBarChart($.extend(true, [], data));
 					 	$( ".btn" ).click(function() {
