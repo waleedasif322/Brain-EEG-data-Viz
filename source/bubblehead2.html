@@ -1,7 +1,5 @@
 <!DOCTYPE html>
-<html>
-<head>
-<meta http-equiv="content-type" content="text/html; charset=UTF8">
+<meta charset="utf-8">
 <style>
 
 body {
@@ -31,10 +29,8 @@ pointer-events: none;
 }
 
 </style>
-<title>Bubble head diagram with time series</title>
-</head>
 <body>
-
+<title>Bubble head diagram with time series</title>
 <h1><b>Welcome to Brain Visualization Project</b></h1>
 <h1>CS599.68 Data Visualization Class</h1>
 <h3>This Brain cells activity test is conducted by Dr. Timmothy Ellmore of Psychology Department. In this experiment, random abstract images were shown to the testing person. Each image will flash on the computer for a 2-3second time period. The person's job is to recognize the images shown matches with the previously shown images. This experiment is Brain data visualization illustrates Brain cells  activity on short memory test. In this experiment, the brain cells activity on 64 nodes will be shown on bubblehead diagram. The red bubbles shows the activity at peak level at that instance of time. The white bubble indicates litle/no activity on brain cell at that instance of time.</h3>
@@ -43,7 +39,7 @@ pointer-events: none;
 <br/>
 <br/>
 Timeline <input type="range" style="width:800px" min="1" max="139" value=1 id="range_input" />
-<label for="male" id="input_label">1</label>th image in the experiment
+<label for="male" id="input_label">1</label>s
 </br>
 <button type="button"  id="start_button">Start</button>
 <button type="button"  id="stop_button">Stop</button>
@@ -66,19 +62,6 @@ Timeline <input type="range" style="width:800px" min="1" max="139" value=1 id="r
           <input type="radio" name="options"> view multi-bar-Graphs
         </label>
     </div>
-
-</br>
-<div id="bubblediv" style="float:left"></div>
-
-
-<div id="gadgets">
-<div id = "color_bar"><h2>Color bar</h2><h4>(intensity represents strength of signal)</h4> </div>
-<div id = "image_section"><h2>Image number: <label style="color:red" id="image_number_id">1</label></h2></div>
-<div id = "line_plot_section"><h2>Node plot for node <label  style="color:red" id="node_plot_id">1</label></h2></div>
-
-</div>
-
-
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="d3.js"></script>
 <script src="jquery.js"></script>
@@ -126,6 +109,7 @@ d3.text("imagecount.txt", function(imct) {
     height = 1000 - margin.top - margin.bottom;
 
 
+
 	var svg = d3.select("#bubblediv").append("svg")
 		.attr("width", 850)
 		.attr("height", 850)
@@ -146,6 +130,7 @@ d3.text("imagecount.txt", function(imct) {
 			colors[i] = json_frames[i][frame][30];
 
 	}
+
 
 	//find max and min for each channel and create a color scale for each
 	for(var i =0; i<64; i++){
@@ -354,19 +339,8 @@ d3.text("imagecount.txt", function(imct) {
 
 				vis.append('svg:g')
 				  .attr('class', 'x axis')
-/*
-HEAD
 				  .attr('transform', 'translate(0,' + (HEIGHT - MARGINS.bottom) + ')')
 				  .call(xAxis);
-*/
-
-				  .attr('transform', 'translate(0,' + (HEIGHT - MARGINS.bottom) + ')')
-				  .call(xAxis) .append("text").attr("text-anchor", "end")
-											.attr("y", -10)
-											.attr("x", 300)
-											.attr("dy", ".75em")
-											.text("nth picture shown");
-
 
 				vis.append('svg:g')
 				  .attr('class', 'y axis')
@@ -378,15 +352,6 @@ HEAD
 				  .attr('dy', '.71em')
 				  .style('Correlation');
 
-/*=======
-				  .call(yAxis).append("text").attr("text-anchor", "end")
-							.attr("y", -40)
-							.attr("x",-80)
-							.attr("dy", ".60em")
-							.attr("transform", "rotate(-90)")
-							.text("Value (eV)");
-
->>>>>>> matt*/
 
 				var lineFunc = d3.svg.line()
 									  .x(function(d) {
@@ -399,7 +364,7 @@ HEAD
 
 				vis.append('svg:path')
 					  .attr('d', lineFunc(lineData))
-					  .attr('stroke', function(d) { return colors(d.name);})
+					  .attr('stroke', function(d) { return color(d.name);})
 					  .attr('stroke-width', 2)
 					  .attr('fill', 'none');
 
@@ -515,85 +480,6 @@ HEAD
 	}
 
 	var circles = svg.selectAll("circle")
-/*=======
-					  .attr('stroke', 'blue')
-					  .attr('stroke-width', 2)
-					  .attr('fill', 'none');
-
-
-}
-
-
-
-
-
-
-	d3.select('#line_plot_section').append("svg").attr("id","visualisation").attr("width",500).attr("height",200).append("g");
-
-	var svg = d3.select("#bubblediv").append("svg")
-		.attr("width", 850)
-		.attr("height", 850)
-		.style("background-image","url(unnamed.PNG)")
-		.append("g").attr("transform",
-								"translate(" + margin.left + "," + margin.top + ")");
-
-
-	var gadgets = d3.select("#gadgets");
-
-
-	var tooltip = d3.select("body").append("div")
-				.attr("class", "tooltip")
-				.style("opacity", 0);
-
-
-	var color_arr = [];
-	var color_list = d3.scale.linear()
-						.domain([min_glob,max_glob])
-						.range([color1,color2]);
-
-	var ictr = 0;
-	for (var i =min_glob; i<max_glob; i+=5000){
-
-
-		color_arr[ictr++] = color_list(i);
-
-
-	}
-	var color_bar = d3.select("#color_bar").append("svg").attr("width", 100)
-														.attr("height", 250)
-														.style("float","left")
-														.selectAll("rect")
-														.data(color_arr)
-														.enter()
-														.append("rect")
-														.attr("x",function(d,i){
-
-
-														return 10;
-
-														})
-														.attr("y",function(d,i){
-
-														return i*10;
-
-														})
-														.attr("width", 10)
-														.attr("height",10)
-														.attr("fill",function(d,i){
-															return color_arr[i];
-
-														});
-
-
-
-
-	var pic_img = d3.select("#image_section").append("div").html("</br><img width='500px' height='300px' src='img/"+imagecount[0]+".jpg'/>");
-
-
-
-
-var circles = svg.selectAll("circle")
->>>>>>> matt*/
 					.data(json_frames)
 					.enter()
 					.append("circle")
@@ -682,14 +568,6 @@ var circles = svg.selectAll("circle")
 
 
 
-
-	//plot 0th node by default
-	mlineplot(json_frames[0], 0, 0);
-
-
-
-
-
 	var btn_click = d3.selectAll("#start_button").on("click", function(){
 
 			dx=1;
@@ -705,7 +583,7 @@ var circles = svg.selectAll("circle")
 	});
 
 
-var makeCallback = function() {
+	var makeCallback = function() {
 
 		return function() {
 
@@ -717,8 +595,6 @@ var makeCallback = function() {
 					var im1 = "</br><img width='500px' height='300px' src='img/"+ imagecount[vv]+  ".jpg'/>";
 					gadgets.html(im1);
 					d3.selectAll("#input_label").html(rang.value);
-
-					d3.select("#image_number_id").text(imagecount[vv]);
 
 					rang.value = parseInt(rang.value) + dx;
 
@@ -770,7 +646,8 @@ var makeCallback = function() {
 		}
 	};
 
-d3.selectAll("#range_input").on("input", function(d,i){
+	d3.selectAll("#range_input")
+		.on("input", function(d,i){
 
 					threshold_filter = this.value;
 
@@ -789,11 +666,6 @@ d3.selectAll("#range_input").on("input", function(d,i){
 						cols[i] = json_frames[i][frame][30];
 
 					}
-
-
-					d3.select("#image_number_id").html(imagecount[vv]);
-
-					//d3.select("#node_plot_id").html(imagecount[vv]);
 
 
 					circles.attr("fill",function(d,i){
@@ -815,14 +687,10 @@ d3.selectAll("#range_input").on("input", function(d,i){
 
 	d3.selectAll("#range_input").value(1);
 })
-
 });
 });
-//});
 </script>
  <label>1</label>
 	<svg id="visualisation" width="500" height="200" style="float:left" ></svg>
 
 </body><HR><author>Waleed, Matt, and Raj, December 22, 2014</author>
-
-</html>
