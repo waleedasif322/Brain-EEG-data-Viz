@@ -67,7 +67,8 @@ d3.text("imagecount.txt", function(imct) {
 	var json_frames = JSON.parse(data1);
 	var positions = d3.csv.parseRows(dataa);
 	var imagecount = d3.csv.parseRows(imct);
-	
+	var image_number = imagecount.length;
+	var node_number = imagecount.length / 2;
 	 // 33 milleseconds * 60 = 1980 miliseconds < 2000 : in other words display 60 images in 33 milisecond intervals, which adds up to almost 2 seconds total
 	var interval = 60; //callback interval update every 33 miliseconds
 	var interval2 =34; //this is how often callback gets executed
@@ -86,8 +87,6 @@ d3.text("imagecount.txt", function(imct) {
 	var bub_scale = 2;
 	var color1 = "white";
 	var color2 = "red";
-	var body = d3.selectAll("body").append("div");
-	
 	var rang = d3.selectAll("#range_input")[0][0];
 
 	
@@ -98,7 +97,7 @@ d3.text("imagecount.txt", function(imct) {
 	var selected_node = 0;
 
 
-				
+	d3.select("#range_input")[0][0].max = image_number;	
 	
 	//this is for initial colors for frame 0
 	var colors = []
@@ -115,7 +114,7 @@ d3.text("imagecount.txt", function(imct) {
 		var min_val =[];
 		var max_val = [];
 		
-		for(var j = 0; j<140; j++){ 
+		for(var j = 0; j<image_number; j++){ 
 			var min1 = d3.min(json_frames[i][j]);
 			var max1 = d3.max(json_frames[i][j]);
 			min_val[j] =  min1;
@@ -165,7 +164,7 @@ function lineplot (d, e, i)
 		}
 		
 
-		var x = new Array(140);
+		var x = new Array(image_number);
 		for (var l = 0; l < x.length; l++)
 		{
 			x[l] = l;
@@ -474,7 +473,7 @@ var makeCallback = function() {
 					var vv = parseInt(rang.value);
 					var im1 = "<img width='500px' height='300px' src='img/"+ imagecount[vv]+  ".jpg'/>";
 					pic_img.html(im1);
-					d3.selectAll("#input_label").html(vv);
+					d3.selectAll("#input_label").html(vv+1);
 					
 					d3.select("#image_number_id").text(imagecount[vv]);
 					
