@@ -1,0 +1,22 @@
+README FILE:
+
+About files here.
+bubblhead.html and eeg_viz_proj.html
+
+
+these files can be changed for next experiment:
+
+Two folders
+/eeg-thumbs/ folder containing thumndails of all images (index 1-N.jpg)
+/img folder/ containing full images (index 1-N.jpg)
+
+Files
+
+->intervals.txt this file contains time during experiment, when images were shown in order, should be N lines of timestamps.
+
+->30 fps_data.txt this file contains array of eeg_data[0-63][0-N-1][0-59] (60 for all channels, all imgeges)
+this file can be generated using readeed.py file by executing generate_sig_file_30fps (intervals.txt file need to be present)
+
+->imagecount.txt contains image numbers which were shown in order, should be N lines
+
+->correlation-chord-subtracted.csv pearson correlation matrix shoul be N by N matrix
