@@ -231,20 +231,38 @@ function lineplot (d, e, i)
 
 				var lineFunc = d3.svg.line()
 									  .x(function(d) {
+									  console.log(d.x);
 									    return xRange(d.x);
+										
+									  })
+									  .y(function(d) {
+									  console.log(d.y);
+									    return yRange(d.y);
+									  })
+									  .interpolate('linear');
+									  
+				var lineFunc2 = d3.svg.line()
+									  .x(function(d) {
+									   return xRange(frame);
 									  })
 									  .y(function(d) {
 									    return yRange(d.y);
 									  })
-									  .interpolate('linear');
-
+									  .interpolate("basis");
+									  
 				vis.append('svg:path')
 					  .attr('d', lineFunc(lineData))
 					  .attr('stroke', 'blue')
 					  .attr('stroke-width', 2)
 					  .attr('fill', 'none');
+					 
 					  
-					  	
+				vis.append('svg:path')
+					  .attr('d', lineFunc2(lineData))
+					  .attr('stroke', 'red')
+					  .attr('stroke-width', 2)
+					  .attr('fill', 'none');
+	
 }
 	
 
@@ -397,20 +415,19 @@ var circles = svg.selectAll("circle")
 					
 	//plot 0th node by default
 	lineplot(json_frames[0], 0, 0);
-					
+			//lineplot(json_frames[1],1,1);		
 			
 					
 					
 	
-	var btn_click = d3.selectAll("#start_button").on("click", function(){
+var btn_click = d3.selectAll("#start_button").on("click", function(){
 	
 			dx=1;
 			d3.timer(makeCallback(),interval);
 			
 	});
-	
 
-	var btn_click2 = d3.selectAll("#stop_button").on("click", function(){
+var btn_click2 = d3.selectAll("#stop_button").on("click", function(){
 	
 			dx=0;
 			
@@ -428,6 +445,7 @@ interval2 = val;
 	
 
 });
+
 var makeCallback = function() {
 
 		return function() {
@@ -522,6 +540,8 @@ d3.selectAll("#range_input").on("input", function(d,i){
 					
 					//d3.select("#node_plot_id").html(imagecount[vv]);
 					
+					
+					lineplot(json_frames[ctr2], 0, 0);
 					
 					circles.attr("fill",function(d,i){
 					
