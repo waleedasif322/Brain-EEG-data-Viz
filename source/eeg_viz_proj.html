@@ -1,4 +1,6 @@
 <html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF8">
 <style>
 
 body {
@@ -11,7 +13,7 @@ body {
   stroke-width: .5px;
 }
 
-div.tooltip {	
+div.tooltip {
 position: absolute;
 text-align: center;
 width: 210px;
@@ -24,30 +26,31 @@ border-width: 2px;
 border-style: solid;
 border-color: black;
 border-radius: 10px;
-pointer-events: none;		
+pointer-events: none;
 }
 
 </style>
 
-<header>
 
-<script src="http://d3js.org/d3.v3.min.js"></script>
 
-</header>
+<!-- <script src="http://d3js.org/d3.v3.min.js"></script> -->
+
+
 
 <script src="d3.js"></script>
-<script src="d3.min.js"></script>
+<!-- <script src="d3.min.js"></script> -->
+</head>
 
+
+
+
+<body>
 <h1>EEG VIZ</h1>
 <h3>CLICK TO SELECT IMAGES</h3>
 <div id="divs" style="
     height: 400px;
     overflow: auto;
 "></div>
-
-
-
-<body>
 <br><br>
 
 
@@ -112,74 +115,74 @@ d3.text("imagecount.txt", function(imct) {
 	var positions = d3.csv.parseRows(ps);
 	var imagecount = d3.csv.parseRows(imct);
 	var corr_diff = d3.csv.parseRows(data3);
-	
+
 	 // 33 milleseconds * 60 = 1980 miliseconds < 2000 : in other words display 60 images in 33 milisecond intervals, which adds up to almost 2 seconds total
-	
+
 	console.log(imagecount);
-	
+
 	document.getElementById("range_input_scale").disabled = true;
-	
+
 	//var frame = 0; //current picture displayed
 	var ctr2 = 0; //counter for each frame; for color change inbetween images 30fps depends on intervals
 	var z_list = [] //this is array of color scales for nodes
 	var min_glob = []; //this is global min value for all nodes at all times
 	var max_glob = []; //this is global max value for all nodes at all times
 	var PI = 3.141592653;
-	
-	
-	
-	
+
+
+
+
 	var t_list = []
 	var t_len = 0;
-	
+
 	var threshold_filter = 0;
 	var threshold_filter2 = 1;
-	
+
 	var bub_scale = 1;
-	
+
 	var bub_size_scale = 2;
-	
+
 	var border_width =1;
-	
+
 	var margin = {top: -55*bub_scale, right: 0, bottom: 0, left: -40*bub_scale};
-	
+
 	var svgs = [];
-	
+
     var  width = (800*bub_scale - margin.left - margin.right);
-	
-    var height = (800*bub_scale - margin.top - margin.bottom);	
-	
+
+    var height = (800*bub_scale - margin.top - margin.bottom);
+
 	var min_arr64 = [];
 	var max_arr64 = [];
-	
-	
-	
+
+
+
 	//find max and min for each channel and create a color scale for each
 	for(var i =0; i<64; i++){
-	
+
 		var min_val =[];
 		var max_val = [];
-		
-		for(var j = 0; j<140; j++){ 
-			
+
+		for(var j = 0; j<140; j++){
+
 			var min1 = d3.min(json_frames[i][j]);
 			var max1 = d3.max(json_frames[i][j]);
 			min_val[j] =  min1;
 			max_val[j] = max1;
 		}
-		
-		var min = Math.ceil(d3.min(min_val));		
+
+		var min = Math.ceil(d3.min(min_val));
 		var max = Math.ceil(d3.max(max_val));
-		
+
 		z_list[i] = d3.scale.linear()
 						.domain([min,max])
 						.range(["white","red"]);
-		
+
 		min_arr64[i] = min;
 		max_arr64[i] = max;
 		min_glob[i] = min;
 		max_glob[i] = max;
-	}	
+	}
 
 	min_glob = Math.ceil(d3.min(min_glob));
 	max_glob = Math.ceil(d3.max(max_glob));
@@ -188,7 +191,7 @@ d3.text("imagecount.txt", function(imct) {
 	var size_scale = d3.scale.linear()
 						.domain([min_glob,max_glob])
 						.range([1,10000]);
-						
+
 	//generate thumbnails
 	for( var i=0; i<140; i++){
 		var img = document.createElement("img");
@@ -199,10 +202,10 @@ d3.text("imagecount.txt", function(imct) {
 	}
 
 
-var tooltip = d3.select("body").append("div")	
-				.attr("class", "tooltip")				
+var tooltip = d3.select("body").append("div")
+				.attr("class", "tooltip")
 				.style("opacity", 0);
-				
+
 
 d3.selectAll("img").style("margin",5).style("padding",5).on("click", function(i,d){
 
@@ -215,11 +218,11 @@ d3.selectAll("img").style("margin",5).style("padding",5).on("click", function(i,
 				t_len = t_len+1;
 		}).on("mouseover", function(i,d){
 
-				
+
 				var a = "#img_"+d;
 
 				//d3.select(a).style("border-color","yellow").style("border-width","5px").style("border-style","solid");
-				
+
 
 		}).on("mouseout", function(i,d){
 
@@ -230,114 +233,117 @@ d3.selectAll("img").style("margin",5).style("padding",5).on("click", function(i,
 
 
 		});
-			
+
 
 d3.selectAll("#range_input_scale").on("input", function(d,i){
 
-		
+
 			//console.log(svgs);
-			
-			
+
+
 			var val = (this.value)/100;
-			
-			
+
+
 			bub_scale = val;
-	
-			
+
+
 			var newwidth = width * val;
 			var newheight = height *val;
-			
-			
+
+
 			border_width = val;
-				
-			//d3.selectAll(svgs[0]).each().remove();
-	
-			
+
 			d3.selectAll("svg")
 			.attr("height",newheight)
 			.attr("width",newwidth)
 			.style("background-size",newwidth+"px "+newheight+"px")
-			.select("g").attr("transform", 
+			.select("g").attr("transform",
 									"translate(" + margin.left*val + "," + margin.top*val + ")")
 			.selectAll("circle")
 						.attr("cx",function(d,i){ return positions[i*2]*bub_scale;})
 						.attr("cy",function(d,i){ return positions[i*2+1]*bub_scale;})
-						.attr("r", function(d,i){ 
+						.attr("r", function(d,i){
 									if(i == 63 || i == 62){
-						
+
 									return 0;
-						
+
 									}
 							var val2  = Math.sqrt(size_scale(((d[i][30])/PI)));
 							return bub_size_scale*bub_scale*val2;
-								
-								}).attr("stroke-width",border_width);
 
-		
-});	
+								}).attr("stroke-width",border_width);
+/*<<<<<<< HEAD
+=======*/
+
+			//scale pictures
+			d3.selectAll('.bub_pics').attr("width",250*bub_scale).attr("height",120*bub_scale)
+
+
+
+});
 
 d3.selectAll("#range_input_size").on("input", function(d,i){
 
-		
+
 			//console.log(svgs);
-			
+
 			var val = (this.value)/100;
 			bub_size_scale = val;
 			console.log(val);
 
 			//d3.selectAll(svgs[0]).each().remove();
-	
-			
+
+
 			d3.selectAll("svg")
 			.selectAll("circle")
-						.attr("r", function(d,i){ 
+						.attr("r", function(d,i){
 								if(i == 63 || i == 62){
-						
+
 							return 0;
-						
+
 						}
 							var val2  = Math.sqrt(size_scale(((d[i][30])/PI)));
 							return bub_scale*val*val2;
-								
+
 								});
 
-		
-});	
+
+});
 
 d3.selectAll("#range_input").on("input", function(d,i){
 
 			threshold_filter = (this.value-100)/100;
-			
+
 			d3.selectAll("#input_label")
-				.html((this.value-100)/100);					
-});	
+				.html((this.value-100)/100);
+});
 
 d3.selectAll("#range_input2").on("input", function(d,i){
 
 			threshold_filter2 = (this.value-100)/100;
 			d3.selectAll("#input_label2")
-				.html((this.value-100)/100);					
-});				
-				
+				.html((this.value-100)/100);
+});
+
 var btn_click = d3.select("#generate_bubbles").on("click", function(){
 
 
 
 		//console.log(t_len);
-		
+
 		for(var k = 0; k<t_len; k++){
-		
+
 			svgs[k]  = draw_bubbleheadr(k);
-	
+
 		}
-	
+
 	//deselect pictures
 	d3.selectAll("img").style("border-color","white");
-	
+
 	t_list=[];
 	t_len=0;
 	document.getElementById("range_input_scale").disabled = false;
-	
+
 });
 
 function groupTicks(d) {
@@ -363,58 +369,58 @@ function fade(opacity) {
 
 function draw_chord(){
 
-			
+
 			var scale_vals = d3.scale.linear()
 								.domain([-1,1])
 								.range([0,10]);
 
-		
+
 			var new_arr = [];
-			
+
 			//extract new matrix algorithm
-			for(var i=0; i<t_len; i++){			
-				new_arr[i] = []		
+			for(var i=0; i<t_len; i++){
+				new_arr[i] = []
 				for(var j=0; j<=i; j++){
-				
+
 					var val = scale_vals(corr_diff[t_list[i]][t_list[j]]);
-					
+
 					//filter below thershold and above
-					if (corr_diff[t_list[i]][t_list[j]] < threshold_filter 
+					if (corr_diff[t_list[i]][t_list[j]] < threshold_filter
 						|| corr_diff[t_list[i]][t_list[j]] == 1
 						|| corr_diff[t_list[i]][t_list[j]] > threshold_filter2){
-						
-						val = 0;		
 
-						
+						val = 0;
+
+
 					}
-					
-					new_arr[i][j] = val;	
-				}		
+
+					new_arr[i][j] = val;
+				}
 				for(var j=i+1; j<t_len; j++){
 
 					var val = scale_vals(corr_diff[t_list[i]][t_list[j]]);
-					
+
 					//filter below thereshold and above
 					if (corr_diff[t_list[i]][t_list[j]] < threshold_filter
 						|| corr_diff[t_list[i]][t_list[j]] == 1
-						|| corr_diff[t_list[i]][t_list[j]] > threshold_filter2){	
-						
-						val = 0;			
+						|| corr_diff[t_list[i]][t_list[j]] > threshold_filter2){
+
+						val = 0;
 					}
-					
+
 					new_arr[i][j] = val;//t_list[i] + "," + t_list[j];
 				}
-				
+
 			}
-			
-	
+
+
 			var chord = d3.layout.chord()
 				.padding(.05)
 				.sortSubgroups(d3.descending)
 				//.sortGroups(d3.descending)
 				.matrix(new_arr);
 
-				
+
 			var width2 = width
 				height2 = height,
 				innerRadius = Math.min(width2, height2) * .41,
@@ -442,7 +448,7 @@ function draw_chord(){
 				,"#FFF5EE"
 				,"#2E8B57"
 				,"#F4A460"
-				,"#FA8072"	
+				,"#FA8072"
 				]);
 
 			var svg = d3.select("body").append("svg")
@@ -451,9 +457,9 @@ function draw_chord(){
 				.style("float","left")
 			  .append("g")
 			  .attr("transform", "translate(" + width2 / 2 + "," + height2 / 2 + ")");
-			
-			
-			
+
+
+
 			svg.append("g").selectAll("path")
 				.data(chord.groups)
 			  .enter().append("path")
@@ -464,17 +470,17 @@ function draw_chord(){
 				.on("mouseover", fade(.1))
 				.on("mouseout",fade(1));
 
-			var div = d3.select("body").append("div")	
-				.attr("class", "tooltip")				
+			var div = d3.select("body").append("div")
+				.attr("class", "tooltip")
 				.style("opacity", 0);
 
-			var div2 = d3.select("body").append("div")	
+			var div2 = d3.select("body").append("div")
 				.attr("class", "pic_comparison")
 				.style("float","left")
 				.style("width","500px")
 				.style("opacity", 0);
-				
-				
+
+
 				svg.append("g")
 				.attr("class", "chord")
 				.selectAll("path")
@@ -483,80 +489,80 @@ function draw_chord(){
 				.attr("d", d3.svg.chord().radius(innerRadius))
 				.style("fill", function(d) { return fill(d.target.index); })
 				.on("click", function(d,e){
-				
+
 					var ind1 = d.source.index;
 					var ind2 = d.target.index;
-					
+
 					//console.log(d);
-					
+
 					var im1 = "<img width='500px' height='300px' src='img/"+imagecount[t_list[ind1]] +  ".jpg'/>";
 					var im2 = "<img width='500px' height='300px' src='img/"+imagecount[t_list[ind2]] +  ".jpg'/>";
-					
 
-					
-					div2.transition()		
-						.duration(200)		
-						.style("opacity", .9);		
-									
+
+
+					div2.transition()
+						.duration(200)
+						.style("opacity", .9);
+
 					div2.html(im1 + " " + (t_list[ind1]+1) + " vs "+ (t_list[ind2]+1) + " "+ im2
-							)	
-						.style("left", (d3.event.pageX +50) + "px")		
+							)
+						.style("left", (d3.event.pageX +50) + "px")
 						.style("top", (d3.event.pageY - 28) + "px");
-					
+
 					//window.open("Image "+ t_list[d.source.index] +" vs "+ "Image "+t_list[d.target.index]);
-					
-				
+
+
 				})
-				.on("mouseover", function(d,e){ 
-				
+				.on("mouseover", function(d,e){
+
 					//fade(0.1);
 					svg.selectAll(".chord path")
 						.transition()
 						.style("opacity",.1);
-						
+
 					d3.select(this)
 						.transition()
-						.style("opacity", 1);				
-					
-					div.transition()		
-						.duration(200)		
-						.style("opacity", .9);		
-					
+						.style("opacity", 1);
+
+					div.transition()
+						.duration(200)
+						.style("opacity", .9);
+
 					var ind1 = t_list[d.source.index]+1;
 					var ind2 = t_list[d.target.index]+1;
-					
+
 					//console.log(t_list[d.target.index]);
-					
+
 					var tt = corr_diff[t_list[d.source.index]][t_list[d.target.index]];
-					
-					
+
+
 					console.log(tt);
 					var t2 = parseFloat(tt).toFixed(6);
 					console.log(t2);
-					div.html("Image "+ind1 +" vs "+ "Image "+ind2+ "<br/><br/>"+ 
+					div.html("Image "+ind1 +" vs "+ "Image "+ind2+ "<br/><br/>"+
 									"correlation: " + t2 + "</br>"
 									//"color: " +   color_diff[t_list[d.source.index]][t_list[d.target.index]]+ "</br>"+
-									//"gray: "+ gray_diff[t_list[d.source.index]][t_list[d.target.index]]		
-							)	
-						.style("left", (d3.event.pageX) + "px")		
+									//"gray: "+ gray_diff[t_list[d.source.index]][t_list[d.target.index]]
+							)
+						.style("left", (d3.event.pageX) + "px")
 						.style("top", (d3.event.pageY - 28) + "px");
 
-						
-				
+
+
 				})
-				.on("mouseout",function(){ 
-				
+				.on("mouseout",function(){
+
 					d3.selectAll(".chord")
 						.selectAll("path")
 						.style("opacity",1);
-					
-					div.transition()		
+
+					div.transition()
 						.duration(200).style("opacity", 0);
 				});
-	
-				
-				
-				
+
+
+
+
 			var ticks = svg.append("g").selectAll("g")
 				.data(chord.groups)
 				.enter().append("g").selectAll("g")
@@ -579,7 +585,7 @@ function draw_chord(){
 				.attr("dy", ".35em")
 				.attr("transform", function(d) { return d.angle > Math.PI ? "rotate(180)translate(-16)" : null; })
 				.style("text-anchor", function(d) { return d.angle > Math.PI ? "end" : null; })
-				.text(function(d,i,e) { 
+				.text(function(d,i,e) {
 				return t_list[e] + 1; });
 
 }
@@ -592,11 +598,11 @@ function draw_bubbleheadr(frame){
 		//this is for initial colors for frame 0
 		var colors = [];
 		console.log(json_frames[0][0][30]);
-		
+
 		for(var i=0; i<64; i++){
-							
+
 				colors[i] = json_frames[i][frame][30];
-					
+
 		}
 
 		var background_width = 250*bub_scale;
@@ -607,7 +613,7 @@ function draw_bubbleheadr(frame){
 			.attr("height", height)
 			.style("background-image","url(unnamed.PNG)").style("background-size", width+"px "+height+"px")
 			.style("float","left")
-			.append("g").attr("transform", 
+			.append("g").attr("transform",
 									"translate(" + margin.left* bub_scale+ "," + margin.top*bub_scale + ")");
 
 
@@ -615,14 +621,14 @@ function draw_bubbleheadr(frame){
 						.data(json_frames)
 						.enter()
 						.append("circle")
-						.attr("r",function (d,i){ 
+						.attr("r",function (d,i){
 								if(i == 63 || i == 62){
-						
+
 									return 0;
-						
+
 								}
-								
-								
+
+
 								var val  = Math.sqrt(size_scale(d[frame][ctr2])/PI);
 								return bub_size_scale*bub_scale*val;
 
@@ -630,55 +636,55 @@ function draw_bubbleheadr(frame){
 						.attr("cx",function(d,i){ return positions[i*2]*bub_scale;})
 						.attr("cy",function(d,i){ return positions[i*2+1]*bub_scale;})
 						.attr("fill",function(d,i){
-						
-						 
+
+
 						return z_list[i](colors[i]);
-						
+
 
 						})
 						.style("opacity", 0.9)
-						.on("mouseover", function(d,e,i){ 
-					
-							
+						.on("mouseover", function(d,e,i){
+
+
 							d3.select(this)
 								.transition()
-								.style("opacity", 1);				
-							
-							tooltip.transition()		
-								.duration(200)		
-								.style("opacity", .9);		
-								
+								.style("opacity", 1);
+
+							tooltip.transition()
+								.duration(200)
+								.style("opacity", .9);
+
 							var e1 = e +1;
-							
+
 							d3.select(this)
 									.transition()
 									.attr("stroke", "yellow");
-							
-							tooltip.html("Node: <b>"+ e1 + "</b><br/>Value now: <b>"+ d[frame][ctr2].toFixed(2)	
-									+"</b> eV<br/>Max val:<b> "+max_arr64[e1-1]+" </b>eV<br/>Min val:<b> "+min_arr64[e1-1]+"</b> eV")	
-								.style("left", (d3.event.pageX) + "px")		
+
+							tooltip.html("Node: <b>"+ e1 + "</b><br/>Value now: <b>"+ d[frame][ctr2].toFixed(2)
+									+"</b> eV<br/>Max val:<b> "+max_arr64[e1-1]+" </b>eV<br/>Min val:<b> "+min_arr64[e1-1]+"</b> eV")
+								.style("left", (d3.event.pageX) + "px")
 								.style("top", (d3.event.pageY - 28) + "px");
 
-							
-					
-						}).on("mouseout",function(){ 
-				
+
+
+						}).on("mouseout",function(){
+
 								d3.select(this)
 									.transition()
 									.attr("stroke", "black");
-									
-								tooltip.transition()		
+
+								tooltip.transition()
 								.duration(200).style("opacity", 0);
-								
+
 						}).on("click",function(d,e,i){
-					
+
 							//this needs to be filled up by raj
-									
-					
+
+
 						})
 						.attr("stroke","black").attr("stroke-width",border_width);
-						
-			return svg;			
+
+			return svg;
 
 
 }
@@ -687,12 +693,12 @@ function draw_bubbleheadr(frame){
 var btn_click2 = d3.select("#generate_button").on("click", function(){
 
 	draw_chord();
-	
+
 	//d3.selectAll("img").style("border-color","white");
-	
+
 	//t_list=[];
 	//t_len=0;
-	
+
 	});
 
 
@@ -702,8 +708,8 @@ var btn_click2 = d3.select("#generate_button").on("click", function(){
 });
 });
 
-	
-	
+
+
 
 
 
