@@ -45,8 +45,8 @@ Timeline <input type="range" style="width:800px" min="1" max="139" value=1 id="r
 
 <div id="gadgets">
 <div id = "color_bar"><h2>Color bar</h2> </div>
-<div id = "image_section"><h2>Image</h2> </div>
-<div id = "line_plot_section"><h2>Node Plot</h2> </div>
+<div id = "image_section"><h2>Image number: </h2></h1><label id="image_number_id">1</label></h1></div>
+<div id = "line_plot_section"><h2>Node lot for node </h2><h1><label id="node_plot_id">1</label></h1></div>
 
 </div>
 
@@ -142,7 +142,7 @@ d3.text("imagecount.txt", function(imct) {
 
 						
 						
-	d3.select('#line_plot_section').append("svg").attr("id","visualisation").attr("width",500).attr("height",200).append("g");
+
 						
 function lineplot (d, e, i) 
 {
@@ -234,23 +234,10 @@ function lineplot (d, e, i)
 	
 
 	
-	var color_arr = [];
-	var color_list = d3.scale.linear()
-						.domain([min_glob,max_glob])
-						.range([color1,color2]);
-	
-	var ictr = 0;
-	for (var i =min_glob; i<max_glob; i+=5000){
-	
-	
-		color_arr[ictr++] = color_list(i);
-	
-	
-	
-	}
-	
 
 	
+
+	d3.select('#line_plot_section').append("svg").attr("id","visualisation").attr("width",500).attr("height",200).append("g");
 
 	var svg = d3.select("#bubblediv").append("svg")
 		.attr("width", 850)
@@ -268,7 +255,19 @@ function lineplot (d, e, i)
 				.style("opacity", 0);
 	
 	
-
+	var color_arr = [];
+	var color_list = d3.scale.linear()
+						.domain([min_glob,max_glob])
+						.range([color1,color2]);
+	
+	var ictr = 0;
+	for (var i =min_glob; i<max_glob; i+=5000){
+	
+	
+		color_arr[ictr++] = color_list(i);
+	
+	
+	}
 	var color_bar = d3.select("#color_bar").append("svg").attr("width", 100)
 														.attr("height", 250)
 														.style("float","left")
@@ -297,10 +296,12 @@ function lineplot (d, e, i)
 
 	
 	
-	var pic_img = d3.select("#image_section").html("<h2>Image Shown</h2></br><img width='500px' height='300px' src='img/"+imagecount[0]+".jpg'/>");
+	var pic_img = d3.select("#image_section").append("div").html("</br><img width='500px' height='300px' src='img/"+imagecount[0]+".jpg'/>");
 													
 	
-	var circles = svg.selectAll("circle")
+
+
+var circles = svg.selectAll("circle")
 					.data(json_frames)
 					.enter()
 					.append("circle")
@@ -365,11 +366,13 @@ function lineplot (d, e, i)
 				
 						//this needs to be filled up by raj
 							
-						console.log(d,e,i);
+						//console.log(d,e,i);
 						lineplot(d, e, i);
+						d3.select("#node_plot_id").html(e+1);
 
 					})
-					.attr("stroke","black").attr("stroke-width",border_width);
+					.attr("stroke","black")
+					.attr("stroke-width",border_width);
 
 
 
@@ -405,10 +408,12 @@ var makeCallback = function() {
 				if(counter>1960){
 				
 					var vv = parseInt(rang.value) ;
-					var im1 = "<h2>Image Shown</h2></br><img width='500px' height='300px' src='img/"+ imagecount[vv]+  ".jpg'/>";
+					var im1 = "<img width='500px' height='300px' src='img/"+ imagecount[vv]+  ".jpg'/>";
 					pic_img.html(im1);
 					d3.selectAll("#input_label").html(rang.value);
-				
+					
+					d3.select("#image_number_id").text(imagecount[vv]);
+					
 					rang.value = parseInt(rang.value) + dx;
 					
 					counter=0;
@@ -467,7 +472,7 @@ d3.selectAll("#range_input").on("input", function(d,i){
 						.html(this.value);
 						
 					var vv = parseInt(rang.value);
-					var im1 = "<h2>Image Shown</h2></br><img width='500px' height='300px' src='img/"+ imagecount[vv]+  ".jpg'/>";
+					var im1 = "<img width='500px' height='300px' src='img/"+ imagecount[vv]+  ".jpg'/>";
 					frame = vv;
 					//console.log("hi");
 					pic_img.html(im1).transition();
@@ -478,6 +483,11 @@ d3.selectAll("#range_input").on("input", function(d,i){
 						cols[i] = json_frames[i][frame][30];
 						
 					}
+					
+					
+					d3.select("#image_number_id").html(imagecount[vv]);
+					
+					//d3.select("#node_plot_id").html(imagecount[vv]);
 					
 					
 					circles.attr("fill",function(d,i){
