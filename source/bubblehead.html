@@ -322,11 +322,8 @@ d3.text("imagecount.txt", function(imct) {
 				    }), d3.max(lineData, function(d) {
 				      return d.x;
 				    })]),
-				    yRange = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([d3.min(lineData, function(d) {
-				      return d.y;
-				    }), d3.max(lineData, function(d) {
-				      return d.y;
-				    })]),
+				    yRange = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([d3.min, d3.max
+				   ]),
 				    xAxis = d3.svg.axis()
 				      .scale(xRange)
 				      .tickSize(5)
@@ -364,7 +361,7 @@ d3.text("imagecount.txt", function(imct) {
 
 				vis.append('svg:path')
 					  .attr('d', lineFunc(lineData))
-					  .attr('stroke', function(d) { return color(d.name);)
+					  .attr('stroke', function(d) { return 'color.d';})
 					  .attr('stroke-width', 2)
 					  .attr('fill', 'none');
 				
