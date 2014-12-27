@@ -2,9 +2,12 @@ Brain EEG data readme
 =====================
 [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/waleedasif322/Brain-EEG-data-Viz?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-* brainvisionio.py - replacement file for the one in the neo library. The library has an error, and I had to manually fix them, so this file contains the corrections.
-* intervals.txt = file which contains the time in ms where each picture was shown
-* Untitled1.ipynb - file for use with `ipython notebook` which contains commands to load EEG data from only 64 channels/nodes, and calculate the average signal for each image for every channel/node.
+# For Professor Grossberg
+
+1. Clone the repo.
+2. Run `python -m SimpleHTTPServer`
+3. Open [localhost:8000](http://localhost:8000)
+4. Navigate to the 3 different visualizations.
 
 # Getting Started for the first time
 
@@ -20,7 +23,7 @@ Once installed, everytime you want to activate it, navigate to the direcory wher
 
 	source venv/bin/activate
 
-Once activated, you can start working. 
+Once activated, you can start working.
 
 Make a directory for the project, and initialize git:
 
