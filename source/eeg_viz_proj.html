@@ -52,7 +52,7 @@ pointer-events: none;
 
 
 <h1>MENU</h1>
-<h3>Generate one of the visualizations for the selected images after adjusting the parameters</h3>
+<h3>Generate one of the visualizations for the selected images after adjusting the parameters</h3><label color="red" id="error_msg"></label>
 <div style="float:left" >
 <table >
 <tr>
@@ -326,8 +326,12 @@ var btn_click = d3.select("#generate_bubbles").on("click", function(){
 
 
 
-		//console.log(t_len);
-		
+		console.log(t_len);
+			if(t_len==0){
+	
+	d3.select("#error_msg").html("<span style='color:red'>ERROR: No images selected. Select images by clicking on them.<span>")
+	}else{
+	d3.select("#error_msg").html("");
 		for(var k = 0; k<t_len; k++){
 		
 			svgs[k]  = draw_bubbleheadr(k);
@@ -340,7 +344,7 @@ var btn_click = d3.select("#generate_bubbles").on("click", function(){
 	t_list=[];
 	t_len=0;
 	document.getElementById("range_input_scale").disabled = false;
-	
+	}
 });
 
 function groupTicks(d) {
@@ -387,11 +391,17 @@ function draw_chord(){
 						|| corr_diff[t_list[i]][t_list[j]] > threshold_filter2){
 						
 						val = 0;		
-
+						
 						
 					}
+					else{
 					
-					new_arr[i][j] = val;	
+				
+					
+					}
+					
+					new_arr[i][j] = val;
+									
 				}		
 				for(var j=i+1; j<t_len; j++){
 
@@ -402,13 +412,42 @@ function draw_chord(){
 						|| corr_diff[t_list[i]][t_list[j]] == 1
 						|| corr_diff[t_list[i]][t_list[j]] > threshold_filter2){	
 						
-						val = 0;			
+						val = 0;
+											
+					}else{
+					
+					
 					}
 					
 					new_arr[i][j] = val;//t_list[i] + "," + t_list[j];
+					
 				}
 				
 			}
+			
+			//check if not zero
+			
+			var is_zero = true;
+			for(var i =0; i<t_len; i++){
+				for(var j =0; j<t_len; j++){
+					if(new_arr[i][j] != 0){
+					
+					is_zero = false;
+					break;
+					
+					}
+			}
+			}
+			
+			
+			if(is_zero == true){
+			d3.select("#error_msg").html("<span style='color:red'>ERROR: No correlations found to match filter criteria.")
+			
+			}
+			else{
+			
+			
+			//d3.select("#error_msg").html("<span style='color:red'>ERROR: No images selected. Select images by clicking on them.<span>")
 			
 	
 			var chord = d3.layout.chord()
@@ -585,6 +624,7 @@ function draw_chord(){
 				.text(function(d,i,e) { 
 				return t_list[e] + 1; });
 
+			}
 }
 
 function draw_bubbleheadr(frame){
@@ -689,8 +729,16 @@ function draw_bubbleheadr(frame){
 
 var btn_click2 = d3.select("#generate_button").on("click", function(){
 
-	draw_chord();
+
+
+	console.log(t_len);
+	if(t_len==0){
 	
+	d3.select("#error_msg").html("<span style='color:red'>ERROR: No images selected. Select images by clicking on them.</span>")
+	}else{
+	d3.select("#error_msg").html("");
+	draw_chord();
+	}
 	//d3.selectAll("img").style("border-color","white");
 	
 	//t_list=[];
