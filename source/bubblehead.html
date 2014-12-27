@@ -95,7 +95,7 @@ d3.text("imagecount.txt", function(imct) {
     width = 1000 - margin.left - margin.right,
     height = 1000 - margin.top - margin.bottom;
 
-
+	var selected_node = 0;
 
 
 				
@@ -138,7 +138,7 @@ d3.text("imagecount.txt", function(imct) {
 
 	min_glob = Math.ceil(d3.min(min_glob));
 	max_glob = Math.ceil(d3.max(max_glob));
-;
+
 	
 	var size_scale = d3.scale.linear()
 						.domain([min_glob,max_glob])
@@ -335,6 +335,7 @@ function lineplot (d, e, i)
 	var pic_img = d3.select("#image_section").append("div").html("</br><img width='500px' height='300px' src='img/"+imagecount[0]+".jpg'/>");
 													
 	
+	
 
 
 var circles = svg.selectAll("circle")
@@ -405,8 +406,20 @@ var circles = svg.selectAll("circle")
 						//console.log(d,e,i);
 						lineplot(d, e, i);
 						d3.select("#node_plot_id").html(e+1);
+						
+						//unselect last
+						d3.select("#node_circle_"+selected_node).attr("stroke","black")
+													.attr("stroke-width",border_width);
+													
+						//select new
+						selected_node = e;
+						d3.select("#node_circle_"+selected_node).attr("stroke","black")
+																.attr("stroke-width",6);
+						
+						
 
 					})
+					.attr("id",function(d,i){return "node_circle_"+i;})
 					.attr("stroke","black")
 					.attr("stroke-width",border_width);
 
@@ -417,7 +430,9 @@ var circles = svg.selectAll("circle")
 	lineplot(json_frames[0], 0, 0);
 			//lineplot(json_frames[1],1,1);		
 			
-					
+	d3.select("#node_circle_"+selected_node).attr("stroke","black")
+					.attr("stroke-width",6);
+	
 					
 	
 var btn_click = d3.selectAll("#start_button").on("click", function(){
