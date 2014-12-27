@@ -41,7 +41,7 @@ Timeline <input type="range" style="width:800px" min="1" max="139" value=1 id="r
 <button type="button"  id="stop_button">Stop</button>
 </br>
 <div id="bubblediv" style="float:left"></div>
-<h2>Image Shown</h2>
+
 <div id="gadgets"></div>
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="d3.js"></script>
@@ -73,32 +73,20 @@ d3.text("imagecount.txt", function(imct) {
 	var	min_arr64 = [];
 	var	max_arr64 = [];
 	var bub_scale = 2;
-	
+	var color1 = "white";
+	var color2 = "red";
 	var body = d3.selectAll("body").append("div");
-
-	
-	var gadgets = d3.select("#gadgets");
 	
 	var rang = d3.selectAll("#range_input")[0][0];
 
-	gadgets.html("<img width='500px' height='300px' src='img/"+imagecount[0]+".jpg'/>");
+	
 	var margin = {top: -55, right: 0, bottom: 0, left: -30},
     width = 1000 - margin.left - margin.right,
     height = 1000 - margin.top - margin.bottom;
 
 
 
-	var svg = d3.select("#bubblediv").append("svg")
-		.attr("width", 850)
-		.attr("height", 850)
-		.style("background-image","url(unnamed.PNG)")
-		.append("g").attr("transform", 
-								"translate(" + margin.left + "," + margin.top + ")");
-		
-	
-	var tooltip = d3.select("body").append("div")	
-				.attr("class", "tooltip")				
-				.style("opacity", 0);
+
 				
 	
 	//this is for initial colors for frame 0
@@ -127,7 +115,7 @@ d3.text("imagecount.txt", function(imct) {
 		
 		z_list[i] = d3.scale.linear()
 						.domain([min,max])
-						.range(["white","red"]);
+						.range([color1,color2]);
 						
 		min_arr64[i] = min;
 		max_arr64[i] = max;
@@ -145,8 +133,8 @@ d3.text("imagecount.txt", function(imct) {
 						.domain([min_glob,max_glob])
 						.range([1,10000]);
 
-	function lineplot (d, e, i) 
-	{
+function lineplot (d, e, i) 
+{
 		d3.select("#visualisation").selectAll("g").remove();
 		d3.select("#visualisation").selectAll("path").remove();
 		
@@ -230,8 +218,76 @@ d3.text("imagecount.txt", function(imct) {
 					  .attr('stroke-width', 2)
 					  .attr('fill', 'none');
 
+}
+	
+
+	
+	var color_arr = [];
+	var color_list = d3.scale.linear()
+						.domain([min_glob,max_glob])
+						.range([color1,color2]);
+	
+	var ictr = 0;
+	for (var i =min_glob; i<max_glob; i+=5000){
+	
+	
+		color_arr[ictr++] = color_list(i);
+	
+	
+	
 	}
-						
+	
+
+	
+
+	var svg = d3.select("#bubblediv").append("svg")
+		.attr("width", 850)
+		.attr("height", 850)
+		.style("background-image","url(unnamed.PNG)")
+		.append("g").attr("transform", 
+								"translate(" + margin.left + "," + margin.top + ")");
+		
+	
+	var gadgets = d3.select("#gadgets");
+	
+	
+	var tooltip = d3.select("body").append("div")	
+				.attr("class", "tooltip")				
+				.style("opacity", 0);
+	
+	
+
+	var color_bar = d3.select("#gadgets").append("svg").attr("width", 100)
+														.attr("height", 250)
+														.style("float","left")
+														.selectAll("rect")
+														.data(color_arr)
+														.enter()
+														.append("rect")
+														.attr("x",function(d,i){
+														
+														
+														return 10;
+														
+														})
+														.attr("y",function(d,i){
+														
+														return i*10;
+														
+														})
+														.attr("width", 10)
+														.attr("height",10)
+														.attr("fill",function(d,i){		
+															return color_arr[i];
+
+														});
+													
+
+	
+	
+	var pic_img = gadgets.append("div").html("<h2>Image Shown</h2></br><img width='500px' height='300px' src='img/"+imagecount[0]+".jpg'/>");
+													
+	
 	var circles = svg.selectAll("circle")
 					.data(json_frames)
 					.enter()
@@ -321,7 +377,7 @@ d3.text("imagecount.txt", function(imct) {
 	});
 
 
-	var makeCallback = function() {
+var makeCallback = function() {
 
 		return function() {
 		
@@ -330,8 +386,8 @@ d3.text("imagecount.txt", function(imct) {
 				if(counter>1960){
 				
 					var vv = parseInt(rang.value) ;
-					var im1 = "</br><img width='500px' height='300px' src='img/"+ imagecount[vv]+  ".jpg'/>";
-					gadgets.html(im1);
+					var im1 = "<h2>Image Shown</h2></br><img width='500px' height='300px' src='img/"+ imagecount[vv]+  ".jpg'/>";
+					pic_img.html(im1);
 					d3.selectAll("#input_label").html(rang.value);
 				
 					rang.value = parseInt(rang.value) + dx;
@@ -384,8 +440,7 @@ d3.text("imagecount.txt", function(imct) {
 		}
 	};
   
-	d3.selectAll("#range_input")
-		.on("input", function(d,i){
+d3.selectAll("#range_input").on("input", function(d,i){
 
 					threshold_filter = this.value;	
 					
@@ -393,10 +448,10 @@ d3.text("imagecount.txt", function(imct) {
 						.html(this.value);
 						
 					var vv = parseInt(rang.value);
-					var im1 = "</br><img width='500px' height='300px' src='img/"+ imagecount[vv]+  ".jpg'/>";
+					var im1 = "<h2>Image Shown</h2></br><img width='500px' height='300px' src='img/"+ imagecount[vv]+  ".jpg'/>";
 					frame = vv;
 					//console.log("hi");
-					gadgets.html(im1).transition();
+					pic_img.html(im1).transition();
 					
 					var cols = []
 					for(var i=0; i<64; i++){
@@ -433,6 +488,7 @@ d3.text("imagecount.txt", function(imct) {
 	
 	
 })
+
 });
 });
 </script>
