@@ -35,7 +35,7 @@ pointer-events: none;
 <br/>
 <br/>
 Timeline <input type="range" style="width:800px" min="1" max="139" value=1 id="range_input" />
-<label for="male" id="input_label">1</label>s
+<label for="male" id="input_label">1</label>th image in the experiment
 </br>
 <button type="button"  id="start_button">Start</button>
 <button type="button"  id="stop_button">Stop</button>
@@ -45,8 +45,8 @@ Timeline <input type="range" style="width:800px" min="1" max="139" value=1 id="r
 
 <div id="gadgets">
 <div id = "color_bar"><h2>Color bar</h2> </div>
-<div id = "image_section"><h2>Image number: </h2></h1><label id="image_number_id">1</label></h1></div>
-<div id = "line_plot_section"><h2>Node lot for node </h2><h1><label id="node_plot_id">1</label></h1></div>
+<div id = "image_section"><h2>Image number: <label style="color:red" id="image_number_id">1</label></h2></div>
+<div id = "line_plot_section"><h2>Node lot for node <label  style="color:red" id="node_plot_id">1</label></h2></div>
 
 </div>
 
@@ -196,24 +196,34 @@ function lineplot (d, e, i)
 				    })]),
 				    xAxis = d3.svg.axis()
 				      .scale(xRange)
-				      .tickSize(5)
+				      .tickSize(2)
 				      .tickSubdivide(true),
 				    yAxis = d3.svg.axis()
 				      .scale(yRange)
-				      .tickSize(5)
+				      .tickSize(2)
 				      .orient('left')
 				      .tickSubdivide(true);
 				 
 				vis.append('svg:g')
 				  .attr('class', 'x axis')
+				 
 				  .attr('transform', 'translate(0,' + (HEIGHT - MARGINS.bottom) + ')')
-				  .call(xAxis);
+				  .call(xAxis) .append("text").attr("text-anchor", "end")
+											.attr("y", -10)
+											.attr("x", 300)
+											.attr("dy", ".75em")
+											.text("nth picture shown");
 				 
 				vis.append('svg:g')
 				  .attr('class', 'y axis')
 				  .attr('transform', 'translate(' + (MARGINS.left) + ',0)')
-				  .call(yAxis);
-
+				  .call(yAxis).append("text").attr("text-anchor", "end")
+							.attr("y", -40)
+							.attr("x",-80)
+							.attr("dy", ".60em")
+							.attr("transform", "rotate(-90)")
+							.text("Value (eV)");
+							
 
 				var lineFunc = d3.svg.line()
 									  .x(function(d) {
@@ -229,7 +239,8 @@ function lineplot (d, e, i)
 					  .attr('stroke', 'blue')
 					  .attr('stroke-width', 2)
 					  .attr('fill', 'none');
-
+					  
+					  	
 }
 	
 
@@ -380,7 +391,7 @@ var circles = svg.selectAll("circle")
 	//plot 0th node by default
 	lineplot(json_frames[0], 0, 0);
 					
-					
+			
 					
 					
 	
