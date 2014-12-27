@@ -231,12 +231,12 @@ function lineplot (d, e, i)
 
 				var lineFunc = d3.svg.line()
 									  .x(function(d) {
-									  console.log(d.x);
+									  //console.log(d.x);
 									    return xRange(d.x);
 										
 									  })
 									  .y(function(d) {
-									  console.log(d.y);
+									  //console.log(d.y);
 									    return yRange(d.y);
 									  })
 									  .interpolate('linear');
@@ -403,7 +403,8 @@ var circles = svg.selectAll("circle")
 				
 						//this needs to be filled up by raj
 							
-						//console.log(d,e,i);
+						console.log(d,e,i);
+
 						lineplot(d, e, i);
 						d3.select("#node_plot_id").html(e+1);
 						
@@ -427,10 +428,10 @@ var circles = svg.selectAll("circle")
 
 					
 	//plot 0th node by default
-	lineplot(json_frames[0], 0, 0);
+	lineplot(json_frames[frame], 0, 0);
 			//lineplot(json_frames[1],1,1);		
 			
-	d3.select("#node_circle_"+selected_node).attr("stroke","black")
+	d3.select("#node_circle_"+frame).attr("stroke","black")
 					.attr("stroke-width",6);
 	
 					
@@ -452,9 +453,9 @@ d3.selectAll("#speed_input").on("input", function(d,i){
 
 var val = this.value;
 
-console.log(val);
+//console.log(val);
 
-console.log(interval2);
+//console.log(interval2);
 interval2 = val;
 
 	
@@ -522,7 +523,7 @@ var makeCallback = function() {
 			
 			//interval2 = d3.selectAll("#speed_input")[0][0].value;
 			
-			console.log(interval2);
+			//console.log(interval2);
 			counter =  counter+interval2;
 
 			return true;
@@ -556,7 +557,7 @@ d3.selectAll("#range_input").on("input", function(d,i){
 					//d3.select("#node_plot_id").html(imagecount[vv]);
 					
 					
-					lineplot(json_frames[ctr2], 0, 0);
+					lineplot(json_frames[selected_node], selected_node, 0);
 					
 					circles.attr("fill",function(d,i){
 					
