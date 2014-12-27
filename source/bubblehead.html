@@ -31,20 +31,24 @@ pointer-events: none;
 </style>
 <body>
 <h2>Time Line</h2>
-<h4>click play to play the experiment(30fps) or click anywhere on timeline to fastforward</h4>
+<h4>Click play to play the experiment at 30fps or click anywhere on timeline to fastforward</h4>
 <br/>
 <br/>
-Timeline <input type="range" style="width:800px" min="1" max="139" value=1 id="range_input" />
+Image timeline <input type="range" style="width:800px" min="1" max="139" value=1 id="range_input" />
 <label for="male" id="input_label">1</label>th image in the experiment
 </br>
 <button type="button"  id="start_button">Start</button>
 <button type="button"  id="stop_button">Stop</button>
+Simulation speed: <input type="range" style="width:100px" min="34" max="500" value=34 id="speed_input" />
+
 </br>
+<div id = "color_bar"><h2>Color bar</h2></div>
 <div id="bubblediv" style="float:left"></div>
 
 
 <div id="gadgets">
-<div id = "color_bar"><h2>Color bar</h2><h4>(intensity represents strength of signal)</h4> </div>
+
+
 <div id = "image_section"><h2>Image number: <label style="color:red" id="image_number_id">1</label></h2></div>
 <div id = "line_plot_section"><h2>Node plot for node <label  style="color:red" id="node_plot_id">1</label></h2></div>
 
@@ -65,8 +69,8 @@ d3.text("imagecount.txt", function(imct) {
 	var imagecount = d3.csv.parseRows(imct);
 	
 	 // 33 milleseconds * 60 = 1980 miliseconds < 2000 : in other words display 60 images in 33 milisecond intervals, which adds up to almost 2 seconds total
-	var interval = 33; //callback interval update every 33 miliseconds
-	var interval2 =40; //this is how often callback gets executed
+	var interval = 60; //callback interval update every 33 miliseconds
+	var interval2 =34; //this is how often callback gets executed
 	var counter = 0; //counts frames
 	var dx = 0; //change for times 0=stop 1=start
 	var frame = 0; //current picture displayed
@@ -173,7 +177,7 @@ function lineplot (d, e, i)
 			lineData.push({ x: x[q], y: y[q]});
 		}
 
-		console.log(lineData);
+		//console.log(lineData);
 
 		var vis = d3.select('body').select("#visualisation"),
 				    WIDTH = 500,
@@ -305,8 +309,11 @@ function lineplot (d, e, i)
 														});
 													
 
-	
-	
+	d3.select('#color_bar').select('svg').append('text')
+							.attr("x",10).attr("y", 240).text("Max Signal")
+							
+	d3.select('#color_bar').select('svg').append('text')
+							.attr("x",10).attr("y", 10).text("Min Signal")
 	var pic_img = d3.select("#image_section").append("div").html("</br><img width='500px' height='300px' src='img/"+imagecount[0]+".jpg'/>");
 													
 	
@@ -409,7 +416,18 @@ var circles = svg.selectAll("circle")
 			
 	});
 
+d3.selectAll("#speed_input").on("input", function(d,i){
 
+var val = this.value;
+
+console.log(val);
+
+console.log(interval2);
+interval2 = val;
+
+	
+
+});
 var makeCallback = function() {
 
 		return function() {
@@ -449,7 +467,7 @@ var makeCallback = function() {
 			for(var i=0; i<64; i++){
 				
 				cols[i] = json_frames[i][frame][ctr2-1];
-				console.log(cols);
+				//console.log(cols);
 				
 			}
 			
@@ -469,12 +487,16 @@ var makeCallback = function() {
 
 			cols = [];
 			
+			//interval2 = d3.selectAll("#speed_input")[0][0].value;
+			
+			console.log(interval2);
 			counter =  counter+interval2;
 
 			return true;
 		}
 	};
-  
+    
+
 d3.selectAll("#range_input").on("input", function(d,i){
 
 					threshold_filter = this.value;	
