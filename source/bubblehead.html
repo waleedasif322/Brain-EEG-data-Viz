@@ -49,7 +49,7 @@ Simulation speed: <input type="range" style="width:100px" min="34" max="500" val
 <div id="gadgets">
 
 
-<div id = "image_section"><h2>Image number: <label style="color:red" id="image_number_id">1</label></h2></div>
+<div id = "image_section"><h2>Image number: <label style="color:red" id="image_number_id">11</label></h2></div>
 <div id = "line_plot_section"><h2>Node plot for node <label  style="color:red" id="node_plot_id">1</label></h2></div>
 
 </div>
@@ -430,7 +430,8 @@ var circles = svg.selectAll("circle")
 	//plot 0th node by default
 	lineplot(json_frames[frame], 0, 0);
 			//lineplot(json_frames[1],1,1);		
-			
+	
+	d3.select("#image_number_id").text(imagecount[frame]);	
 	d3.select("#node_circle_"+frame).attr("stroke","black")
 					.attr("stroke-width",6);
 	
@@ -470,17 +471,17 @@ var makeCallback = function() {
 			
 				if(counter>1960){
 				
-					var vv = parseInt(rang.value) ;
+					var vv = parseInt(rang.value);
 					var im1 = "<img width='500px' height='300px' src='img/"+ imagecount[vv]+  ".jpg'/>";
 					pic_img.html(im1);
-					d3.selectAll("#input_label").html(rang.value);
+					d3.selectAll("#input_label").html(vv);
 					
 					d3.select("#image_number_id").text(imagecount[vv]);
 					
 					rang.value = parseInt(rang.value) + dx;
 					
 					counter=0;
-					frame = rang.value;
+					frame = vv;
 					ctr2 = 0;
 				}
 				
@@ -504,7 +505,7 @@ var makeCallback = function() {
 				//console.log(cols);
 				
 			}
-			
+			lineplot(json_frames[selected_node], selected_node, 0);
 			circles.attr("fill",function(d,i){
 			
 				return z_list[i](cols[i]);	
@@ -538,7 +539,7 @@ d3.selectAll("#range_input").on("input", function(d,i){
 					d3.selectAll("#input_label")
 						.html(this.value);
 						
-					var vv = parseInt(rang.value);
+					var vv = parseInt(rang.value) -1;
 					var im1 = "<img width='500px' height='300px' src='img/"+ imagecount[vv]+  ".jpg'/>";
 					frame = vv;
 					//console.log("hi");
