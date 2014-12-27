@@ -52,7 +52,7 @@ pointer-events: none;
 
 
 <h1>MENU</h1>
-<h3>Generate one of the visualizations for the selected images after adjusting the parameters</h3><label color="red" id="error_msg"></label>
+<h3>Generate one of the visualizations for the selected images after adjusting the parameters</h3>
 <div style="float:left" >
 <table >
 <tr>
@@ -250,8 +250,9 @@ d3.selectAll("#range_input_scale").on("input", function(d,i){
 			
 			border_width = val;
 				
-				
-			//scale bubbles
+			//d3.selectAll(svgs[0]).each().remove();
+	
+			
 			d3.selectAll("svg")
 			.attr("height",newheight)
 			.attr("width",newwidth)
@@ -271,10 +272,6 @@ d3.selectAll("#range_input_scale").on("input", function(d,i){
 							return bub_size_scale*bub_scale*val2;
 								
 								}).attr("stroke-width",border_width);
-								
-			//scale pictures
-			d3.selectAll('.bub_pics').attr("width",250*bub_scale).attr("height",120*bub_scale)		
-				
 
 		
 });	
@@ -326,12 +323,8 @@ var btn_click = d3.select("#generate_bubbles").on("click", function(){
 
 
 
-		console.log(t_len);
-			if(t_len==0){
-	
-	d3.select("#error_msg").html("<span style='color:red'>ERROR: No images selected. Select images by clicking on them.<span>")
-	}else{
-	d3.select("#error_msg").html("");
+		//console.log(t_len);
+		
 		for(var k = 0; k<t_len; k++){
 		
 			svgs[k]  = draw_bubbleheadr(k);
@@ -344,7 +337,7 @@ var btn_click = d3.select("#generate_bubbles").on("click", function(){
 	t_list=[];
 	t_len=0;
 	document.getElementById("range_input_scale").disabled = false;
-	}
+	
 });
 
 function groupTicks(d) {
@@ -361,7 +354,7 @@ function groupTicks(d) {
 function fade(opacity) {
 
 			  return function(g, i) {
-				d3.selectAll("svg").selectAll(".chord path")
+				svg.selectAll(".chord path")
 					.filter(function(d) { return d.source.index != i && d.target.index != i; })
 				  .transition()
 					.style("opacity", opacity);
@@ -391,17 +384,11 @@ function draw_chord(){
 						|| corr_diff[t_list[i]][t_list[j]] > threshold_filter2){
 						
 						val = 0;		
-						
+
 						
 					}
-					else{
 					
-				
-					
-					}
-					
-					new_arr[i][j] = val;
-									
+					new_arr[i][j] = val;	
 				}		
 				for(var j=i+1; j<t_len; j++){
 
@@ -412,42 +399,13 @@ function draw_chord(){
 						|| corr_diff[t_list[i]][t_list[j]] == 1
 						|| corr_diff[t_list[i]][t_list[j]] > threshold_filter2){	
 						
-						val = 0;
-											
-					}else{
-					
-					
+						val = 0;			
 					}
 					
 					new_arr[i][j] = val;//t_list[i] + "," + t_list[j];
-					
 				}
 				
 			}
-			
-			//check if not zero
-			
-			var is_zero = true;
-			for(var i =0; i<t_len; i++){
-				for(var j =0; j<t_len; j++){
-					if(new_arr[i][j] != 0){
-					
-					is_zero = false;
-					break;
-					
-					}
-			}
-			}
-			
-			
-			if(is_zero == true){
-			d3.select("#error_msg").html("<span style='color:red'>ERROR: No correlations found to match filter criteria.")
-			
-			}
-			else{
-			
-			
-			//d3.select("#error_msg").html("<span style='color:red'>ERROR: No images selected. Select images by clicking on them.<span>")
 			
 	
 			var chord = d3.layout.chord()
@@ -576,7 +534,7 @@ function draw_chord(){
 					var t2 = parseFloat(tt).toFixed(6);
 					console.log(t2);
 					div.html("Image "+ind1 +" vs "+ "Image "+ind2+ "<br/><br/>"+ 
-									"Pearson correlation: " + t2 + "</br>"
+									"correlation: " + t2 + "</br>"
 									//"color: " +   color_diff[t_list[d.source.index]][t_list[d.target.index]]+ "</br>"+
 									//"gray: "+ gray_diff[t_list[d.source.index]][t_list[d.target.index]]		
 							)	
@@ -624,7 +582,6 @@ function draw_chord(){
 				.text(function(d,i,e) { 
 				return t_list[e] + 1; });
 
-			}
 }
 
 function draw_bubbleheadr(frame){
@@ -645,7 +602,7 @@ function draw_bubbleheadr(frame){
 		var background_width = 250*bub_scale;
 		var background_height = 120*bub_scale;
 		//
-		var svg = d3.select("body").append("div").style("float","left").html("</br><img class='bub_pics' width='"+background_width+"px' height='"+background_height+"px' src='img/"+imagecount[frame]+".jpg'/>").append("svg")
+		var svg = d3.select("body").append("div").style("float","left").html("</br><img width='"+background_width+"px' height='"+background_height+"px' src='img/"+imagecount[frame]+".jpg'/>").append("svg")
 			.attr("width", width)
 			.attr("height", height)
 			.style("background-image","url(unnamed.PNG)").style("background-size", width+"px "+height+"px")
@@ -729,16 +686,8 @@ function draw_bubbleheadr(frame){
 
 var btn_click2 = d3.select("#generate_button").on("click", function(){
 
-
-
-	console.log(t_len);
-	if(t_len==0){
-	
-	d3.select("#error_msg").html("<span style='color:red'>ERROR: No images selected. Select images by clicking on them.</span>")
-	}else{
-	d3.select("#error_msg").html("");
 	draw_chord();
-	}
+	
 	//d3.selectAll("img").style("border-color","white");
 	
 	//t_list=[];
