@@ -1,6 +1,6 @@
-/source/img/*.jpg
-/images/
-/thumbs/
-*.vhdr
+/images/*.jpg
+
 *.eeg
 *.vmrk
+*.vhdr
+/.ipynb_checkpoints

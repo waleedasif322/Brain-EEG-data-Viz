@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+body {
+  font: 10px sans-serif;
+}
+
+.chord path {
+  fill-opacity: .67;
+  stroke: #000;
+  stroke-width: .5px;
+}
+
+div.tooltip {	
+    position: absolute;			
+    text-align: center;			
+    width: 150px;					
+    height: 100px;					
+    padding: 2px;				
+    font: 12px sans-serif;		
+    background: lightsteelblue;	
+    border: 0px;		
+    border-radius: 8px;			
+    pointer-events: none;			
+}
+
+</style>
+<body>
+#Images selected: <input type="text" name="fname" id="input_text" value="20">
+<button type="button"  id="generate_button">Generate diagram</button>
+<input type="range"  min="0" max="200" id="range_input" />
+more than filter: <label for="male" id="input_label">0</label>
+<input type="range"  min="0" max="200" id="range_input2" value=200 />
+less than filter: <label for="male" id="input_label2">1</label>
+</br>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="d3.js"></script>
+<script>
+
+//read file	
+d3.text('output.csv', function(error3, data3){
+			
+			
+var corr_diff = d3.csv.parseRows(data3);
+
+				
+//image comparison list by index
+var t_list= [2,20,72,11,9,111,66,77,88];
+var t_len = t_list.length;
+
+
+//everything below filter dont show
+var threshold_filter = 0;
+var threshold_filter2 = 1;
+
+d3.selectAll("#range_input").on("input", function(d,i){
+
+			threshold_filter = (this.value-100)/100;
+			
+			d3.selectAll("#input_label")
+				.html((this.value-100)/100);					
+});	
+d3.selectAll("#range_input2").on("input", function(d,i){
+
+			threshold_filter2 = (this.value-100)/100;
+			d3.selectAll("#input_label2")
+				.html((this.value-100)/100);					
+});	
+
+
+
+
+
+var btn_click = d3.selectAll("#generate_button").on("click", function(){
+			
+			var scale_vals = d3.scale.linear()
+								.domain([-1,1])
+								.range([0,10]);
+
+			//var rand = Math.floor(Math.random() * 216);
+			
+			t_len = d3.select("#input_text")[0][0].value;
+
+			//console.log(t_len);
+			
+			for(var i=0; i<t_len; i++){
+				t_list[i]=i;
+			}
+			
+			
+			
+			/*
+			//old script to take 10x10 from main matrix	
+			
+			var nr = 10;
+			var arr = [];
+			for(var x = 0; x < nr; x++){
+				arr[x] = [];    
+				for(var y = 0; y < nr; y++){ 
+				
+					arr[x][y] = corr_diff[x][y];  
+				}    
+			}
+			
+			for(var x = 0; x < nr; x++){
+				for(var y = 0; y < nr; y++){ 
+				
+					arr[x][y] = scale_vals(arr[x][y]);  
+					
+				}    
+			}	
+			for(var i = 0; i<nr; i++){		
+				for(var j=0; j<=i; j++){			
+				arr[i][j] = 0;
+			
+				}
+			}
+*/
+				
+		
+			var new_arr = [];
+			
+			//extract new matrix algorithm
+			for(var i=0; i<t_len; i++){			
+				new_arr[i] = []		
+				for(var j=0; j<=i; j++){
+				
+					var val = scale_vals(corr_diff[t_list[i]][t_list[j]]);
+					
+					//filter below thershold and above
+					if (corr_diff[t_list[i]][t_list[j]] < threshold_filter 
+						|| corr_diff[t_list[i]][t_list[j]] == 1
+						|| corr_diff[t_list[i]][t_list[j]] > threshold_filter2){
+						
+						val = 0;		
+
+						
+					}
+					
+					new_arr[i][j] = val;	
+				}		
+				for(var j=i+1; j<t_len; j++){
+
+					var val = scale_vals(corr_diff[t_list[i]][t_list[j]]);
+					
+					//filter below thereshold and above
+					if (corr_diff[t_list[i]][t_list[j]] < threshold_filter
+						|| corr_diff[t_list[i]][t_list[j]] == 1
+						|| corr_diff[t_list[i]][t_list[j]] > threshold_filter2){	
+						
+						val = 0;			
+					}
+					
+					new_arr[i][j] = val;//t_list[i] + "," + t_list[j];
+				}
+				
+			}
+			
+	
+			var chord = d3.layout.chord()
+				.padding(.05)
+				.sortSubgroups(d3.descending)
+				//.sortGroups(d3.descending)
+				.matrix(new_arr);
+
+				
+			var width = 800,
+				height = 800,
+				innerRadius = Math.min(width, height) * .41,
+				outerRadius = innerRadius * 1.1;
+
+			var fill = d3.scale.ordinal()
+				.domain(d3.range(t_len))
+				.range([
+				 "#9ACD32"
+				,"#377DB8"
+				,"#F5DEB3"
+				,"#EE82EE"
+				,"#40E0D0"
+				,"#FF6347"
+				,"#D8BFD8"
+				,"#D2B48C"
+				,"#4682B4"
+				,"#00FF7F"
+				,"#FFFAFA"
+				,"#708090"
+				,"#708090"
+				,"#6A5ACD"
+				,"#87CEEB"
+				,"#A0522D"
+				,"#FFF5EE"
+				,"#2E8B57"
+				,"#F4A460"
+				,"#FA8072"	
+				]);
+
+			var svg = d3.select("body").append("svg")
+				.attr("width", width)
+				.attr("height", height)
+				.style("float","left")
+			  .append("g")
+			  .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+			svg.append("g").selectAll("path")
+				.data(chord.groups)
+			  .enter().append("path")
+				.style("fill", function(d) { return fill(d.index); })
+				.style("stroke", function(d) { return fill(d.index); })
+				.style("float","left")
+				.attr("d", d3.svg.arc().innerRadius(innerRadius).outerRadius(outerRadius))
+				.on("mouseover", fade(.1))
+				.on("mouseout",fade(1));
+
+			var div = d3.select("body").append("div")	
+				.attr("class", "tooltip")				
+				.style("opacity", 0);
+
+			var div2 = d3.select("body").append("div")	
+				.attr("class", "pic_comparison")
+				.style("float","left")
+				.style("width","500px")
+				.style("opacity", 0);
+				
+				
+				svg.append("g")
+				.attr("class", "chord")
+				.selectAll("path")
+				.data(chord.chords)
+				.enter().append("path")
+				.attr("d", d3.svg.chord().radius(innerRadius))
+				.style("fill", function(d) { return fill(d.target.index); })
+				.on("click", function(d,e){
+				
+					var ind1 = d.source.index+1;
+					var ind2 = d.target.index+1;
+					
+					var im1 = "<img width='500px' height='300px' src='img/"+t_list[ind1] +  ".jpg'/>";
+					var im2 = "<img width='500px' height='300px' src='img/"+t_list[ind2] +  ".jpg'/>";
+					
+
+					
+					div2.transition()		
+						.duration(200)		
+						.style("opacity", .9);		
+									
+					div2.html(im1 + " " + ind1 + " vs "+ ind2 + " "+ im2
+							)	
+						.style("left", (d3.event.pageX +50) + "px")		
+						.style("top", (d3.event.pageY - 28) + "px");
+					
+					//window.open("Image "+ t_list[d.source.index] +" vs "+ "Image "+t_list[d.target.index]);
+					
+				
+				})
+				.on("mouseover", function(d,e){ 
+				
+					//fade(0.1);
+					svg.selectAll(".chord path")
+						.transition()
+						.style("opacity",.1);
+						
+					d3.select(this)
+						.transition()
+						.style("opacity", 1);				
+					
+					div.transition()		
+						.duration(200)		
+						.style("opacity", .9);		
+					
+					var ind1 = t_list[d.source.index]+1;
+					var ind2 = t_list[d.target.index]+1;
+						
+					var tt = corr_diff[t_list[d.source.index]][t_list[d.target.index]];
+					console.log(tt);
+					var t2 = parseFloat(tt).toFixed(6);
+					console.log(t2);
+					div.html("Image "+ind1 +" vs "+ "Image "+ind2+ "<br/><br/>"+ 
+									"correlation: " + t2 + "</br>"
+									//"color: " +   color_diff[t_list[d.source.index]][t_list[d.target.index]]+ "</br>"+
+									//"gray: "+ gray_diff[t_list[d.source.index]][t_list[d.target.index]]		
+							)	
+						.style("left", (d3.event.pageX) + "px")		
+						.style("top", (d3.event.pageY - 28) + "px");
+
+						
+				
+				})
+				.on("mouseout",function(){ 
+				
+					d3.selectAll(".chord")
+						.selectAll("path")
+						.style("opacity",1);
+					
+					div.transition()		
+						.duration(200).style("opacity", 0);
+				});
+	
+				
+				
+				
+			var ticks = svg.append("g").selectAll("g")
+				.data(chord.groups)
+				.enter().append("g").selectAll("g")
+				.data(groupTicks)
+				.enter().append("g")
+				.attr("transform", function(d) {
+				  return "rotate(" + (d.angle * 180 / Math.PI - 90) + ")"
+					  + "translate(" + outerRadius + ",0)";
+				});
+
+			ticks.append("line")
+				.attr("x1", 1)
+				.attr("y1", 0)
+				.attr("x2", 5)
+				.attr("y2", 0)
+				.style("stroke", "#000");
+
+			ticks.append("text")
+				.attr("x", 8)
+				.attr("dy", ".35em")
+				.attr("transform", function(d) { return d.angle > Math.PI ? "rotate(180)translate(-16)" : null; })
+				.style("text-anchor", function(d) { return d.angle > Math.PI ? "end" : null; })
+				.text(function(d,i,e) { 
+				return t_list[e] + 1; });
+
+			/*
+	*/
+					// Returns an array of tick angles and labels, given a group.
+			function groupTicks(d) {
+			  var k = (d.endAngle - d.startAngle) / d.value;
+			  return d3.range(0, d.value, 1000).map(function(v, i) {
+				return {
+				  angle: v * k + d.startAngle,
+				  label: i % 5 ? null : v / 1000 + "k"
+				};
+			  });
+			}
+
+			// Returns an event handler for fading a given chord group.
+			function fade(opacity) {
+			  return function(g, i) {
+				svg.selectAll(".chord path")
+					.filter(function(d) { return d.source.index != i && d.target.index != i; })
+				  .transition()
+					.style("opacity", opacity);
+			  };
+			}
+			
+			
+			
+	});
+	});
+
+</script>
