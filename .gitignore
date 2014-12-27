@@ -2,3 +2,5 @@
 *.vmrk
 *.vhdr
 /.ipynb_checkpoints
+
+*.git
