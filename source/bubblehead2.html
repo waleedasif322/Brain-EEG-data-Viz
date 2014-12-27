@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+body {
+  font: 10px sans-serif;
+}
+
+.chord path {
+  fill-opacity: .67;
+  stroke: #000;
+  stroke-width: .5px;
+}
+
+div.tooltip {
+position: absolute;
+text-align: center;
+width: 210px;
+height: 110px;
+padding-top: 7px;
+font-size: 16px;
+font-family: cursive;
+background: rgb(244, 247, 250);
+border-width: 2px;
+border-style: solid;
+border-color: black;
+border-radius: 10px;
+pointer-events: none;
+}
+
+</style>
+<body>
+<title>Bubble head diagram with time series</title>
+<h1><b>Welcome to Brain Visualization Project</b></h1>
+<h1>CS599.68 Data Visualization Class</h1>
+<h3>This Brain cells activity test is conducted by Dr. Timmothy Ellmore of Psychology Department. In this experiment, random abstract images were shown to the testing person. Each image will flash on the computer for a 2-3second time period. The person's job is to recognize the images shown matches with the previously shown images. This experiment is Brain data visualization illustrates Brain cells  activity on short memory test. In this experiment, the brain cells activity on 64 nodes will be shown on bubblehead diagram. The red bubbles shows the activity at peak level at that instance of time. The white bubble indicates litle/no activity on brain cell at that instance of time.</h3>
+<h2>Time Line</h2>
+<h4>click play to play the experiment(30fps) or click anywhere on timeline to fastforward</h4>
+<br/>
+<br/>
+Timeline <input type="range" style="width:800px" min="1" max="139" value=1 id="range_input" />
+<label for="male" id="input_label">1</label>s
+</br>
+<button type="button"  id="start_button">Start</button>
+<button type="button"  id="stop_button">Stop</button>
+</br><h2>Bubble head Diagram</h2>
+<div id="bubblediv" style="float:left"></div>
+<h2>Image Shown</h2>
+<div id="gadgets"></div>
+	<div class="btn-group" data-toggle="buttons">
+        <label class="btn btn-primary active" id="sline">
+        <h2><b>Plotting Node values Graph for the selected Node/nodes</b></h2>
+          <input type="radio" name="options"> view single-line-Graph
+        </label>
+        <label class="btn btn-primary" id="mline">
+          <input type="radio" name="options"> view multi-line-Graphs
+        </label>
+        <label class="btn btn-primary" id="sbar">
+          <input type="radio" name="options"> view single-bar-Graph
+        </label>
+        <label class="btn btn-primary" id="mbar">
+          <input type="radio" name="options"> view multi-bar-Graphs
+        </label>
+    </div>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="d3.js"></script>
+<script src="jquery.js"></script>
+<script src="bootstrap.js"></script>
+<script src="chart.js"></script>
+<script>
+//read file
+d3.text('30fps_data.txt', function(error3, data1){
+d3.text("positions.txt", function(dataa) {
+d3.text("imagecount.txt", function(imct) {
+
+
+
+	var json_frames = JSON.parse(data1);
+	var positions = d3.csv.parseRows(dataa);
+	var imagecount = d3.csv.parseRows(imct);
+
+	 // 33 milleseconds * 60 = 1980 miliseconds < 2000 : in other words display 60 images in 33 milisecond intervals, which adds up to almost 2 seconds total
+	var interval = 33; //callback interval update every 33 miliseconds
+	var interval2 =40; //this is how often callback gets executed
+	var counter = 0; //counts frames
+	var dx = 0; //change for times 0=stop 1=start
+	var frame = 0; //current picture displayed
+	var ctr2 = 0; //counter for each frame; for color change inbetween images 30fps depends on intervals
+	var z_list = [] //this is array of color scales for nodes
+	var min_glob = []; //this is global min value for all nodes at all times
+	var max_glob = []; //this is global max value for all nodes at all times
+	var PI = 3.141592653;//pi value
+	var border_width = 1;//border with =1
+
+	var	min_arr64 = [];//min_array for all node
+	var	max_arr64 = [];
+	var bub_scale = 2;
+
+	var body = d3.selectAll("body").append("div");
+
+
+	var gadgets = d3.select("#gadgets");
+
+	var rang = d3.selectAll("#range_input")[0][0];
+
+	gadgets.html("<img width='500px' height='300px' src='img/"+imagecount[0]+".jpg'/>");
+	var margin = {top: -55, right: 0, bottom: 0, left: -30},
+    width = 1000 - margin.left - margin.right,
+    height = 1000 - margin.top - margin.bottom;
+
+
+
+	var svg = d3.select("#bubblediv").append("svg")
+		.attr("width", 850)
+		.attr("height", 850)
+		.style("background-image","url(unnamed.png)")
+		.append("g").attr("transform",
+								"translate(" + margin.left + "," + margin.top + ")");
+
+
+	var tooltip = d3.select("body").append("div")
+				.attr("class", "tooltip")
+				.style("opacity", 0);
+
+
+	//this is for initial colors for frame 0
+	var colors = []
+	for(var i=0; i<64; i++){
+
+			colors[i] = json_frames[i][frame][30];
+
+	}
+
+
+	//find max and min for each channel and create a color scale for each
+	for(var i =0; i<64; i++){
+
+		var min_val =[];
+		var max_val = [];
+
+		for(var j = 0; j<140; j++){
+			var min1 = d3.min(json_frames[i][j]);
+			var max1 = d3.max(json_frames[i][j]);
+			min_val[j] =  min1;
+			max_val[j] = max1;
+		}
+		var min = Math.ceil(d3.min(min_val));
+		var max = Math.ceil(d3.max(max_val));
+
+		z_list[i] = d3.scale.linear()
+						.domain([min,max])
+						.range(["white","red"]);
+
+		min_arr64[i] = min;
+		max_arr64[i] = max;
+
+		min_glob[i] = min;
+		max_glob[i] = max;
+
+	}
+
+	min_glob = Math.ceil(d3.min(min_glob));
+	max_glob = Math.ceil(d3.max(max_glob));
+;
+
+	var size_scale = d3.scale.linear()
+						.domain([min_glob,max_glob])
+						.range([1,10000]);
+
+	//Plotting single line graph for the selected node
+	function slineplot (d, e, i)
+	{
+		d3.select("#visualisation").selectAll("g").remove();
+		d3.select("#visualisation").selectAll("path").remove();
+
+		var y = [];
+
+		for (var k = 0; k < d.length; k++)
+		{
+			for (var j = 0; j < d[k].length; j++)
+			{
+				if (j == 30)
+					y.push(d[k][j]);
+			}
+		}
+
+		var x = new Array(140);
+		for (var l = 0; l < x.length; l++)
+		{
+			x[l] = l;
+		}
+
+		var lineData = []
+		for (var q = 0; q < d.length; q++)
+		{
+			lineData.push({ x: x[q], y: y[q]});
+		}
+
+		console.log(lineData);
+
+		var vis = d3.select('body').select("#visualisation"),
+				    WIDTH = 500,
+				    HEIGHT = 200,
+				    MARGINS = {
+				      top: 20,
+				      right: 20,
+				      bottom: 20,
+				      left: 50
+				    },
+				    xRange = d3.scale.linear().range([MARGINS.left, WIDTH - MARGINS.right]).domain([d3.min(lineData, function(d) {
+				      return d.x;
+				    }), d3.max(lineData, function(d) {
+				      return d.x;
+				    })]),
+				    yRange = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([d3.min(lineData, function(d) {
+				      return d.y;
+				    }), d3.max(lineData, function(d) {
+				      return d.y;
+				    })]),
+				    xAxis = d3.svg.axis()
+				      .scale(xRange)
+				      .tickSize(5)
+				      .tickSubdivide(true),
+				    yAxis = d3.svg.axis()
+				      .scale(yRange)
+				      .tickSize(5)
+				      .orient('left')
+				      .tickSubdivide(true);
+
+				vis.append('svg:g')
+				  .attr('class', 'x axis')
+				  .attr('transform', 'translate(0,' + (HEIGHT - MARGINS.bottom) + ')')
+				  .call(xAxis);
+
+				vis.append('svg:g')
+				  .attr('class', 'y axis')
+				  .attr('transform', 'translate(' + (MARGINS.left) + ',0)')
+				  .call(yAxis);
+
+
+				var lineFunc = d3.svg.line()
+									  .x(function(d) {
+									    return xRange(d.x);
+									  })
+									  .y(function(d) {
+									    return yRange(d.y);
+									  })
+									  .interpolate('linear');
+
+				vis.append('svg:path')
+					  .attr('d', lineFunc(lineData))
+					  .attr('stroke', 'blue')
+					  .attr('stroke-width', 2)
+					  .attr('fill', 'none');
+
+				vis.append("text")
+				.attr('class', 'x label')
+				.attr('text-anchor', 'center')
+				.attr('x', width)
+				.attr('y', height - 2)
+				.text(function(d) {return d;});
+
+				vis.append("text")
+				.attr('class', 'y label')
+				.attr('text-anchor', 'center')
+				.attr('y', 200)
+				.attr('dy', '.75e')
+				.attr('transform', 'rotate(-90)')
+				.text('Correlation values ');
+
+				tooltip.html("Node: "+ e1 + "<br/>Value now: <b>"+ d[frame][ctr2].toFixed(2)
+									+"</b> eV<br/>Max val:<b> "+max_arr64[e1-1]+" </b>eV<br/>Min val:<b> "+min_arr64[e1-1]+"</b> eV<br/><span style='font-size:12px'>click to show plot</span>"
+								)
+							.style("left", (d3.event.pageX) + "px")
+							.style("top", (d3.event.pageY - 28) + "px");
+
+
+	}
+
+				//Plotting single line graph for the selected node
+	function mlineplot (d, e, i)
+	{
+		d3.select("#visualisation").selectAll("g").append("g");
+		d3.select("#visualisation").selectAll("path").append("path");
+
+		var y = [];
+
+		for (var k = 0; k < d.length; k++)
+		{
+			for (var j = 0; j < d[k].length; j++)
+			{
+				if (j == 30)
+					y.push(d[k][j]);
+			}
+		}
+
+		var x = new Array(140);
+		for (var l = 0; l < x.length; l++)
+		{
+			x[l] = l;
+		}
+
+		var lineData = []
+		for (var q = 0; q < d.length; q++)
+		{
+			lineData.push({ x: x[q], y: y[q]});
+		}
+
+		console.log(lineData);
+
+		var vis = d3.select('body').select("#visualisation"),
+				    WIDTH = 500,
+				    HEIGHT = 200,
+				    MARGINS = {
+				      top: 20,
+				      right: 20,
+				      bottom: 20,
+				      left: 50
+				    },
+				    xRange = d3.scale.linear().range([MARGINS.left, WIDTH - MARGINS.right]).domain([d3.min(lineData, function(d) {
+				      return d.x;
+				    }), d3.max(lineData, function(d) {
+				      return d.x;
+				    })]),
+				    yRange = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([d3.min(lineData, function(d) {
+				      return d.y;
+				    }), d3.max(lineData, function(d) {
+				      return d.y;
+				    })]),
+				    xAxis = d3.svg.axis()
+				      .scale(xRange)
+				      .tickSize(5)
+				      .tickSubdivide(true),
+				    yAxis = d3.svg.axis()
+				      .scale(yRange)
+				      .tickSize(5)
+				      .orient('left')
+				      .tickSubdivide(true);
+
+				vis.append('svg:g')
+				  .attr('class', 'x axis')
+				  .attr('transform', 'translate(0,' + (HEIGHT - MARGINS.bottom) + ')')
+				  .call(xAxis);
+
+				vis.append('svg:g')
+				  .attr('class', 'y axis')
+				  .attr('transform', 'translate(' + (MARGINS.left) + ',0)')
+				  .call(yAxis)
+				  .append('svg:text')
+				  .attr('transform', 'rotate(-90)')
+				  .attr('y', 6)
+				  .attr('dy', '.71em')
+				  .style('Correlation');
+
+
+				var lineFunc = d3.svg.line()
+									  .x(function(d) {
+									    return xRange(d.x);
+									  })
+									  .y(function(d) {
+									    return yRange(d.y);
+									  })
+									  .interpolate('linear');
+
+				vis.append('svg:path')
+					  .attr('d', lineFunc(lineData))
+					  .attr('stroke', function(d) { return color(d.name);})
+					  .attr('stroke-width', 2)
+					  .attr('fill', 'none');
+
+				vis.append('svg:text')
+				.datum(function(d) { return {name: d.name, value: d.values[d.values.length -1]}})
+				.attr('transform', function(d) { return 'translate('+ x(d.value.i) + y(d.value.e) +')';})
+				.attr('x', 64)
+				.attr('y', height - 2)
+				.attr('dy', '.35em')
+				.text(function(d) {return d.name;});
+			}
+
+				//Plotting single line graph for the selected node
+	function mbarplot (d, e, i)
+	{
+		d3.select("#visualisation").selectAll("g").append("g");
+		d3.select("#visualisation").selectAll("path").append("path");
+
+		var y = [];
+
+		for (var k = 0; k < d.length; k++)
+		{
+			for (var j = 0; j < d[k].length; j++)
+			{
+				if (j == 30)
+					y.push(d[k][j]);
+			}
+		}
+
+		var x = new Array(140);
+		for (var l = 0; l < x.length; l++)
+		{
+			x[l] = l;
+		}
+
+		var lineData = []
+		for (var q = 0; q < d.length; q++)
+		{
+			lineData.push({ x: x[q], y: y[q]});
+		}
+
+		console.log(lineData);
+
+		var vis = d3.select('body').select("#visualisation"),
+				    WIDTH = 500,
+				    HEIGHT = 200,
+				    MARGINS = {
+				      top: 20,
+				      right: 20,
+				      bottom: 20,
+				      left: 50
+				    },
+				    xRange = d3.scale.linear().range([MARGINS.left, WIDTH - MARGINS.right]).domain([d3.min(lineData, function(d) {
+				      return d.x;
+				    }), d3.max(lineData, function(d) {
+				      return d.x;
+				    })]),
+				    yRange = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([d3.min(lineData, function(d) {
+				      return d.y;
+				    }), d3.max(lineData, function(d) {
+				      return d.y;
+				    })]),
+				    xAxis = d3.svg.axis()
+				      .scale(xRange)
+				      .tickSize(5)
+				      .tickSubdivide(true),
+				    yAxis = d3.svg.axis()
+				      .scale(yRange)
+				      .tickSize(5)
+				      .orient('left')
+				      .tickSubdivide(true);
+
+				vis.append('svg:g')
+				  .attr('class', 'x axis')
+				  .attr('transform', 'translate(0,' + (HEIGHT - MARGINS.bottom) + ')')
+				  .call(xAxis);
+
+				vis.append('svg:g')
+				  .attr('class', 'y axis')
+				  .attr('transform', 'translate(' + (MARGINS.left) + ',0)')
+				  .call(yAxis);
+
+
+				var lineFunc = d3.svg.line()
+									  .x(function(d) {
+									    return xRange(d.x);
+									  })
+									  .y(function(d) {
+									    return yRange(d.y);
+									  })
+									  .interpolate('linear');
+
+				vis.append('svg:path')
+					  .attr('d', lineFunc(lineData))
+					  .attr('stroke', 'blue')
+					  .attr('stroke-width', 2)
+					  .attr('fill', 'none');
+
+				vis.append("text")
+				.attr('class', 'x label')
+				.attr('text-anchor', 'center')
+				.attr('x', width)
+				.attr('y', height - 2)
+				.text(function(d) {return d;});
+
+				vis.append("text")
+				.attr('class', 'y label')
+				.attr('text-anchor', 'center')
+				.attr('y', 200)
+				.attr('dy', '.75e')
+				.attr('transform', 'rotate(-90)')
+				.text('Correlation values ');
+	}
+
+	var circles = svg.selectAll("circle")
+					.data(json_frames)
+					.enter()
+					.append("circle")
+					//we are avoiding node 63 and 64 for the
+					.attr("r",function (d,i){
+
+						if(i == 63 || i == 62){
+							return 0;
+						}
+
+						//console.log(i.toString() + d[frame][ctr2]/200);
+						//return d[frame][ctr2]/200;
+						var val  = Math.sqrt(size_scale((d[frame][ctr2]))/PI);
+						return  bub_scale*val;
+
+					})
+					.attr("cx",function(d,i){ return positions[i*2];})
+					.attr("cy",function(d,i){ return positions[i*2+1];})
+					.attr("fill",function(d,i){
+
+
+					return z_list[i](colors[i]);
+
+
+					})
+					.style("opacity", 0.9)
+					.on("mouseover", function(d,e,i){
+
+
+						d3.select(this)
+							.transition()
+							.style("opacity", 1);
+
+						tooltip.transition()
+							.duration(200)
+							.style("opacity", .9);
+
+
+						var e1 = e +1;
+
+						d3.select(this)
+								.transition()
+								.attr("stroke", "yellow");
+
+						tooltip.html("Node: "+ e1 + "<br/>Value now: <b>"+ d[frame][ctr2].toFixed(2)
+									+"</b> eV<br/>Max val:<b> "+max_arr64[e1-1]+" </b>eV<br/>Min val:<b> "+min_arr64[e1-1]+"</b> eV<br/><span style='font-size:12px'>click to show plot</span>"
+								)
+							.style("left", (d3.event.pageX) + "px")
+							.style("top", (d3.event.pageY - 28) + "px");
+
+
+
+					}).on("mouseout",function(){
+
+							d3.select(this)
+								.transition()
+								.attr("stroke", "black");
+
+							tooltip.transition()
+							.duration(200).style("opacity", 0);
+
+					}).on("click",function(d,e,i){
+							//slineplot(d,e,i);
+							mlineplot(d,e,i);
+
+						 VIZ.stackBarChart($.extend(true, [], data));
+					 	$( ".btn" ).click(function() {
+          					VIZ.clearAll();
+          					if (this.id == 'sline') {
+            					VIZ.slineplot(d,e,i);
+          					}
+          				 	else if (this.id == 'mline') {
+            					VIZ.mlineplot(d,e,i);
+          					}
+          				 	else if (this.id == 'area') {
+            					VIZ.sbarplot(d,e,i);
+          					}
+          				 	else {
+            					VIZ.mbarplot(d,e,i);
+          				}
+        				});
+
+					})
+					.attr("stroke","black").attr("stroke-width",border_width);
+
+
+
+
+	var btn_click = d3.selectAll("#start_button").on("click", function(){
+
+			dx=1;
+			d3.timer(makeCallback(),interval);
+
+	});
+
+
+	var btn_click2 = d3.selectAll("#stop_button").on("click", function(){
+
+			dx=0;
+
+	});
+
+
+	var makeCallback = function() {
+
+		return function() {
+
+			if(dx>0){
+
+				if(counter>1960){
+
+					var vv = parseInt(rang.value) ;
+					var im1 = "</br><img width='500px' height='300px' src='img/"+ imagecount[vv]+  ".jpg'/>";
+					gadgets.html(im1);
+					d3.selectAll("#input_label").html(rang.value);
+
+					rang.value = parseInt(rang.value) + dx;
+
+					counter=0;
+					frame = rang.value;
+					ctr2 = 0;
+				}
+
+				ctr2 = ctr2 + 1;
+
+				d3.timer(makeCallback(),interval);
+
+			}
+			else{
+
+				//d3.timer(makeCallback(),0);
+
+			}
+
+
+			var cols = []
+			//
+			for(var i=0; i<64; i++){
+
+				cols[i] = json_frames[i][frame][ctr2-1];
+				console.log(cols);
+
+			}
+
+			circles.attr("fill",function(d,i){
+
+				return z_list[i](cols[i]);
+
+			}).attr("r",function (d,i){
+						if(i == 63 || i == 62){
+
+							return 0;
+
+						}
+							var val  = Math.sqrt(size_scale(d[frame][ctr2])/PI);
+							return  bub_scale*val;
+					});
+
+			cols = [];
+
+			counter =  counter+interval2;
+
+			return true;
+		}
+	};
+
+	d3.selectAll("#range_input")
+		.on("input", function(d,i){
+
+					threshold_filter = this.value;
+
+					d3.selectAll("#input_label")
+						.html(this.value);
+
+					var vv = parseInt(rang.value);
+					var im1 = "</br><img width='500px' height='300px' src='img/"+ imagecount[vv]+  ".jpg'/>";
+					frame = vv;
+					//console.log("hi");
+					gadgets.html(im1).transition();
+
+					var cols = []
+					for(var i=0; i<64; i++){
+
+						cols[i] = json_frames[i][frame][30];
+
+					}
+
+
+					circles.attr("fill",function(d,i){
+
+						//console.log(frame);
+						return z_list[i](cols[i]);
+
+					}).attr("r",function (d,i){
+
+						if(i == 63 || i == 62){
+
+							return 0;
+
+						}
+						var val  = Math.sqrt(size_scale(d[frame][ctr2])/PI);
+								return bub_scale*val;
+					});
+		});
+
+	d3.selectAll("#range_input").value(1);
+})
+});
+});
+</script>
+ <label>1</label>
+	<svg id="visualisation" width="500" height="200" style="float:left" ></svg>
+
+</body><HR><author>Waleed, Matt, and Raj, December 22, 2014</author>

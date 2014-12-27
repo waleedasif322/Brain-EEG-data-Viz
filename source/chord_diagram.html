@@ -39,9 +39,7 @@ less than filter: <label for="male" id="input_label2">1</label>
 <script>
 
 //read file
-d3.text('../python-scripts/node-node-corr.csv', function(error3, data3){
-
-
+d3.text('output.csv', function(error3, data3){
 var corr_diff = d3.csv.parseRows(data3);
 
 
@@ -164,9 +162,8 @@ var btn_click = d3.selectAll("#generate_button").on("click", function(){
 				//.sortGroups(d3.descending)
 				.matrix(new_arr);
 
-
-			var width = 600,
-				height = 600,
+			var width = 800,
+				height = 800,
 				innerRadius = Math.min(width, height) * .41,
 				outerRadius = innerRadius * 1.1;
 

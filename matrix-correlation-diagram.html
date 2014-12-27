@@ -4,12 +4,8 @@
     <link rel="stylesheet" href="/libs/bootstrap/dist/css/bootstrap.min.css">
 
     <script type="text/javascript" src="/libs/jquery/dist/jquery.min.js"></script>
-    <script src="/libs/angular/angular.min.js"></script>
-    <script src="/libs/angular-bootstrap/ui-bootstrap.min.js"></script>
-    <script src="/libs/d3/d3.v3.min.js"></script>
-    <script src="/libs/angular-isotope-master/demo/scripts/vendor/jquery.isotope.min.js"></script>
-    <script src="/libs/angular-isotope-master/dist/angular-isotope.js"></script>
-    <script src="/picture-loader.js"></script>
+    <script src="/source/d3.js"></script>
+
 
     <style>
       #img1{
@@ -25,10 +21,25 @@
   </head>
   <body>
     <br>
-    <h1 style="text-align:center">Brain EEG Data Visualization Project</h1>
+    <h1 style="text-align:center">Correlation (-1 to 1) of the brain waves with regards to each image</h1>
     <div class="col-md-12">
       <p>A person was shown 140 images and asked to try and remember each image. Images were abstract landscapes, which means the person viewing the images doesn't give a name to each image.
       This allows us to see which images trigger which part of the brain, and how each part of the brain is linked with another.</p>
+      <p>
+        The correlation data was obtained through the following steps:
+        <ol>
+        <li>First read the binary file with python.</li>
+        <li>We have 64 channels of data, from the 64 nodes that were placed on the brain.</li>
+        <li>Data was read continuosly and each millisecond logged a brain wave in microvolts.</li>
+        <li>To gather correlation of the brain waves corresponding to the images, I took the average signal for each image.</li>
+        <li>Then for each image, I subtracted the average signal of that image from all the brain wave readings of that image (2000 datapoints for each image) </li>
+        <li>Then the final results I used the pearson correlation function to correlate the brain signals for every image.</li>
+        <li>We missed a step which was to filter the frequencies above 30 hz.</li>
+
+        <li>I also had to cluster the data in python for it so show nicely in the correlation matrix. I used scipy to do this.</li>
+        </ol>
+      </p>
+      <h2>Click on the graph below to display the diagram of the nodes on the head to see how strong the waves were.</h2>
     </div>
     <hr>
     <br>

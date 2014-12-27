@@ -1,8 +1,3 @@
-/images/*.jpg
-/thumbs/*.jpg
-/source/img/*.jpg
-/smallthumbs/*.jpg
-
 *.eeg
 *.vmrk
 *.vhdr
