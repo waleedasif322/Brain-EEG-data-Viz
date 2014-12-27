@@ -42,7 +42,14 @@ Timeline <input type="range" style="width:800px" min="1" max="139" value=1 id="r
 </br>
 <div id="bubblediv" style="float:left"></div>
 
-<div id="gadgets"></div>
+
+<div id="gadgets">
+<div id = "color_bar"><h2>Color bar</h2> </div>
+<div id = "image_section"><h2>Image</h2> </div>
+<div id = "line_plot_section"><h2>Node Plot</h2> </div>
+
+</div>
+
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="d3.js"></script>
 <script>
@@ -133,6 +140,10 @@ d3.text("imagecount.txt", function(imct) {
 						.domain([min_glob,max_glob])
 						.range([1,10000]);
 
+						
+						
+	d3.select('#line_plot_section').append("svg").attr("id","visualisation").attr("width",500).attr("height",200).append("g");
+						
 function lineplot (d, e, i) 
 {
 		d3.select("#visualisation").selectAll("g").remove();
@@ -148,6 +159,7 @@ function lineplot (d, e, i)
 					y.push(d[k][j]);
 			}
 		}
+		
 
 		var x = new Array(140);
 		for (var l = 0; l < x.length; l++)
@@ -257,7 +269,7 @@ function lineplot (d, e, i)
 	
 	
 
-	var color_bar = d3.select("#gadgets").append("svg").attr("width", 100)
+	var color_bar = d3.select("#color_bar").append("svg").attr("width", 100)
 														.attr("height", 250)
 														.style("float","left")
 														.selectAll("rect")
@@ -285,7 +297,7 @@ function lineplot (d, e, i)
 
 	
 	
-	var pic_img = gadgets.append("div").html("<h2>Image Shown</h2></br><img width='500px' height='300px' src='img/"+imagecount[0]+".jpg'/>");
+	var pic_img = d3.select("#image_section").html("<h2>Image Shown</h2></br><img width='500px' height='300px' src='img/"+imagecount[0]+".jpg'/>");
 													
 	
 	var circles = svg.selectAll("circle")
@@ -353,7 +365,7 @@ function lineplot (d, e, i)
 				
 						//this needs to be filled up by raj
 							
-						//console.log(d[i]);
+						console.log(d,e,i);
 						lineplot(d, e, i);
 
 					})
@@ -361,6 +373,13 @@ function lineplot (d, e, i)
 
 
 
+					
+	//plot 0th node by default
+	lineplot(json_frames[0], 0, 0);
+					
+					
+					
+					
 	
 	var btn_click = d3.selectAll("#start_button").on("click", function(){
 	
@@ -492,8 +511,9 @@ d3.selectAll("#range_input").on("input", function(d,i){
 });
 });
 </script>
-<h2>Node values plot for node</h2> <label>1</label>
-	<svg id="visualisation" width="500" height="200" style="float:left" ></svg>
+
+
+
 
 
 </body>
