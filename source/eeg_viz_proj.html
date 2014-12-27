@@ -250,9 +250,8 @@ d3.selectAll("#range_input_scale").on("input", function(d,i){
 			
 			border_width = val;
 				
-			//d3.selectAll(svgs[0]).each().remove();
-	
-			
+				
+			//scale bubbles
 			d3.selectAll("svg")
 			.attr("height",newheight)
 			.attr("width",newwidth)
@@ -272,6 +271,10 @@ d3.selectAll("#range_input_scale").on("input", function(d,i){
 							return bub_size_scale*bub_scale*val2;
 								
 								}).attr("stroke-width",border_width);
+								
+			//scale pictures
+			d3.selectAll('.bub_pics').attr("width",250*bub_scale).attr("height",120*bub_scale)		
+				
 
 		
 });	
@@ -602,7 +605,7 @@ function draw_bubbleheadr(frame){
 		var background_width = 250*bub_scale;
 		var background_height = 120*bub_scale;
 		//
-		var svg = d3.select("body").append("div").style("float","left").html("</br><img width='"+background_width+"px' height='"+background_height+"px' src='img/"+imagecount[frame]+".jpg'/>").append("svg")
+		var svg = d3.select("body").append("div").style("float","left").html("</br><img class='bub_pics' width='"+background_width+"px' height='"+background_height+"px' src='img/"+imagecount[frame]+".jpg'/>").append("svg")
 			.attr("width", width)
 			.attr("height", height)
 			.style("background-image","url(unnamed.PNG)").style("background-size", width+"px "+height+"px")
