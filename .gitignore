@@ -1,0 +1,6 @@
+/source/img/*.jpg
+/images/
+/thumbs/
+*.vhdr
+*.eeg
+*.vmrk
