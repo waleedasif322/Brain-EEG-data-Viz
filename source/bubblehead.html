@@ -305,6 +305,7 @@ d3.text("imagecount.txt", function(imct) {
 		{
 			lineData.push({ x: x[q], y: y[q]});
 		}
+		var color = d3.scale.category10();
 
 		console.log(lineData);
 
@@ -317,13 +318,17 @@ d3.text("imagecount.txt", function(imct) {
 				      bottom: 20,
 				      left: 50
 				    },
+				   
 				    xRange = d3.scale.linear().range([MARGINS.left, WIDTH - MARGINS.right]).domain([d3.min(lineData, function(d) {
 				      return d.x;
 				    }), d3.max(lineData, function(d) {
 				      return d.x;
 				    })]),
-				    yRange = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([d3.min, d3.max
-				   ]),
+				    yRange = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([d3.min(lineData, function(d) {
+				      return d.y;
+				    }), d3.max(lineData, function(d) {
+				      return d.y;
+				    })]),
 				    xAxis = d3.svg.axis()
 				      .scale(xRange)
 				      .tickSize(5)
@@ -347,7 +352,8 @@ d3.text("imagecount.txt", function(imct) {
 				  .attr('transform', 'rotate(-90)')
 				  .attr('y', 6)
 				  .attr('dy', '.71em')
-				  .style('Correlation');
+				  .style('text-anchor','center')
+				  .text('Correlation');
 
 
 				var lineFunc = d3.svg.line()
@@ -358,13 +364,14 @@ d3.text("imagecount.txt", function(imct) {
 									    return yRange(d.y);
 									  })
 									  .interpolate('linear');
-
-				vis.append('svg:path')
+					
+					vis.append('svg:path')
 					  .attr('d', lineFunc(lineData))
-					  .attr('stroke', function(d) { return 'color.d';})
+					  .attr('stroke', 'blue')
 					  .attr('stroke-width', 2)
 					  .attr('fill', 'none');
 				
+
 				vis.append('svg:text')
 				.datum(function(d) { return {name: d.name, value: d.values[d.values.length -1]}})
 				.attr('transform', function(d) { return 'translate('+ x(d.value.i) + y(d.value.e) +')';})
@@ -476,6 +483,110 @@ d3.text("imagecount.txt", function(imct) {
 				.text('Correlation values ');
 	}
 			
+		//Plotting single line graph for the selected node
+	function sbarplot (d, e, i) 
+	{
+		d3.select("#visualisation").selectAll("g").remove();
+		d3.select("#visualisation").selectAll("path").remove();
+		
+		var y = [];
+
+		for (var k = 0; k < d.length; k++)
+		{
+			for (var j = 0; j < d[k].length; j++)
+			{
+				if (j == 30)
+					y.push(d[k][j]);
+			}
+		}
+
+		var x = new Array(140);
+		for (var l = 0; l < x.length; l++)
+		{
+			x[l] = l;
+		}
+
+		var barData = []
+		for (var q = 0; q < d.length; q++)
+		{
+			barData.push({ x: x[q], y: y[q]});
+		}
+
+		console.log(barData);
+
+		var vis = d3.select('body').select("#visualisation"),
+				    WIDTH = 500,
+				    HEIGHT = 200,
+				    MARGINS = {
+				      top: 20,
+				      right: 20,
+				      bottom: 20,
+				      left: 50
+				    },
+				    xRange = d3.scale.linear().range([MARGINS.left, WIDTH - MARGINS.right]).domain([d3.min(barData, function(d) {
+				      return d.x;
+				    }), d3.max(barData, function(d) {
+				      return d.x;
+				    })]),
+				    yRange = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([d3.min(barData, function(d) {
+				      return d.y;
+				    }), d3.max(barData, function(d) {
+				      return d.y;
+				    })]),
+				    xAxis = d3.svg.axis()
+				      .scale(xRange)
+				      .tickSize(5)
+				      .tickSubdivide(true),
+				    yAxis = d3.svg.axis()
+				      .scale(yRange)
+				      .tickSize(5)
+				      .orient('left')
+				      .tickSubdivide(true);
+				 
+				vis.append('svg:g')
+				  .attr('class', 'x axis')
+				  .attr('transform', 'translate(0,' + (HEIGHT - MARGINS.bottom) + ')')
+				  .call(xAxis);
+				 
+				vis.append('svg:g')
+				  .attr('class', 'y axis')
+				  .attr('transform', 'translate(' + (MARGINS.left) + ',0)')
+				  .call(yAxis);
+
+
+				var barFunc = vis.selectAll("bar")
+      			  .data(barData)
+    			  .enter().append("rect")
+                  .style("fill", "steelblue")
+                  .attr("x", function(d) { return xRange(d.x);})
+      			  .attr("width", xRange())
+      			  .attr("y", function(d) { return yRange(d.y);})
+      			  .attr("height", function(d) { return d.y; });
+
+									
+
+				vis.append('svg:path')
+					  .attr('d', barFunc(barData))
+					  .attr('stroke', 'blue')
+					  .attr('stroke-width', 2)
+					  .attr('fill', 'none');
+				
+				vis.append("text")
+				.attr('class', 'x label')
+				.attr('text-anchor', 'center')
+				.attr('x', width)
+				.attr('y', height - 2)
+				.text(function(d) {return d;});
+
+				vis.append("text")
+				.attr('class', 'y label')
+				.attr('text-anchor', 'center')
+				.attr('y', 200)
+				.attr('dy', '.75e')
+				.attr('transform', 'rotate(-90)')
+				.text('Correlation values ');
+		
+	}
 	var circles = svg.selectAll("circle")
 					.data(json_frames)
 					.enter()
@@ -539,9 +650,9 @@ d3.text("imagecount.txt", function(imct) {
 							.duration(200).style("opacity", 0);
 							
 					}).on("click",function(d,e,i){
-							//slineplot(d,e,i);
 							mlineplot(d,e,i);
-
+							//mlineplot(d,e,i);
+								//sbarplot(d,e,i);
 						 VIZ.stackBarChart($.extend(true, [], data));
 					 	$( ".btn" ).click(function() {
           					VIZ.clearAll();
