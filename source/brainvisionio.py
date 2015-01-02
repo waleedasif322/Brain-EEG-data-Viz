@@ -65,6 +65,7 @@ class BrainVisionIO(BaseIO):
 
     def read_segment(self, lazy = False, cascade = True):
 
+
         ## Read header file (vhdr)
         header = readBrainSoup(self.filename2)
         assert header['Common Infos']['DataFormat'] == 'BINARY', NotImplementedError
