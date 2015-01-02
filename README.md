@@ -9,7 +9,7 @@ Brain EEG data readme
 3. Open [localhost:8000](http://localhost:8000)
 4. Navigate to the 3 different visualizations.
 
-# Getting Started for the first time
+# FOR MATT AND RAJ ONLY
 
 How to read data from .eeg file:
 
